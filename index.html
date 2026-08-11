@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>捲繞出勤表(S4)</title>
+    <title>捲繞出勤表 (S1-S4)</title>
     <style>
         :root {
             --bg-day: #c6e0b4;
@@ -224,14 +224,13 @@
         .form-status-btn.closed { background-color: #6c757d; }
         .form-status-btn:disabled { cursor: not-allowed; opacity: 0.85; }
 
-        /* =================== 確認按鈕 (強化灰色判斷) =================== */
+        /* =================== 確認按鈕 =================== */
         .btn-confirm {
             position: fixed;
             bottom: 25px;
             right: 25px;
             z-index: 9999;
-            display: none; /* 預設隱藏，由JS控制 */
-            
+            display: none;
             padding: 15px 25px;
             font-size: 20px;
             font-weight: bold;
@@ -252,7 +251,6 @@
         .btn-confirm:active:not(:disabled) {
             transform: scale(0.95);
         }
-        /* 強制設定 disabled 為灰色 */
         .btn-confirm:disabled {
             background-color: #a0a0a0 !important;
             box-shadow: none !important;
@@ -268,9 +266,8 @@
                 font-size: 17px;
             }
         }
-        /* ============================================================= */
 
-        /* =================== 中英雙語自定義彈窗 =================== */
+        /* =================== 自定義彈窗 =================== */
         .custom-modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -459,11 +456,21 @@
 <!-- ==== 登入視窗 ==== -->
 <div id="loginOverlay" class="login-overlay">
     <div class="login-card">
-        <h2>系統登入(捲繞S4)</h2>
+        <h2>系統登入 (捲繞 S1-S4)</h2>
+        <div class="login-field">
+            <label for="loginTeamSelect">班別</label>
+            <select id="loginTeamSelect">
+                <option value="">-- 請選擇班別 --</option>
+                <option value="S1">S1</option>
+                <option value="S2">S2</option>
+                <option value="S3">S3</option>
+                <option value="S4">S4</option>
+            </select>
+        </div>
         <div class="login-field">
             <label for="loginNameSelect">員工姓名 (帳號)</label>
             <select id="loginNameSelect">
-                <option value="">-- 請選擇姓名 --</option>
+                <option value="">-- 請先選擇班別 --</option>
             </select>
         </div>
         <div class="login-field">
@@ -471,7 +478,7 @@
             <input type="password" id="loginPasswordInput" placeholder="預設密碼：0000">
         </div>
         <button id="loginSubmitBtn" class="login-btn">登入</button>
-        <div id="loginErrorMsg" class="login-error">請選擇姓名或密碼錯誤！</div>
+        <div id="loginErrorMsg" class="login-error">請選擇班別/姓名或密碼錯誤！</div>
     </div>
 </div>
 
@@ -534,6 +541,15 @@
                 <select id="monthSelect"></select>
             </div>
             <div class="control-group">
+                <span>查看班別</span>
+                <select id="viewTeamSelect">
+                    <option value="S1">S1</option>
+                    <option value="S2">S2</option>
+                    <option value="S3">S3</option>
+                    <option value="S4">S4</option>
+                </select>
+            </div>
+            <div class="control-group">
                 <span>加班限制</span>
                 <select id="otLimitSelect">
                     <option value="">空白</option>
@@ -572,11 +588,20 @@
 <script>
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbweTf0KM7CB3GCnurQOSbHGDlApdoO0QX2yfR4MFwHZ2DvopymmQjTVG85GpZ506DRR5w/exec";
 
-    const employees = [
-        "陳喬志", "楊代億", "廖曉彤", "蔡靜儀", "賴建亦", "施榮傑",
-        "陰其德", "黃譯鋒", "楊雅婷", "羅啟倫", "埃爾默", "拉斯特",
-        "雷伊", "漢斯", "達利斯", "甘達", "特拉多", "達爾文"
-    ];
+    // 各班員工名單
+    const teams = {
+        'S1': ["方慎之","陳泰安","蔡南嘉","李珮菁","朱建穎","王泳淇","吳峻霖","黃詠綺","蘭狄","凱文","勞倫司","安東尼","明華","艾麥倫","邱立斯","拉特","羅內爾","艾佛森"],
+        'S2': ["黃正忠","張韶眞","陳宥庠","黃威翔","羅翊禎","黃文靖","蔡易良","吳奇玲","詹姆士","達力","山博","羅傑","達路","童氏蓮","羅德","達布","安吉","羅蘭多"],
+        'S3': ["陳文全","吳國隆","李茂玄","葉秀芬","王俊智","吳慧如","黃筱珊","吳明珠","蘇炫元","托弗","杰倫","艾諾","吳氏莊","納撒","格林","喬司華","喬丹","吉姆"],
+        'S4': ["陳喬志","楊代億","廖曉彤","蔡靜儀","賴建亦","施榮傑","陰其德","黃譯鋒","楊雅婷","羅啟倫","埃爾默","拉斯特","雷伊","漢斯","達利斯","甘達","特拉多","達爾文"]
+    };
+
+    const teamAdmins = {
+        'S1': '方慎之',
+        'S2': '黃正忠',
+        'S3': '陳文全',
+        'S4': '陳喬志'
+    };
 
     const weekDaysTW = ["日", "一", "二", "三", "四", "五", "六"];
 
@@ -585,6 +610,7 @@
 
     const syncStatus = document.getElementById('syncStatus');
     const loginOverlay = document.getElementById('loginOverlay');
+    const loginTeamSelect = document.getElementById('loginTeamSelect');
     const loginNameSelect = document.getElementById('loginNameSelect');
     const loginPasswordInput = document.getElementById('loginPasswordInput');
     const loginSubmitBtn = document.getElementById('loginSubmitBtn');
@@ -615,6 +641,7 @@
 
     const yearSelect = document.getElementById('yearSelect');
     const monthSelect = document.getElementById('monthSelect');
+    const viewTeamSelect = document.getElementById('viewTeamSelect');
     const otLimitSelect = document.getElementById('otLimitSelect');
     const toggleStatsBtn = document.getElementById('toggleStatsBtn');
 
@@ -625,10 +652,20 @@
     function showSync() { syncStatus.style.display = 'block'; }
     function hideSync() { syncStatus.style.display = 'none'; }
 
-    employees.forEach(emp => {
-        let opt = document.createElement('option');
-        opt.value = emp; opt.textContent = emp;
-        loginNameSelect.appendChild(opt);
+    // 當班別改變時，更新員工下拉選單
+    loginTeamSelect.addEventListener('change', function() {
+        const team = this.value;
+        loginNameSelect.innerHTML = '';
+        if (!team) {
+            loginNameSelect.innerHTML = '<option value="">-- 請先選擇班別 --</option>';
+            return;
+        }
+        const members = teams[team] || [];
+        members.forEach(emp => {
+            let opt = document.createElement('option');
+            opt.value = emp; opt.textContent = emp;
+            loginNameSelect.appendChild(opt);
+        });
     });
 
     async function fetchCloudData() {
@@ -637,6 +674,7 @@
             const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData`);
             const data = await resp.json();
             if (data) cloudData = data;
+            // 處理 dailyMarks (可能儲存在 settings 中)
             if (cloudData.settings && cloudData.settings.dailyMarks) {
                 try {
                     cloudData.dailyMarks = JSON.parse(cloudData.settings.dailyMarks);
@@ -669,24 +707,28 @@
         }
     }
 
-    async function saveDailyMarks() {
+    async function saveDailyMarks(team) {
         const serialized = JSON.stringify(cloudData.dailyMarks);
         if (!cloudData.settings) cloudData.settings = {};
         cloudData.settings.dailyMarks = serialized;
-        await postCloudData({ action: 'saveSetting', key: 'dailyMarks', value: serialized });
+        await postCloudData({ action: 'saveSetting', key: `${team.toLowerCase()}_dailyMarks`, value: serialized });
     }
 
-    function getUserPassword(empName) {
-        return (cloudData.passwords && cloudData.passwords[empName]) ? cloudData.passwords[empName] : "0000";
+    function getUserPassword(team, empName) {
+        const key = `${team.toLowerCase()}_password_${empName}`;
+        return (cloudData.passwords && cloudData.passwords[key]) ? cloudData.passwords[key] : "0000";
     }
 
-    function isFormOpen() {
-        return !(cloudData.settings && cloudData.settings['form_status'] === 'closed');
+    function isFormOpen(team) {
+        const key = `${team.toLowerCase()}_form_status`;
+        return !(cloudData.settings && cloudData.settings[key] === 'closed');
     }
 
     function updateFormStatusUI() {
+        const loginTeam = sessionStorage.getItem('s4_current_team');
         const currentUser = sessionStorage.getItem('s4_current_user');
-        const open = isFormOpen();
+        const isAdmin = (currentUser === teamAdmins[loginTeam]);
+        const open = isFormOpen(loginTeam);
         if (open) {
             formStatusBtn.textContent = '填表：開啟';
             formStatusBtn.className = 'form-status-btn open';
@@ -694,16 +736,18 @@
             formStatusBtn.textContent = '填表：關閉';
             formStatusBtn.className = 'form-status-btn closed';
         }
-        formStatusBtn.disabled = (currentUser !== "陳喬志");
+        formStatusBtn.disabled = !isAdmin;
     }
 
     formStatusBtn.addEventListener('click', function() {
+        const loginTeam = sessionStorage.getItem('s4_current_team');
         const currentUser = sessionStorage.getItem('s4_current_user');
-        if (currentUser !== "陳喬志") return;
-        const nextState = isFormOpen() ? 'closed' : 'open';
+        if (currentUser !== teamAdmins[loginTeam]) return;
+        const key = `${loginTeam.toLowerCase()}_form_status`;
+        const nextState = isFormOpen(loginTeam) ? 'closed' : 'open';
         if (!cloudData.settings) cloudData.settings = {};
-        cloudData.settings['form_status'] = nextState;
-        postCloudData({ action: 'saveSetting', key: 'form_status', value: nextState });
+        cloudData.settings[key] = nextState;
+        postCloudData({ action: 'saveSetting', key: key, value: nextState });
         updateFormStatusUI();
         renderTable();
     });
@@ -711,10 +755,12 @@
     async function checkLoginStatus() {
         await fetchCloudData();
         const currentUser = sessionStorage.getItem('s4_current_user');
-        if (currentUser) {
+        const loginTeam = sessionStorage.getItem('s4_current_team');
+        if (currentUser && loginTeam) {
             loginOverlay.style.display = 'none';
             mainApp.style.display = 'block';
-            userInfoDisplay.textContent = `👤 ${currentUser}`;
+            userInfoDisplay.textContent = `👤 ${loginTeam}-${currentUser}`;
+            viewTeamSelect.value = loginTeam; // 預設顯示自己的班
             updateFormStatusUI();
             renderTable();
         } else {
@@ -723,16 +769,21 @@
         }
     }
 
-    // 登入按鈕：驗證成功馬上顯示同步中
     loginSubmitBtn.addEventListener('click', function() {
+        const selectedTeam = loginTeamSelect.value;
         const selectedUser = loginNameSelect.value;
         const inputPwd = loginPasswordInput.value;
-        const correctPwd = getUserPassword(selectedUser);
-        if (selectedUser && inputPwd === correctPwd) {
+        if (!selectedTeam || !selectedUser) {
+            loginErrorMsg.style.display = 'block';
+            return;
+        }
+        const correctPwd = getUserPassword(selectedTeam, selectedUser);
+        if (inputPwd === correctPwd) {
             sessionStorage.setItem('s4_current_user', selectedUser);
+            sessionStorage.setItem('s4_current_team', selectedTeam);
             loginErrorMsg.style.display = 'none';
             loginPasswordInput.value = '';
-            showSync(); 
+            showSync();
             checkLoginStatus();
         } else {
             loginErrorMsg.style.display = 'block';
@@ -749,7 +800,8 @@
 
     savePwdBtn.addEventListener('click', async function() {
         const currentUser = sessionStorage.getItem('s4_current_user');
-        const correctPwd = getUserPassword(currentUser);
+        const loginTeam = sessionStorage.getItem('s4_current_team');
+        const correctPwd = getUserPassword(loginTeam, currentUser);
         const oldVal = oldPwdInput.value;
         const newVal = newPwdInput.value;
         const confirmVal = confirmPwdInput.value;
@@ -766,15 +818,19 @@
             pwdErrorMsg.style.display = "block"; return;
         }
         if(!cloudData.passwords) cloudData.passwords = {};
-        cloudData.passwords[currentUser] = newVal;
-        postCloudData({ action: 'savePassword', key: currentUser, value: newVal });
+        const key = `${loginTeam.toLowerCase()}_password_${currentUser}`;
+        cloudData.passwords[key] = newVal;
+        postCloudData({ action: 'savePassword', key: key, value: newVal });
         alert("密碼修改成功！");
         changePwdModal.style.display = 'none';
     });
 
     logoutBtn.addEventListener('click', function() {
         sessionStorage.removeItem('s4_current_user');
-        loginNameSelect.value = ""; loginPasswordInput.value = "";
+        sessionStorage.removeItem('s4_current_team');
+        loginTeamSelect.value = "";
+        loginNameSelect.innerHTML = '<option value="">-- 請先選擇班別 --</option>';
+        loginPasswordInput.value = "";
         checkLoginStatus();
     });
 
@@ -800,16 +856,28 @@
         this.textContent = document.body.classList.contains('hide-stats') ? '顯示統計' : '隱藏統計';
     });
 
+    viewTeamSelect.addEventListener('change', renderTable);
+
     otLimitSelect.addEventListener('change', function() {
+        const viewTeam = viewTeamSelect.value;
+        const loginTeam = sessionStorage.getItem('s4_current_team');
+        const currentUser = sessionStorage.getItem('s4_current_user');
+        // 只有該班管理員能修改加班限制
+        if (viewTeam !== loginTeam || currentUser !== teamAdmins[loginTeam]) {
+            this.value = (cloudData.otLimits && cloudData.otLimits[`${viewTeam.toLowerCase()}_otlimit_${yearSelect.value}_${monthSelect.value}`]) || '';
+            alert("您無權修改此班的加班限制");
+            return;
+        }
         const year = yearSelect.value;
         const month = monthSelect.value;
-        const limitKey = `${year}_${month}`;
+        const limitKey = `${viewTeam.toLowerCase()}_otlimit_${year}_${month}`;
         if (!cloudData.otLimits) cloudData.otLimits = {};
         cloudData.otLimits[limitKey] = this.value;
         postCloudData({ action: 'saveOtLimit', key: limitKey, value: this.value });
     });
 
-    function getDefaultShift(year, month, day) {
+    // ================== 輪班規則核心 ==================
+    function getBaseS4(year, month, day) {
         const shiftCycle = ['日', '夜', '夜', '日', '日', '夜', '夜', '日', '日', '夜', '夜', '日'];
         const utcEpoch = Date.UTC(2025, 11, 31);
         const utcTarget = Date.UTC(year, month - 1, day);
@@ -826,12 +894,35 @@
         return '';
     }
 
-    function calculateTotalClassStats(year, month, daysInMonth) {
+    function getTeamDefaultShift(team, year, month, day) {
+        if (team === 'S4') {
+            return getBaseS4(year, month, day);
+        } else if (team === 'S3') {
+            const base = getBaseS4(year, month, day);
+            if (base === '日') return '夜';
+            if (base === '夜') return '日';
+            return '';
+        } else if (team === 'S2') {
+            const prevDay = new Date(year, month - 1, day - 2);
+            return getBaseS4(prevDay.getFullYear(), prevDay.getMonth() + 1, prevDay.getDate());
+        } else if (team === 'S1') {
+            const prevDay = new Date(year, month - 1, day - 2);
+            const base = getBaseS4(prevDay.getFullYear(), prevDay.getMonth() + 1, prevDay.getDate());
+            if (base === '日') return '夜';
+            if (base === '夜') return '日';
+            return '';
+        }
+        return '';
+    }
+    // ==================================================
+
+    function calculateTotalClassStats(year, month, daysInMonth, team) {
         let grandTotalOt = 0, grandTotalLv = 0, grandTotalUa = 0;
-        employees.forEach(empName => {
+        const members = teams[team] || [];
+        members.forEach(empName => {
             for (let i = 1; i <= daysInMonth; i++) {
-                const shiftKey = `s4_shift_${year}_${month}_${empName}_${i}`;
-                const defaultShift = getDefaultShift(year, month, i);
+                const shiftKey = `${team.toLowerCase()}_shift_${year}_${month}_${empName}_${i}`;
+                const defaultShift = getTeamDefaultShift(team, year, month, i);
                 let val;
                 if (pendingChanges[shiftKey] !== undefined) {
                     val = pendingChanges[shiftKey];
@@ -849,13 +940,14 @@
         if (totalUaDisplay) totalUaDisplay.textContent = `加班未到: ${grandTotalUa}天`;
     }
 
-    function calculateDailyOtStats(year, month, daysInMonth) {
+    function calculateDailyOtStats(year, month, daysInMonth, team) {
         for (let i = 1; i <= daysInMonth; i++) {
-            const defaultShift = getDefaultShift(year, month, i);
+            const defaultShift = getTeamDefaultShift(team, year, month, i);
             const dailyElem = document.getElementById(`daily_ot_${year}_${month}_${i}`);
             let dailyOtCount = 0;
-            employees.forEach(empName => {
-                const shiftKey = `s4_shift_${year}_${month}_${empName}_${i}`;
+            const members = teams[team] || [];
+            members.forEach(empName => {
+                const shiftKey = `${team.toLowerCase()}_shift_${year}_${month}_${empName}_${i}`;
                 let val;
                 if (pendingChanges[shiftKey] !== undefined) {
                     val = pendingChanges[shiftKey];
@@ -873,22 +965,21 @@
         }
     }
 
-    // 更新右下角確認按鈕狀態
     function updateConfirmBtnState() {
         const currentUser = sessionStorage.getItem('s4_current_user');
-        // 陳喬志不顯示此按鈕
-        if (currentUser === "陳喬志") {
+        const loginTeam = sessionStorage.getItem('s4_current_team');
+        // 管理員不顯示確認按鈕
+        if (currentUser === teamAdmins[loginTeam]) {
             confirmBtn.style.display = 'none';
             return;
         }
-
         const count = Object.keys(pendingChanges).length;
         confirmBtn.innerHTML = `✔ Confirm / 確認儲存 (${count})`;
         if (count > 0) {
             confirmBtn.style.display = 'block';
             confirmBtn.disabled = false;
         } else {
-            confirmBtn.style.display = 'none'; // 沒資料時隱藏
+            confirmBtn.style.display = 'none';
         }
     }
 
@@ -896,7 +987,6 @@
         return new Promise((resolve) => {
             confirmModalText.textContent = message;
             confirmModal.style.display = 'flex';
-
             confirmModalYes.onclick = function() {
                 confirmModal.style.display = 'none';
                 resolve(true);
@@ -926,15 +1016,12 @@
     confirmBtn.addEventListener('click', async function() {
         const keys = Object.keys(pendingChanges);
         if (keys.length === 0) return;
-
         const confirmSave = await showConfirmModal(
             `Are you sure you want to save the ${keys.length} pending change(s)? / 確定要儲存目前 ${keys.length} 筆異動資料嗎？`
         );
         if (!confirmSave) return;
-
         showSync();
         confirmBtn.disabled = true;
-
         try {
             const promises = [];
             for (const [key, val] of Object.entries(pendingChanges)) {
@@ -946,31 +1033,28 @@
                 }));
             }
             await Promise.all(promises);
-
             for (const [key, val] of Object.entries(pendingChanges)) {
                 cloudData.shifts[key] = val;
             }
             pendingChanges = {};
-            
             document.querySelectorAll('td.pending-edit').forEach(el => {
                 el.classList.remove('pending-edit');
             });
-            
             updateConfirmBtnState();
 
+            const viewTeam = viewTeamSelect.value;
             const year = parseInt(yearSelect.value);
             const month = parseInt(monthSelect.value);
             const daysInMonth = new Date(year, month, 0).getDate();
-            employees.forEach(empName => {
+            const members = teams[viewTeam] || [];
+            members.forEach(empName => {
                 const otCellId = `ot_${year}_${month}_${empName}`;
                 const lvCellId = `lv_${year}_${month}_${empName}`;
-                calculateStats(empName, year, month, daysInMonth, otCellId, lvCellId);
+                calculateStats(empName, year, month, daysInMonth, otCellId, lvCellId, viewTeam);
             });
-            calculateTotalClassStats(year, month, daysInMonth);
-            calculateDailyOtStats(year, month, daysInMonth);
-            
+            calculateTotalClassStats(year, month, daysInMonth, viewTeam);
+            calculateDailyOtStats(year, month, daysInMonth, viewTeam);
             successModal.style.display = 'flex';
-
         } catch (err) {
             console.error("儲存異常", err);
             alert("❌ Data save failed. Please try again later. / 資料儲存失敗，請稍後再試！");
@@ -982,23 +1066,22 @@
 
     function renderTable() {
         const currentUser = sessionStorage.getItem('s4_current_user');
-        if (!currentUser) return;
+        const loginTeam = sessionStorage.getItem('s4_current_team');
+        if (!currentUser || !loginTeam) return;
 
-        // 確認當前用戶是否為管理者 (陳喬志)
-        const isAdmin = (currentUser === "陳喬志");
+        const viewTeam = viewTeamSelect.value;
+        const isAdmin = (currentUser === teamAdmins[loginTeam]);
+        const canEditTeam = isAdmin && (viewTeam === loginTeam);
+        const formOpen = isFormOpen(loginTeam);
 
-        updateFormStatusUI();
-        const formOpen = isFormOpen();
-
-        // 只有陳喬志能調配加班限制
-        otLimitSelect.disabled = !isAdmin || !formOpen;
+        // 加班限制: 只有該班管理員且目前查看的是自己班才能操作
+        const limitKey = `${viewTeam.toLowerCase()}_otlimit_${yearSelect.value}_${monthSelect.value}`;
+        otLimitSelect.value = (cloudData.otLimits && cloudData.otLimits[limitKey] !== undefined) ? cloudData.otLimits[limitKey] : '';
+        otLimitSelect.disabled = !canEditTeam || !formOpen;
 
         const year = parseInt(yearSelect.value);
         const month = parseInt(monthSelect.value);
         const daysInMonth = new Date(year, month, 0).getDate();
-
-        const limitKey = `${year}_${month}`;
-        otLimitSelect.value = (cloudData.otLimits && cloudData.otLimits[limitKey] !== undefined) ? cloudData.otLimits[limitKey] : '';
 
         const thead = document.getElementById('tableHead');
         const tbody = document.getElementById('tableBody');
@@ -1008,7 +1091,7 @@
         trMark.innerHTML = `
             <th class="col-stats stats-ot" rowspan="3"><div class="cell-content">當月<br>加班</div></th>
             <th class="col-stats stats-lv" rowspan="3"><div class="cell-content">當月<br>請假</div></th>
-            <th class="col-name"><div class="cell-content">S4</div></th>
+            <th class="col-name"><div class="cell-content">${viewTeam}</div></th>
         `;
         let trDate = document.createElement('tr');
         trDate.innerHTML = `<th class="col-name"><div class="cell-content">日期</div></th>`;
@@ -1021,7 +1104,7 @@
         const todayD = today.getDate();
 
         for (let i = 1; i <= daysInMonth; i++) {
-            const markKey = `${year}_${month}_${i}`;
+            const markKey = `${viewTeam.toLowerCase()}_mark_${year}_${month}_${i}`;
             const dateObj = new Date(year, month - 1, i);
             const dayOfWeek = dateObj.getDay();
             const isToday = (year === todayY && month === todayM && i === todayD);
@@ -1038,14 +1121,11 @@
             });
             const currentMark = cloudData.dailyMarks[markKey] || '';
             selectMark.value = currentMark;
-            // 只有陳喬志能修改備註
-            if (!isAdmin) {
-                selectMark.disabled = true;
-            }
+            selectMark.disabled = !canEditTeam; // 只有管理員可修改每日註記
             selectMark.addEventListener('change', function() {
                 const newMark = this.value;
                 cloudData.dailyMarks[markKey] = newMark;
-                saveDailyMarks(); 
+                saveDailyMarks(viewTeam);
             });
             thMark.appendChild(selectMark);
             trMark.appendChild(thMark);
@@ -1066,9 +1146,8 @@
         thead.appendChild(trDate);
         thead.appendChild(trDay);
 
-        const visibleEmployees = isAdmin
-            ? employees
-            : employees.filter(emp => emp === currentUser);
+        // 顯示目前查看班別的所有員工
+        const visibleEmployees = teams[viewTeam] || [];
 
         visibleEmployees.forEach(empName => {
             let tr = document.createElement('tr');
@@ -1080,10 +1159,14 @@
                 <td class="col-name"><div class="cell-content">${empName}</div></td>
             `;
 
+            // 決定此員工的儲存格能否編輯
+            const canEditSelf = (viewTeam === loginTeam && empName === currentUser);
+            const canEditCell = canEditTeam || (canEditSelf && formOpen);
+
             for (let i = 1; i <= daysInMonth; i++) {
                 let td = document.createElement('td');
-                const defaultShift = getDefaultShift(year, month, i);
-                const shiftKey = `s4_shift_${year}_${month}_${empName}_${i}`;
+                const defaultShift = getTeamDefaultShift(viewTeam, year, month, i);
+                const shiftKey = `${viewTeam.toLowerCase()}_shift_${year}_${month}_${empName}_${i}`;
                 const savedValue = (cloudData.shifts) ? cloudData.shifts[shiftKey] : undefined;
                 let finalValue = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
                 if (pendingChanges[shiftKey] !== undefined) {
@@ -1092,9 +1175,8 @@
 
                 let select = document.createElement('select');
                 select.className = 'shift-select';
-                if (!formOpen) {
-                    select.disabled = true;
-                }
+                select.disabled = !canEditCell;
+
                 let baseOptions = (defaultShift === '') ? ['', 'G', '未'] : [defaultShift, '特', '病', '事', '生', '颱'];
                 if (finalValue !== '' && !baseOptions.includes(finalValue)) {
                     baseOptions.push(finalValue);
@@ -1108,7 +1190,12 @@
                 });
 
                 select.addEventListener('change', function() {
-                    if (!isFormOpen()) {
+                    if (!canEditCell) {
+                        alert("您無權修改此儲存格");
+                        this.value = finalValue;
+                        return;
+                    }
+                    if (!isFormOpen(loginTeam) && canEditSelf) {
                         alert("目前填表已關閉，無法修改班表！");
                         this.value = finalValue;
                         return;
@@ -1118,10 +1205,10 @@
                     if (newVal === 'G' && defaultShift === '' && limitVal !== '') {
                         const limit = parseInt(limitVal, 10);
                         let otherOtCount = 0;
-                        employees.forEach(otherEmp => {
+                        visibleEmployees.forEach(otherEmp => {
                             if (otherEmp === empName) return;
-                            const key = `s4_shift_${year}_${month}_${otherEmp}_${i}`;
-                            const def = getDefaultShift(year, month, i);
+                            const key = `${viewTeam.toLowerCase()}_shift_${year}_${month}_${otherEmp}_${i}`;
+                            const def = getTeamDefaultShift(viewTeam, year, month, i);
                             let val;
                             if (pendingChanges[key] !== undefined) {
                                 val = pendingChanges[key];
@@ -1138,30 +1225,27 @@
                         }
                     }
 
-                    // ============ 區分權限邏輯 ============
-                    if (isAdmin) {
-                        // 陳喬志：直接即時儲存，不經過暫存區，也不顯示按鈕
+                    if (canEditTeam) {
+                        // 管理員：即時儲存
                         if (!cloudData.shifts) cloudData.shifts = {};
                         cloudData.shifts[shiftKey] = newVal;
                         postCloudData({ action: 'saveShift', key: shiftKey, value: newVal });
-
                         finalValue = newVal;
                         updateCellColor(td, newVal);
-                        calculateStats(empName, year, month, daysInMonth, otCellId, lvCellId);
-                        calculateTotalClassStats(year, month, daysInMonth);
-                        calculateDailyOtStats(year, month, daysInMonth);
+                        calculateStats(empName, year, month, daysInMonth, otCellId, lvCellId, viewTeam);
+                        calculateTotalClassStats(year, month, daysInMonth, viewTeam);
+                        calculateDailyOtStats(year, month, daysInMonth, viewTeam);
                     } else {
-                        // 一般員工：進入待儲存模式
+                        // 一般員工：進入暫存
                         pendingChanges[shiftKey] = newVal;
                         finalValue = newVal;
                         td.classList.add('pending-edit');
                         updateCellColor(td, newVal);
-                        calculateStats(empName, year, month, daysInMonth, otCellId, lvCellId);
-                        calculateTotalClassStats(year, month, daysInMonth);
-                        calculateDailyOtStats(year, month, daysInMonth);
+                        calculateStats(empName, year, month, daysInMonth, otCellId, lvCellId, viewTeam);
+                        calculateTotalClassStats(year, month, daysInMonth, viewTeam);
+                        calculateDailyOtStats(year, month, daysInMonth, viewTeam);
                         updateConfirmBtnState();
                     }
-                    // ======================================
                 });
 
                 td.appendChild(select);
@@ -1172,7 +1256,7 @@
                 tr.appendChild(td);
             }
             tbody.appendChild(tr);
-            calculateStats(empName, year, month, daysInMonth, otCellId, lvCellId);
+            calculateStats(empName, year, month, daysInMonth, otCellId, lvCellId, viewTeam);
         });
 
         let trDailyOt = document.createElement('tr');
@@ -1189,12 +1273,12 @@
         }
         tbody.appendChild(trDailyOt);
 
-        calculateTotalClassStats(year, month, daysInMonth);
-        calculateDailyOtStats(year, month, daysInMonth);
-        
-        // ============ 渲染完畢最後決定按鈕顯示 ============
-        if (isAdmin) {
-            confirmBtn.style.display = 'none'; // 陳喬志絕對看不到
+        calculateTotalClassStats(year, month, daysInMonth, viewTeam);
+        calculateDailyOtStats(year, month, daysInMonth, viewTeam);
+
+        // 確認按鈕：只有一般員工且在自己的班表才顯示
+        if (currentUser === teamAdmins[loginTeam] || viewTeam !== loginTeam) {
+            confirmBtn.style.display = 'none';
         } else {
             if (Object.keys(pendingChanges).length > 0) {
                 confirmBtn.style.display = 'block';
@@ -1204,15 +1288,14 @@
                 confirmBtn.style.display = 'none';
             }
         }
-        // =================================================
     }
 
-    function calculateStats(empName, year, month, daysInMonth, otCellId, lvCellId) {
+    function calculateStats(empName, year, month, daysInMonth, otCellId, lvCellId, team) {
         let otCount = 0;
         let lvCount = 0;
         for (let i = 1; i <= daysInMonth; i++) {
-            const shiftKey = `s4_shift_${year}_${month}_${empName}_${i}`;
-            const defaultShift = getDefaultShift(year, month, i);
+            const shiftKey = `${team.toLowerCase()}_shift_${year}_${month}_${empName}_${i}`;
+            const defaultShift = getTeamDefaultShift(team, year, month, i);
             let val;
             if (pendingChanges[shiftKey] !== undefined) {
                 val = pendingChanges[shiftKey];
