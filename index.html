@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>捲繞出勤表 (S1-S4)</title>
+    <title>捲繞出勤表 (S1-S4) 第2版</title>
     <style>
         :root {
             --bg-day: #c6e0b4;
@@ -586,7 +586,7 @@
 </div>
 
 <script>
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7grBt1pIgVEQvijRUeM_DFSCrK3NDEQ1nUed6-5ioOf3fppPDPQ6ZqHda5Q1uX6lbGQ/exec";
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbweTf0KM7CB3GCnurQOSbHGDlApdoO0QX2yfR4MFwHZ2DvopymmQjTVG85GpZ506DRR5w/exec";
 
     // 各班員工名單
     const teams = {
@@ -690,7 +690,7 @@
         }
     }
 
-    // 【重要】此版本使用 mode: 'no-cors'，不會觸發跨域錯誤彈窗
+    // 【第2版特徵】使用 mode: 'no-cors'，不會觸發跨域錯誤彈窗
     async function postCloudData(payload) {
         showSync();
         try {
