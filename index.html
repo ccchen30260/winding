@@ -674,7 +674,8 @@
             const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData`);
             const data = await resp.json();
             if (data) cloudData = data;
-            // 處理 dailyMarks (可能儲存在 settings 中)
+            
+            // 修正：從 settings 中讀取統一儲存的 dailyMarks (全域鍵值)
             if (cloudData.settings && cloudData.settings.dailyMarks) {
                 try {
                     cloudData.dailyMarks = JSON.parse(cloudData.settings.dailyMarks);
@@ -707,11 +708,12 @@
         }
     }
 
-    async function saveDailyMarks(team) {
+    // 修正：每日註記統一儲存為全域 dailyMarks 鍵，避免覆蓋
+    async function saveDailyMarks() {
         const serialized = JSON.stringify(cloudData.dailyMarks);
         if (!cloudData.settings) cloudData.settings = {};
         cloudData.settings.dailyMarks = serialized;
-        await postCloudData({ action: 'saveSetting', key: `${team.toLowerCase()}_dailyMarks`, value: serialized });
+        await postCloudData({ action: 'saveSetting', key: 'dailyMarks', value: serialized });
     }
 
     function getUserPassword(team, empName) {
@@ -862,10 +864,15 @@
         const viewTeam = viewTeamSelect.value;
         const loginTeam = sessionStorage.getItem('s4_current_team');
         const currentUser = sessionStorage.getItem('s4_current_user');
-        // 只有該班管理員能修改加班限制
+        // 只有該班管理員且填表開啟時能修改加班限制
         if (viewTeam !== loginTeam || currentUser !== teamAdmins[loginTeam]) {
             this.value = (cloudData.otLimits && cloudData.otLimits[`${viewTeam.toLowerCase()}_otlimit_${yearSelect.value}_${monthSelect.value}`]) || '';
             alert("您無權修改此班的加班限制");
+            return;
+        }
+        if (!isFormOpen(loginTeam)) {
+            alert("目前填表已關閉，無法修改加班限制！");
+            this.value = (cloudData.otLimits && cloudData.otLimits[`${viewTeam.toLowerCase()}_otlimit_${yearSelect.value}_${monthSelect.value}`]) || '';
             return;
         }
         const year = yearSelect.value;
@@ -1071,13 +1078,15 @@
 
         const viewTeam = viewTeamSelect.value;
         const isAdmin = (currentUser === teamAdmins[loginTeam]);
-        const canEditTeam = isAdmin && (viewTeam === loginTeam);
+        // 表單開啟狀態以登入班別為準
         const formOpen = isFormOpen(loginTeam);
-
-        // 加班限制: 只有該班管理員且目前查看的是自己班才能操作
+        // 可編輯班別：管理員且查看自己班，且表單開啟
+        const canEditTeam = isAdmin && (viewTeam === loginTeam) && formOpen;
+        
+        // 加班限制: 只有該班管理員且查看自己班且表單開啟才能操作
         const limitKey = `${viewTeam.toLowerCase()}_otlimit_${yearSelect.value}_${monthSelect.value}`;
         otLimitSelect.value = (cloudData.otLimits && cloudData.otLimits[limitKey] !== undefined) ? cloudData.otLimits[limitKey] : '';
-        otLimitSelect.disabled = !canEditTeam || !formOpen;
+        otLimitSelect.disabled = !canEditTeam;
 
         const year = parseInt(yearSelect.value);
         const month = parseInt(monthSelect.value);
@@ -1121,11 +1130,17 @@
             });
             const currentMark = cloudData.dailyMarks[markKey] || '';
             selectMark.value = currentMark;
-            selectMark.disabled = !canEditTeam; // 只有管理員可修改每日註記
+            // 修正：每日註記也需遵循表單開啟狀態
+            selectMark.disabled = !canEditTeam;
             selectMark.addEventListener('change', function() {
+                if (!formOpen) {
+                    alert("目前填表已關閉，無法修改註記！");
+                    this.value = currentMark;
+                    return;
+                }
                 const newMark = this.value;
                 cloudData.dailyMarks[markKey] = newMark;
-                saveDailyMarks(viewTeam);
+                saveDailyMarks(); // 修正：統一儲存
             });
             thMark.appendChild(selectMark);
             trMark.appendChild(thMark);
@@ -1161,7 +1176,8 @@
 
             // 決定此員工的儲存格能否編輯
             const canEditSelf = (viewTeam === loginTeam && empName === currentUser);
-            const canEditCell = canEditTeam || (canEditSelf && formOpen);
+            // 修正：管理員及一般員工皆須受表單開啟狀態限制
+            const canEditCell = (canEditTeam || (canEditSelf && formOpen)) && formOpen;
 
             for (let i = 1; i <= daysInMonth; i++) {
                 let td = document.createElement('td');
@@ -1195,7 +1211,7 @@
                         this.value = finalValue;
                         return;
                     }
-                    if (!isFormOpen(loginTeam) && canEditSelf) {
+                    if (!formOpen) {
                         alert("目前填表已關閉，無法修改班表！");
                         this.value = finalValue;
                         return;
