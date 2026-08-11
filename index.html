@@ -607,10 +607,9 @@
     let cloudData = { shifts: {}, passwords: {}, otLimits: {}, settings: {} };
     let pendingChanges = {};
 
-    // 當前登入資訊
     let currentUser = null;
     let currentSquad = null;
-    let currentViewSquad = null; // 目前顯示的班級
+    let currentViewSquad = null;
 
     const syncStatus = document.getElementById('syncStatus');
     const loginOverlay = document.getElementById('loginOverlay');
@@ -656,7 +655,6 @@
     function showSync() { syncStatus.style.display = 'block'; }
     function hideSync() { syncStatus.style.display = 'none'; }
 
-    // 登入班級切換時更新姓名選單
     loginSquadSelect.addEventListener('change', function() {
         const squad = this.value;
         loginNameSelect.innerHTML = '<option value="">-- 請選擇姓名 --</option>';
@@ -677,7 +675,6 @@
             const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData`);
             const data = await resp.json();
             if (data) cloudData = data;
-            // 相容舊有無前綴的 S4 設定
             if (cloudData.settings) {
                 if (cloudData.settings['form_status'] && !cloudData.settings['S4_form_status']) {
                     cloudData.settings['S4_form_status'] = cloudData.settings['form_status'];
@@ -685,7 +682,6 @@
                 if (cloudData.settings['dailyMarks'] && !cloudData.settings['S4_dailyMarks']) {
                     cloudData.settings['S4_dailyMarks'] = cloudData.settings['dailyMarks'];
                 }
-                // 解析各班 dailyMarks JSON
                 ['S1','S2','S3','S4'].forEach(sq => {
                     const key = sq + '_dailyMarks';
                     if (cloudData.settings[key]) {
@@ -742,7 +738,6 @@
         const open = isFormOpen(currentViewSquad);
         formStatusBtn.textContent = open ? '填表：開啟' : '填表：關閉';
         formStatusBtn.className = 'form-status-btn ' + (open ? 'open' : 'closed');
-        // 只有在自己班且為該班管理員時才能操作
         formStatusBtn.disabled = !(isMySquad && isManager);
     }
 
@@ -758,7 +753,6 @@
         renderTable();
     });
 
-    // S4 默認班表計算
     function getS4Default(year, month, day) {
         const shiftCycle = ['日', '夜', '夜', '日', '日', '夜', '夜', '日', '日', '夜', '夜', '日'];
         const utcEpoch = Date.UTC(2025, 11, 31);
@@ -788,7 +782,6 @@
         d.setDate(d.getDate() - 2);
         const s2Val = getS4Default(d.getFullYear(), d.getMonth()+1, d.getDate());
         if (squad === 'S2') return s2Val;
-        // S1: flip(S2)
         if (s2Val === '日') return '夜';
         if (s2Val === '夜') return '日';
         return '';
@@ -824,10 +817,17 @@
         if (!empList) return;
         for (let i = 1; i <= daysInMonth; i++) {
             const dailyElem = document.getElementById(`daily_ot_${squad}_${year}_${month}_${i}`);
+            if (!dailyElem) continue;
+            const defaultShift = getDefaultShift(squad, year, month, i);
+            // 上班日不顯示加班人數
+            if (defaultShift !== '') {
+                dailyElem.textContent = '';
+                continue;
+            }
+            // 休息日計算加班人數
             let dailyOtCount = 0;
             empList.forEach(empName => {
                 const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
-                const defaultShift = getDefaultShift(squad, year, month, i);
                 let val;
                 if (pendingChanges[shiftKey] !== undefined) {
                     val = pendingChanges[shiftKey];
@@ -837,7 +837,7 @@
                 }
                 if (val === 'G') dailyOtCount++;
             });
-            if (dailyElem) dailyElem.textContent = dailyOtCount;
+            dailyElem.textContent = dailyOtCount;
         }
     }
 
