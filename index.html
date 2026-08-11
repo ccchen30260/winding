@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>四班排班系統</title>
+    <title>捲繞排班(S1~S4)</title>
     <style>
         :root {
             --bg-day: #c6e0b4;
@@ -454,7 +454,7 @@
 <!-- 登入視窗 -->
 <div id="loginOverlay" class="login-overlay">
     <div class="login-card">
-        <h2>系統登入 (四班排班)</h2>
+        <h2>系統登入(S1~S4)</h2>
         <div class="login-field">
             <label for="loginSquadSelect">班級</label>
             <select id="loginSquadSelect">
@@ -586,12 +586,12 @@
 <script>
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzLY435Gr3k6783bG__8TM0xs04CDLztMghV3Et4LX411iGTEt3so3zYSOVZlo27qPl/exec";
 
-    // 各班員工名單
+    // 各班員工名單 (已修正姓名)
     const squadEmployees = {
         S1: ["方慎之","陳泰安","蔡南嘉","李珮菁","朱建穎","王泳淇","吳峻霖","黃詠綺","蘭狄","凱文","勞倫司","安東尼","明華","艾麥倫","邱立斯","拉特","羅內爾","艾佛森"],
         S2: ["黃正忠","張韶眞","陳宥庠","黃威翔","羅翊禎","黃文靖","蔡易良","吳奇玲","詹姆士","達力","山博","羅傑","達路","童氏蓮","羅德","達布","安吉","羅蘭多"],
         S3: ["陳文全","吳國隆","李茂玄","葉秀芬","王俊智","吳慧如","黃筱珊","吳明珠","蘇炫元","托弗","杰倫","艾諾","吳氏莊","納撒","格林","喬司華","喬丹","吉姆"],
-        S4: ["陳喬志","楊代億","廖曉彤","蔡靜儀","賴建亦","施榮傑","隂其德","黃譯鋒","楊雅婷","羅啟倫","埃爾默","拉斯特","雷伊","漢斯","達利斯","甘達","特拉多","達爾文"]
+        S4: ["陳喬志","楊代億","廖曉彤","蔡靜儀","賴建亦","施榮傑","陰其德","黃譯鋒","楊雅婷","羅啟倫","埃爾默","拉斯特","雷伊","漢斯","達利斯","甘達","特拉多","達爾文"]
     };
 
     // 各班管理員
@@ -901,7 +901,7 @@
             pendingChanges = {};
             document.querySelectorAll('td.pending-edit').forEach(el => el.classList.remove('pending-edit'));
             updateConfirmBtnState();
-            renderTable(); // 重新計算統計
+            renderTable();
             successModal.style.display = 'flex';
         } catch (err) {
             console.error("儲存異常", err);
@@ -918,19 +918,17 @@
         const isMySquad = (viewSquad === currentSquad);
         const isManagerOfView = (currentUser === squadManagers[viewSquad]);
         const isManagerOfMy = (currentUser === squadManagers[currentSquad]);
-        const readOnly = !isMySquad; // 查看其他班只能唯讀
+        const readOnly = !isMySquad;
 
         updateFormStatusUI();
         const formOpen = isFormOpen(viewSquad);
 
-        // 加班限制：只有自己班的管理員在填表開啟時可改
         otLimitSelect.disabled = !(isMySquad && isManagerOfMy && formOpen);
 
         const year = parseInt(yearSelect.value);
         const month = parseInt(monthSelect.value);
         const daysInMonth = new Date(year, month, 0).getDate();
 
-        // 載入加班限制 (兼容S4舊無前綴)
         let limitKey = `${viewSquad}_otlimit_${year}_${month}`;
         let limitVal = (cloudData.otLimits && cloudData.otLimits[limitKey] !== undefined) ? cloudData.otLimits[limitKey] : '';
         if (!limitVal && viewSquad === 'S4') {
@@ -943,7 +941,6 @@
         const tbody = document.getElementById('tableBody');
         thead.innerHTML = ''; tbody.innerHTML = '';
 
-        // 表頭：備註列
         let trMark = document.createElement('tr');
         trMark.innerHTML = `
             <th class="stats-ot" rowspan="3"><div class="cell-content">當月<br>加班</div></th>
@@ -978,7 +975,6 @@
                 selectMark.appendChild(option);
             });
             selectMark.value = dailyMarks[markKey] || '';
-            // 只有自己班的管理員才能改備註
             selectMark.disabled = !(isMySquad && isManagerOfMy);
             selectMark.addEventListener('change', function() {
                 if (!isMySquad || !isManagerOfMy) return;
@@ -1006,7 +1002,6 @@
         thead.appendChild(trDate);
         thead.appendChild(trDay);
 
-        // 決定要顯示的員工
         let visibleEmployees;
         if (isMySquad) {
             visibleEmployees = isManagerOfMy ? squadEmployees[viewSquad] : [currentUser];
@@ -1043,7 +1038,6 @@
                 }
 
                 let baseOptions = (defaultShift === '') ? ['', 'G', '未'] : [defaultShift, '特', '病', '事', '生', '颱'];
-                // 移除一般人員的 "未"
                 const isCurrentManager = (isMySquad && currentUser === squadManagers[viewSquad]);
                 if (!isCurrentManager) {
                     baseOptions = baseOptions.filter(opt => opt !== '未');
@@ -1296,7 +1290,6 @@
         postCloudData({ action: 'saveOtLimit', key: limitKey, value: this.value });
     });
 
-    // 年份、月份選單初始化
     const now = new Date();
     const currentYear = now.getFullYear();
     for (let y = currentYear - 5; y <= currentYear + 5; y++) {
