@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>捲繞出勤表 (S1-S4) 修正版</title>
+    <title>捲繞出勤表 (S1-S4)</title>
     <style>
         :root {
             --bg-day: #c6e0b4;
@@ -674,8 +674,6 @@
             const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData`);
             const data = await resp.json();
             if (data) cloudData = data;
-            
-            // 讀取統一儲存的 dailyMarks
             if (cloudData.settings && cloudData.settings.dailyMarks) {
                 try {
                     cloudData.dailyMarks = JSON.parse(cloudData.settings.dailyMarks);
@@ -692,38 +690,28 @@
         }
     }
 
-    // 【修正】移除了 mode: 'no-cors'，加入伺服器回傳的狀態檢查
+    // 【重要】此版本使用 mode: 'no-cors'，不會觸發跨域錯誤彈窗
     async function postCloudData(payload) {
         showSync();
         try {
-            const resp = await fetch(GAS_WEB_APP_URL, {
+            await fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            const result = await resp.json();
-            if (result.status !== 'success') {
-                console.error("雲端寫入失敗:", result.message);
-                alert("❌ 儲存失敗：" + (result.message || "未知錯誤"));
-                return false;
-            }
-            return true;
         } catch (err) {
-            console.error("雲端寫入異常", err);
-            alert("❌ 網路異常或伺服器錯誤，請稍後再試！");
-            return false;
+            console.error("雲端寫入失敗", err);
         } finally {
             hideSync();
         }
     }
 
-    // 【修正】每日註記統一儲存，並確保成功後才更新本地狀態
-    async function saveDailyMarks() {
+    async function saveDailyMarks(team) {
         const serialized = JSON.stringify(cloudData.dailyMarks);
         if (!cloudData.settings) cloudData.settings = {};
         cloudData.settings.dailyMarks = serialized;
-        const success = await postCloudData({ action: 'saveSetting', key: 'dailyMarks', value: serialized });
-        return success;
+        await postCloudData({ action: 'saveSetting', key: `${team.toLowerCase()}_dailyMarks`, value: serialized });
     }
 
     function getUserPassword(team, empName) {
@@ -874,15 +862,9 @@
         const viewTeam = viewTeamSelect.value;
         const loginTeam = sessionStorage.getItem('s4_current_team');
         const currentUser = sessionStorage.getItem('s4_current_user');
-        
         if (viewTeam !== loginTeam || currentUser !== teamAdmins[loginTeam]) {
             this.value = (cloudData.otLimits && cloudData.otLimits[`${viewTeam.toLowerCase()}_otlimit_${yearSelect.value}_${monthSelect.value}`]) || '';
             alert("您無權修改此班的加班限制");
-            return;
-        }
-        if (!isFormOpen(loginTeam)) {
-            alert("目前填表已關閉，無法修改加班限制！");
-            this.value = (cloudData.otLimits && cloudData.otLimits[`${viewTeam.toLowerCase()}_otlimit_${yearSelect.value}_${monthSelect.value}`]) || '';
             return;
         }
         const year = yearSelect.value;
@@ -985,7 +967,6 @@
     function updateConfirmBtnState() {
         const currentUser = sessionStorage.getItem('s4_current_user');
         const loginTeam = sessionStorage.getItem('s4_current_team');
-        // 管理員不顯示確認按鈕
         if (currentUser === teamAdmins[loginTeam]) {
             confirmBtn.style.display = 'none';
             return;
@@ -1044,13 +1025,12 @@
             for (const [key, val] of Object.entries(pendingChanges)) {
                 promises.push(fetch(GAS_WEB_APP_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'saveShift', key: key, value: val })
                 }));
             }
             await Promise.all(promises);
-            // 因為移除了 no-cors，這裡可以確認寫入成功。
-            // 前端直接同步本地狀態
             for (const [key, val] of Object.entries(pendingChanges)) {
                 cloudData.shifts[key] = val;
             }
@@ -1089,15 +1069,12 @@
 
         const viewTeam = viewTeamSelect.value;
         const isAdmin = (currentUser === teamAdmins[loginTeam]);
-        // 表單開啟狀態以登入班別為準
+        const canEditTeam = isAdmin && (viewTeam === loginTeam);
         const formOpen = isFormOpen(loginTeam);
-        // 【修正】可編輯班別的條件：必須是管理員 + 查看自己班 + 表單開啟
-        const canEditTeam = isAdmin && (viewTeam === loginTeam) && formOpen;
-        
-        // 加班限制: 只有該班管理員且查看自己班且表單開啟才能操作
+
         const limitKey = `${viewTeam.toLowerCase()}_otlimit_${yearSelect.value}_${monthSelect.value}`;
         otLimitSelect.value = (cloudData.otLimits && cloudData.otLimits[limitKey] !== undefined) ? cloudData.otLimits[limitKey] : '';
-        otLimitSelect.disabled = !canEditTeam;
+        otLimitSelect.disabled = !canEditTeam || !formOpen;
 
         const year = parseInt(yearSelect.value);
         const month = parseInt(monthSelect.value);
@@ -1141,16 +1118,11 @@
             });
             const currentMark = cloudData.dailyMarks[markKey] || '';
             selectMark.value = currentMark;
-            selectMark.disabled = !canEditTeam; // 只有管理員且表單開啟時可修改註記
+            selectMark.disabled = !canEditTeam;
             selectMark.addEventListener('change', function() {
-                if (!formOpen) {
-                    alert("目前填表已關閉，無法修改註記！");
-                    this.value = currentMark;
-                    return;
-                }
                 const newMark = this.value;
                 cloudData.dailyMarks[markKey] = newMark;
-                saveDailyMarks(); // 修正：透過新的 postCloudData 寫入
+                saveDailyMarks(viewTeam);
             });
             thMark.appendChild(selectMark);
             trMark.appendChild(thMark);
@@ -1171,7 +1143,6 @@
         thead.appendChild(trDate);
         thead.appendChild(trDay);
 
-        // 顯示目前查看班別的所有員工
         const visibleEmployees = teams[viewTeam] || [];
 
         visibleEmployees.forEach(empName => {
@@ -1184,10 +1155,8 @@
                 <td class="col-name"><div class="cell-content">${empName}</div></td>
             `;
 
-            // 決定此員工的儲存格能否編輯
             const canEditSelf = (viewTeam === loginTeam && empName === currentUser);
-            // 【修正】完整鎖定：管理員受 formOpen 限制，一般員工也受 formOpen 限制
-            const canEditCell = (canEditTeam || (canEditSelf && formOpen)) && formOpen;
+            const canEditCell = canEditTeam || (canEditSelf && formOpen);
 
             for (let i = 1; i <= daysInMonth; i++) {
                 let td = document.createElement('td');
@@ -1221,7 +1190,7 @@
                         this.value = finalValue;
                         return;
                     }
-                    if (!formOpen) {
+                    if (!isFormOpen(loginTeam) && canEditSelf) {
                         alert("目前填表已關閉，無法修改班表！");
                         this.value = finalValue;
                         return;
@@ -1252,7 +1221,6 @@
                     }
 
                     if (canEditTeam) {
-                        // 管理員：即時儲存
                         if (!cloudData.shifts) cloudData.shifts = {};
                         cloudData.shifts[shiftKey] = newVal;
                         postCloudData({ action: 'saveShift', key: shiftKey, value: newVal });
@@ -1262,7 +1230,6 @@
                         calculateTotalClassStats(year, month, daysInMonth, viewTeam);
                         calculateDailyOtStats(year, month, daysInMonth, viewTeam);
                     } else {
-                        // 一般員工：進入暫存
                         pendingChanges[shiftKey] = newVal;
                         finalValue = newVal;
                         td.classList.add('pending-edit');
@@ -1302,7 +1269,6 @@
         calculateTotalClassStats(year, month, daysInMonth, viewTeam);
         calculateDailyOtStats(year, month, daysInMonth, viewTeam);
 
-        // 確認按鈕：只有一般員工且在自己的班表才顯示
         if (currentUser === teamAdmins[loginTeam] || viewTeam !== loginTeam) {
             confirmBtn.style.display = 'none';
         } else {
