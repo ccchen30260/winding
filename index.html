@@ -877,8 +877,8 @@
 
     function updateHighlightBtnUI() {
         if (!currentUser || !currentSquad) return;
-        const isManager = (currentUser === squadManagers[currentSquad]);
-        // ✅ 移除 disabled 佈局，統一由 renderTable 控制 display
+        // ✅ 確保 disabled 為 false，讓管理員可以正常點擊開關
+        highlightBtn.disabled = false;
         highlightBtn.textContent = crosshairEnabled ? '十字高亮：開' : '十字高亮：關';
         highlightBtn.className = 'highlight-btn' + (crosshairEnabled ? ' active' : '');
         document.body.classList.toggle('crosshair-active', crosshairEnabled);
@@ -1117,7 +1117,7 @@
 
         otLimitGroup.style.display = (isMySquad && isManagerOfMy && formOpen) ? 'flex' : 'none';
         
-        // ✅ 修改：判斷跑馬燈、管理人員、十字高亮 開關權限
+        // ✅ 判斷跑馬燈、管理人員、十字高亮 開關權限
         editMarqueeBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
         editEmployeeBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
         highlightBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
