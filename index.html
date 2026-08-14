@@ -779,7 +779,7 @@
         updateHighlightBtnUI();
     });
 
-    // 十字高亮 hover 事件 (已修正日期/星期錯位問題)
+    // 十字高亮 hover 事件 (已完全修正 S4/日期/星期 錯位問題)
     const tableContainer = document.querySelector('.table-container');
     tableContainer.addEventListener('mouseover', function(e) {
         if (!crosshairEnabled) return;
@@ -795,11 +795,10 @@
         const rowIndex = cell.parentElement.rowIndex;
         const colIndex = cell.cellIndex;
         
-        // 【修正重點】針對表頭(日期/星期)的 column index 進行重新對應
-        // rowIndex=1 為日期行, rowIndex=2 為星期行
-        // 它們的 colIndex=2 實際上是 "日期/星期" 文字標籤，應映射到真正的第一天數據欄 (colIndex=3)
+        // 【最終修正】針對所有表頭 (rowIndex 0, 1, 2) 的姓名/日期/星期欄位 (colIndex 2)
+        // 因 rowspan 影響，colIndex=2 對應到真正的日期資料欄應為 colIndex=3
         let targetColIndex = colIndex;
-        if ((rowIndex === 1 || rowIndex === 2) && colIndex === 2) {
+        if (rowIndex < 3 && colIndex === 2) {
             targetColIndex = 3; 
         }
         
