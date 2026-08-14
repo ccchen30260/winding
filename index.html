@@ -605,7 +605,6 @@
 <script>
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzLY435Gr3k6783bG__8TM0xs04CDLztMghV3Et4LX411iGTEt3so3zYSOVZlo27qPl/exec";
 
-    // 各班員工名單 (已修正姓名)
     const squadEmployees = {
         S1: ["方慎之","陳泰安","蔡南嘉","李珮菁","朱建穎","王泳淇","吳峻霖","黃詠綺","蘭狄","凱文","勞倫司","安東尼","明華","艾麥倫","邱立斯","拉特","羅內爾","艾佛森"],
         S2: ["黃正忠","張韶眞","陳宥庠","黃威翔","羅翊禎","黃文靖","蔡易良","吳奇玲","詹姆士","達力","山博","羅傑","達路","童氏蓮","羅德","達布","安吉","羅蘭多"],
@@ -613,7 +612,6 @@
         S4: ["陳喬志","楊代億","廖曉彤","蔡靜儀","賴建亦","施榮傑","陰其德","黃譯鋒","楊雅婷","羅啟倫","埃爾默","拉斯特","雷伊","漢斯","達利斯","甘達","特拉多","達爾文"]
     };
 
-    // 各班管理員
     const squadManagers = {
         S1: "方慎之",
         S2: "黃正忠",
@@ -629,7 +627,7 @@
     let currentUser = null;
     let currentSquad = null;
     let currentViewSquad = null;
-    let crosshairEnabled = false; // 十字高亮狀態
+    let crosshairEnabled = false; 
 
     const syncStatus = document.getElementById('syncStatus');
     const loginOverlay = document.getElementById('loginOverlay');
@@ -676,7 +674,6 @@
     function showSync() { syncStatus.style.display = 'block'; }
     function hideSync() { syncStatus.style.display = 'none'; }
 
-    // 登入班級切換時更新姓名選單
     loginSquadSelect.addEventListener('change', function() {
         const squad = this.value;
         loginNameSelect.innerHTML = '<option value="">-- 請選擇姓名 --</option>';
@@ -772,45 +769,53 @@
         document.body.classList.toggle('crosshair-active', crosshairEnabled);
     }
 
-    // 十字高亮開關
     highlightBtn.addEventListener('click', function() {
         if (!currentUser || currentUser !== squadManagers[currentSquad]) return;
         crosshairEnabled = !crosshairEnabled;
         updateHighlightBtnUI();
     });
 
-    // 十字高亮 hover 事件 (已完全修正 S4/日期/星期 錯位問題)
+    // ==========================================
+    // ✅ 完美修正：使用 getBoundingClientRect 計算物理座標
+    // 徹底解決 rowspan="3" 導致 cellIndex 錯位問題
+    // ==========================================
     const tableContainer = document.querySelector('.table-container');
     tableContainer.addEventListener('mouseover', function(e) {
         if (!crosshairEnabled) return;
-        const td = e.target.closest('td');
-        const th = e.target.closest('th');
-        const cell = td || th;
-        if (!cell) return;
-        
-        // 清除之前的高亮
+        const targetCell = e.target.closest('th, td');
+        if (!targetCell) return;
+
+        // 清除舊高亮
         document.querySelectorAll('.crosshair-highlight').forEach(el => el.classList.remove('crosshair-highlight'));
-        
+
+        // 1. 高亮整列 (水平線)
+        const targetRow = targetCell.parentElement;
+        if (targetRow) {
+            Array.from(targetRow.cells).forEach(c => c.classList.add('crosshair-highlight'));
+        }
+
+        // 2. 高亮整欄 (垂直線) - 使用精準座標定位
+        const rect = targetCell.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2; // 滑鼠所指單元格的水平中心點
+
         const table = document.getElementById('scheduleTable');
-        const rowIndex = cell.parentElement.rowIndex;
-        const colIndex = cell.cellIndex;
-        
-        // 【最終修正】針對所有表頭 (rowIndex 0, 1, 2) 的姓名/日期/星期欄位 (colIndex 2)
-        // 因 rowspan 影響，colIndex=2 對應到真正的日期資料欄應為 colIndex=3
-        let targetColIndex = colIndex;
-        if (rowIndex < 3 && colIndex === 2) {
-            targetColIndex = 3; 
-        }
-        
-        // 高亮整列 (該 row 的所有 th, td)
-        const row = table.rows[rowIndex];
-        if (row) {
-            Array.from(row.cells).forEach(c => c.classList.add('crosshair-highlight'));
-        }
-        // 高亮整欄 (該 col 的所有 th, td) - 使用修正後的 targetColIndex
         for (let i = 0; i < table.rows.length; i++) {
-            const cellInCol = table.rows[i].cells[targetColIndex];
-            if (cellInCol) cellInCol.classList.add('crosshair-highlight');
+            const row = table.rows[i];
+            let closestCell = null;
+            let minDist = Infinity;
+            // 遍歷該行所有單元格，找出與 centerX 水平距離最近的單元格
+            for (let j = 0; j < row.cells.length; j++) {
+                const cellRect = row.cells[j].getBoundingClientRect();
+                const cellCenterX = cellRect.left + cellRect.width / 2;
+                const dist = Math.abs(cellCenterX - centerX);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closestCell = row.cells[j];
+                }
+            }
+            if (closestCell) {
+                closestCell.classList.add('crosshair-highlight');
+            }
         }
     });
 
@@ -897,12 +902,10 @@
             const dailyElem = document.getElementById(`daily_ot_${squad}_${year}_${month}_${i}`);
             if (!dailyElem) continue;
             const defaultShift = getDefaultShift(squad, year, month, i);
-            // 上班日不顯示加班人數
             if (defaultShift !== '') {
                 dailyElem.textContent = '';
                 continue;
             }
-            // 休息日計算加班人數
             let dailyOtCount = 0;
             empList.forEach(empName => {
                 const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
@@ -999,7 +1002,7 @@
         const readOnly = !isMySquad;
 
         updateFormStatusUI();
-        updateHighlightBtnUI(); // 更新高亮按鈕狀態
+        updateHighlightBtnUI();
         const formOpen = isFormOpen(viewSquad);
 
         otLimitSelect.disabled = !(isMySquad && isManagerOfMy && formOpen);
@@ -1116,7 +1119,6 @@
                     select.disabled = true;
                 }
 
-                // 上班日新增返、差、曠
                 let baseOptions;
                 if (defaultShift === '') {
                     baseOptions = ['', 'G', '未'];
