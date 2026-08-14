@@ -584,6 +584,7 @@
                     <option value="S4">S4</option>
                 </select>
             </div>
+            <!-- 十字高亮開關 -->
             <button id="highlightBtn" class="highlight-btn" disabled>十字高亮：關</button>
             <button id="formStatusBtn" class="form-status-btn open">填表：開啟</button>
             <div id="userInfoDisplay" class="user-info">👤 未登入</div>
@@ -840,4 +841,563 @@
         return '';
     }
 
-    function getDefaultShift(squad, year, month
+    function getDefaultShift(squad, year, month, day) {
+        const s4Val = getS4Default(year, month, day);
+        if (squad === 'S4') return s4Val;
+        if (squad === 'S3') {
+            if (s4Val === '日') return '夜';
+            if (s4Val === '夜') return '日';
+            return '';
+        }
+        const d = new Date(year, month-1, day);
+        d.setDate(d.getDate() - 2);
+        const s2Val = getS4Default(d.getFullYear(), d.getMonth()+1, d.getDate());
+        if (squad === 'S2') return s2Val;
+        if (s2Val === '日') return '夜';
+        if (s2Val === '夜') return '日';
+        return '';
+    }
+
+    function calculateTotalClassStats(squad, year, month, daysInMonth) {
+        const empList = squadEmployees[squad];
+        if (!empList) return;
+        let grandTotalOt = 0, grandTotalLv = 0, grandTotalUa = 0;
+        empList.forEach(empName => {
+            for (let i = 1; i <= daysInMonth; i++) {
+                const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
+                const defaultShift = getDefaultShift(squad, year, month, i);
+                let val;
+                if (pendingChanges[shiftKey] !== undefined) {
+                    val = pendingChanges[shiftKey];
+                } else {
+                    const savedValue = (cloudData.shifts) ? cloudData.shifts[shiftKey] : undefined;
+                    val = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
+                }
+                if (val === 'G') grandTotalOt++;
+                if (['特', '病', '事', '生'].includes(val)) grandTotalLv++;
+                if (val === '未') grandTotalUa++;
+            }
+        });
+        if (totalOtDisplay) totalOtDisplay.textContent = `全班加班: ${grandTotalOt}天`;
+        if (totalLvDisplay) totalLvDisplay.textContent = `全班請假: ${grandTotalLv}天`;
+        if (totalUaDisplay) totalUaDisplay.textContent = `加班未到: ${grandTotalUa}天`;
+    }
+
+    function calculateDailyOtStats(squad, year, month, daysInMonth) {
+        const empList = squadEmployees[squad];
+        if (!empList) return;
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dailyElem = document.getElementById(`daily_ot_${squad}_${year}_${month}_${i}`);
+            if (!dailyElem) continue;
+            const defaultShift = getDefaultShift(squad, year, month, i);
+            // 上班日不顯示加班人數
+            if (defaultShift !== '') {
+                dailyElem.textContent = '';
+                continue;
+            }
+            // 休息日計算加班人數
+            let dailyOtCount = 0;
+            empList.forEach(empName => {
+                const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
+                let val;
+                if (pendingChanges[shiftKey] !== undefined) {
+                    val = pendingChanges[shiftKey];
+                } else {
+                    const savedValue = (cloudData.shifts) ? cloudData.shifts[shiftKey] : undefined;
+                    val = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
+                }
+                if (val === 'G') dailyOtCount++;
+            });
+            dailyElem.textContent = dailyOtCount;
+        }
+    }
+
+    function updateConfirmBtnState() {
+        if (!currentSquad || !currentViewSquad || currentViewSquad !== currentSquad) {
+            confirmBtn.style.display = 'none';
+            return;
+        }
+        const isManager = (currentUser === squadManagers[currentSquad]);
+        if (isManager) {
+            confirmBtn.style.display = 'none';
+            return;
+        }
+        const count = Object.keys(pendingChanges).length;
+        if (count > 0) {
+            confirmBtn.innerHTML = `✔ Confirm / 確認儲存 (${count})`;
+            confirmBtn.style.display = 'block';
+            confirmBtn.disabled = false;
+        } else {
+            confirmBtn.style.display = 'none';
+        }
+    }
+
+    function showConfirmModal(message) {
+        return new Promise((resolve) => {
+            confirmModalText.textContent = message;
+            confirmModal.style.display = 'flex';
+            confirmModalYes.onclick = () => { confirmModal.style.display = 'none'; resolve(true); };
+            confirmModalNo.onclick = () => { confirmModal.style.display = 'none'; resolve(false); };
+            confirmModal.onclick = (e) => { if (e.target === confirmModal) { confirmModal.style.display = 'none'; resolve(false); } };
+        });
+    }
+
+    modalConfirmBtn.addEventListener('click', () => successModal.style.display = 'none');
+    successModal.addEventListener('click', (e) => { if (e.target === successModal) successModal.style.display = 'none'; });
+
+    confirmBtn.addEventListener('click', async function() {
+        const keys = Object.keys(pendingChanges);
+        if (keys.length === 0) return;
+        const confirmSave = await showConfirmModal(
+            `Are you sure you want to save the ${keys.length} pending change(s)? / 確定要儲存目前 ${keys.length} 筆異動資料嗎？`
+        );
+        if (!confirmSave) return;
+
+        showSync();
+        confirmBtn.disabled = true;
+        try {
+            const promises = [];
+            for (const [key, val] of Object.entries(pendingChanges)) {
+                promises.push(fetch(GAS_WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'saveShift', key: key, value: val })
+                }));
+            }
+            await Promise.all(promises);
+            for (const [key, val] of Object.entries(pendingChanges)) {
+                cloudData.shifts[key] = val;
+            }
+            pendingChanges = {};
+            document.querySelectorAll('td.pending-edit').forEach(el => el.classList.remove('pending-edit'));
+            updateConfirmBtnState();
+            renderTable();
+            successModal.style.display = 'flex';
+        } catch (err) {
+            console.error("儲存異常", err);
+            alert("❌ Data save failed. / 資料儲存失敗！");
+        } finally {
+            hideSync();
+            confirmBtn.disabled = false;
+        }
+    });
+
+    function renderTable() {
+        if (!currentUser || !currentSquad) return;
+        const viewSquad = currentViewSquad || currentSquad;
+        const isMySquad = (viewSquad === currentSquad);
+        const isManagerOfView = (currentUser === squadManagers[viewSquad]);
+        const isManagerOfMy = (currentUser === squadManagers[currentSquad]);
+        const readOnly = !isMySquad;
+
+        updateFormStatusUI();
+        updateHighlightBtnUI(); // 更新高亮按鈕狀態
+        const formOpen = isFormOpen(viewSquad);
+
+        otLimitSelect.disabled = !(isMySquad && isManagerOfMy && formOpen);
+
+        const year = parseInt(yearSelect.value);
+        const month = parseInt(monthSelect.value);
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        let limitKey = `${viewSquad}_otlimit_${year}_${month}`;
+        let limitVal = (cloudData.otLimits && cloudData.otLimits[limitKey] !== undefined) ? cloudData.otLimits[limitKey] : '';
+        if (!limitVal && viewSquad === 'S4') {
+            const oldKey = `${year}_${month}`;
+            limitVal = (cloudData.otLimits && cloudData.otLimits[oldKey] !== undefined) ? cloudData.otLimits[oldKey] : '';
+        }
+        otLimitSelect.value = limitVal;
+
+        const thead = document.getElementById('tableHead');
+        const tbody = document.getElementById('tableBody');
+        thead.innerHTML = ''; tbody.innerHTML = '';
+
+        let trMark = document.createElement('tr');
+        trMark.innerHTML = `
+            <th class="stats-ot" rowspan="3"><div class="cell-content">當月<br>加班</div></th>
+            <th class="stats-lv" rowspan="3"><div class="cell-content">當月<br>請假</div></th>
+            <th class="col-name"><div class="cell-content">${viewSquad}</div></th>
+        `;
+        let trDate = document.createElement('tr');
+        trDate.innerHTML = `<th class="col-name"><div class="cell-content">日期</div></th>`;
+        let trDay = document.createElement('tr');
+        trDay.innerHTML = `<th class="col-name"><div class="cell-content">星期</div></th>`;
+
+        const today = new Date();
+        const todayY = today.getFullYear();
+        const todayM = today.getMonth() + 1;
+        const todayD = today.getDate();
+
+        const dailyMarks = getDailyMarks(viewSquad);
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            const markKey = `${viewSquad}_mark_${year}_${month}_${i}`;
+            const dateObj = new Date(year, month - 1, i);
+            const dayOfWeek = dateObj.getDay();
+            const isToday = (year === todayY && month === todayM && i === todayD);
+
+            let thMark = document.createElement('th');
+            let selectMark = document.createElement('select');
+            selectMark.className = 'daily-mark-select';
+            ['', 'C', '颱', '豪', '歲', '旺'].forEach(opt => {
+                let option = document.createElement('option');
+                option.value = opt;
+                option.textContent = opt;
+                selectMark.appendChild(option);
+            });
+            selectMark.value = dailyMarks[markKey] || '';
+            selectMark.disabled = !(isMySquad && isManagerOfMy);
+            selectMark.addEventListener('change', function() {
+                if (!isMySquad || !isManagerOfMy) return;
+                const newMark = this.value;
+                dailyMarks[markKey] = newMark;
+                cloudData.settings[viewSquad + '_dailyMarks'] = dailyMarks;
+                postCloudData({ action: 'saveSetting', key: viewSquad + '_dailyMarks', value: JSON.stringify(dailyMarks) });
+            });
+            thMark.appendChild(selectMark);
+            trMark.appendChild(thMark);
+
+            let thDate = document.createElement('th');
+            thDate.innerHTML = `<div class="cell-content">${i}</div>`;
+            if (isToday) thDate.classList.add('today-header');
+            trDate.appendChild(thDate);
+
+            let thDay = document.createElement('th');
+            thDay.innerHTML = `<div class="cell-content">${weekDaysTW[dayOfWeek]}</div>`;
+            if (dayOfWeek === 0 || dayOfWeek === 6) thDay.classList.add('weekend-header');
+            if (isToday) thDay.classList.add('today-header');
+            trDay.appendChild(thDay);
+        }
+
+        thead.appendChild(trMark);
+        thead.appendChild(trDate);
+        thead.appendChild(trDay);
+
+        let visibleEmployees;
+        if (isMySquad) {
+            visibleEmployees = isManagerOfMy ? squadEmployees[viewSquad] : [currentUser];
+        } else {
+            visibleEmployees = squadEmployees[viewSquad];
+        }
+
+        visibleEmployees.forEach(empName => {
+            let tr = document.createElement('tr');
+            const otCellId = `ot_${viewSquad}_${year}_${month}_${empName}`;
+            const lvCellId = `lv_${viewSquad}_${year}_${month}_${empName}`;
+            tr.innerHTML = `
+                <td class="stats-ot"><div class="cell-content" id="${otCellId}">0</div></td>
+                <td class="stats-lv"><div class="cell-content" id="${lvCellId}">0</div></td>
+                <td class="col-name"><div class="cell-content">${empName}</div></td>
+            `;
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                let td = document.createElement('td');
+                const defaultShift = getDefaultShift(viewSquad, year, month, i);
+                const shiftKey = `${viewSquad}_shift_${year}_${month}_${empName}_${i}`;
+                const savedValue = (cloudData.shifts) ? cloudData.shifts[shiftKey] : undefined;
+                let finalValue = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
+                if (pendingChanges[shiftKey] !== undefined) {
+                    finalValue = pendingChanges[shiftKey];
+                }
+
+                let select = document.createElement('select');
+                select.className = 'shift-select';
+                if (readOnly || !formOpen) {
+                    select.disabled = true;
+                } else if (!isMySquad) {
+                    select.disabled = true;
+                }
+
+                // 上班日新增返、差、曠
+                let baseOptions;
+                if (defaultShift === '') {
+                    baseOptions = ['', 'G', '未'];
+                } else {
+                    baseOptions = [defaultShift, '特', '病', '事', '生', '颱', '返', '差', '曠'];
+                }
+                const isCurrentManager = (isMySquad && currentUser === squadManagers[viewSquad]);
+                if (!isCurrentManager) {
+                    baseOptions = baseOptions.filter(opt => opt !== '未');
+                }
+                if (finalValue !== '' && !baseOptions.includes(finalValue)) {
+                    baseOptions.push(finalValue);
+                }
+                baseOptions.forEach(opt => {
+                    let option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    if (opt === finalValue) option.selected = true;
+                    select.appendChild(option);
+                });
+
+                select.addEventListener('change', function() {
+                    if (!isMySquad || readOnly) return;
+                    if (!isFormOpen(viewSquad)) {
+                        alert("目前填表已關閉，無法修改班表！");
+                        this.value = finalValue;
+                        return;
+                    }
+                    const newVal = this.value;
+                    const limitVal = otLimitSelect.value;
+                    if (newVal === 'G' && defaultShift === '' && limitVal !== '') {
+                        const limit = parseInt(limitVal, 10);
+                        let otherOtCount = 0;
+                        squadEmployees[viewSquad].forEach(otherEmp => {
+                            if (otherEmp === empName) return;
+                            const key = `${viewSquad}_shift_${year}_${month}_${otherEmp}_${i}`;
+                            const def = getDefaultShift(viewSquad, year, month, i);
+                            let val;
+                            if (pendingChanges[key] !== undefined) val = pendingChanges[key];
+                            else {
+                                const saved = (cloudData.shifts && cloudData.shifts[key] !== undefined) ? cloudData.shifts[key] : def;
+                                val = saved;
+                            }
+                            if (val === 'G') otherOtCount++;
+                        });
+                        if (otherOtCount >= limit) {
+                            alert(`${month}月${i}日 (非上班日) 加班人數已達上限 (${limit} 人)！`);
+                            this.value = finalValue;
+                            return;
+                        }
+                    }
+
+                    if (isCurrentManager) {
+                        if (!cloudData.shifts) cloudData.shifts = {};
+                        cloudData.shifts[shiftKey] = newVal;
+                        postCloudData({ action: 'saveShift', key: shiftKey, value: newVal });
+                        finalValue = newVal;
+                        updateCellColor(td, newVal);
+                        renderTable();
+                    } else {
+                        pendingChanges[shiftKey] = newVal;
+                        finalValue = newVal;
+                        td.classList.add('pending-edit');
+                        updateCellColor(td, newVal);
+                        calculateStats(empName, viewSquad, year, month, daysInMonth, otCellId, lvCellId);
+                        calculateTotalClassStats(viewSquad, year, month, daysInMonth);
+                        calculateDailyOtStats(viewSquad, year, month, daysInMonth);
+                        updateConfirmBtnState();
+                    }
+                });
+
+                td.appendChild(select);
+                if (pendingChanges[shiftKey] !== undefined) {
+                    td.classList.add('pending-edit');
+                }
+                updateCellColor(td, finalValue);
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+            calculateStats(empName, viewSquad, year, month, daysInMonth, otCellId, lvCellId);
+        });
+
+        let trDailyOt = document.createElement('tr');
+        trDailyOt.className = 'daily-ot-row';
+        trDailyOt.innerHTML = `
+            <td class="stats-ot"><div class="cell-content">-</div></td>
+            <td class="stats-lv"><div class="cell-content">-</div></td>
+            <td class="col-name"><div class="cell-content">加班人數</div></td>
+        `;
+        for (let i = 1; i <= daysInMonth; i++) {
+            let td = document.createElement('td');
+            td.innerHTML = `<div class="cell-content" id="daily_ot_${viewSquad}_${year}_${month}_${i}"></div>`;
+            trDailyOt.appendChild(td);
+        }
+        tbody.appendChild(trDailyOt);
+
+        calculateTotalClassStats(viewSquad, year, month, daysInMonth);
+        calculateDailyOtStats(viewSquad, year, month, daysInMonth);
+        updateConfirmBtnState();
+    }
+
+    function calculateStats(empName, squad, year, month, daysInMonth, otCellId, lvCellId) {
+        let otCount = 0, lvCount = 0;
+        for (let i = 1; i <= daysInMonth; i++) {
+            const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
+            const defaultShift = getDefaultShift(squad, year, month, i);
+            let val;
+            if (pendingChanges[shiftKey] !== undefined) {
+                val = pendingChanges[shiftKey];
+            } else {
+                const savedValue = (cloudData.shifts) ? cloudData.shifts[shiftKey] : undefined;
+                val = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
+            }
+            if (val === 'G') otCount++;
+            if (['特', '病', '事', '生'].includes(val)) lvCount++;
+        }
+        const otElem = document.getElementById(otCellId);
+        const lvElem = document.getElementById(lvCellId);
+        if (otElem) otElem.textContent = otCount;
+        if (lvElem) lvElem.textContent = lvCount;
+    }
+
+    function updateCellColor(td, value) {
+        td.classList.remove('shift-day', 'shift-night', 'shift-g', 'shift-unattended', 'shift-special', 'shift-personal', 'shift-sick', 'shift-physio', 'shift-typhoon', 'shift-return', 'shift-business', 'shift-absent');
+        switch (value) {
+            case '日': td.classList.add('shift-day'); break;
+            case '夜': td.classList.add('shift-night'); break;
+            case 'G': td.classList.add('shift-g'); break;
+            case '未': td.classList.add('shift-unattended'); break;
+            case '特': td.classList.add('shift-special'); break;
+            case '事': td.classList.add('shift-personal'); break;
+            case '病': td.classList.add('shift-sick'); break;
+            case '生': td.classList.add('shift-physio'); break;
+            case '颱': td.classList.add('shift-typhoon'); break;
+            case '返': td.classList.add('shift-return'); break;
+            case '差': td.classList.add('shift-business'); break;
+            case '曠': td.classList.add('shift-absent'); break;
+        }
+    }
+
+    viewSquadSelect.addEventListener('change', function() {
+        const newSquad = this.value;
+        if (newSquad === currentViewSquad) return;
+        if (currentViewSquad === currentSquad && Object.keys(pendingChanges).length > 0 && currentUser !== squadManagers[currentSquad]) {
+            if (!confirm('切換班表將捨棄目前未儲存的變更，確定要繼續嗎？')) {
+                this.value = currentViewSquad;
+                return;
+            }
+        }
+        pendingChanges = {};
+        currentViewSquad = newSquad;
+        updateFormStatusUI();
+        updateHighlightBtnUI();
+        renderTable();
+    });
+
+    loginSubmitBtn.addEventListener('click', async function() {
+        const squad = loginSquadSelect.value;
+        const selectedUser = loginNameSelect.value;
+        const inputPwd = loginPasswordInput.value;
+        if (!squad || !selectedUser) {
+            loginErrorMsg.style.display = 'block';
+            return;
+        }
+        const correctPwd = getUserPassword(selectedUser);
+        if (inputPwd === correctPwd) {
+            currentSquad = squad;
+            currentUser = selectedUser;
+            currentViewSquad = squad;
+            sessionStorage.setItem('schedule_current_squad', squad);
+            sessionStorage.setItem('schedule_current_user', selectedUser);
+            loginErrorMsg.style.display = 'none';
+            loginPasswordInput.value = '';
+            viewSquadSelect.value = squad;
+            showSync();
+            await fetchCloudData();
+            loginOverlay.style.display = 'none';
+            mainApp.style.display = 'block';
+            userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
+            updateFormStatusUI();
+            updateHighlightBtnUI();
+            renderTable();
+        } else {
+            loginErrorMsg.style.display = 'block';
+        }
+    });
+
+    async function checkLoginStatus() {
+        const savedSquad = sessionStorage.getItem('schedule_current_squad');
+        const savedUser = sessionStorage.getItem('schedule_current_user');
+        if (savedSquad && savedUser) {
+            await fetchCloudData();
+            currentSquad = savedSquad;
+            currentUser = savedUser;
+            currentViewSquad = savedSquad;
+            viewSquadSelect.value = savedSquad;
+            loginOverlay.style.display = 'none';
+            mainApp.style.display = 'block';
+            userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
+            updateFormStatusUI();
+            updateHighlightBtnUI();
+            renderTable();
+        } else {
+            loginOverlay.style.display = 'flex';
+            mainApp.style.display = 'none';
+        }
+    }
+
+    changePwdBtn.addEventListener('click', function() {
+        oldPwdInput.value = ''; newPwdInput.value = ''; confirmPwdInput.value = '';
+        pwdErrorMsg.style.display = 'none';
+        changePwdModal.style.display = 'flex';
+    });
+
+    cancelPwdBtn.addEventListener('click', () => changePwdModal.style.display = 'none');
+
+    savePwdBtn.addEventListener('click', async function() {
+        const correctPwd = getUserPassword(currentUser);
+        const oldVal = oldPwdInput.value;
+        const newVal = newPwdInput.value;
+        const confirmVal = confirmPwdInput.value;
+        if (oldVal !== correctPwd) {
+            pwdErrorMsg.textContent = "舊密碼錯誤！";
+            pwdErrorMsg.style.display = "block"; return;
+        }
+        if (!newVal) {
+            pwdErrorMsg.textContent = "新密碼不可空白！";
+            pwdErrorMsg.style.display = "block"; return;
+        }
+        if (newVal !== confirmVal) {
+            pwdErrorMsg.textContent = "兩次輸入的新密碼不一致！";
+            pwdErrorMsg.style.display = "block"; return;
+        }
+        if(!cloudData.passwords) cloudData.passwords = {};
+        cloudData.passwords[currentUser] = newVal;
+        await postCloudData({ action: 'savePassword', key: currentUser, value: newVal });
+        alert("密碼修改成功！");
+        changePwdModal.style.display = 'none';
+    });
+
+    logoutBtn.addEventListener('click', function() {
+        sessionStorage.removeItem('schedule_current_squad');
+        sessionStorage.removeItem('schedule_current_user');
+        currentUser = null;
+        currentSquad = null;
+        currentViewSquad = null;
+        pendingChanges = {};
+        loginSquadSelect.value = '';
+        loginNameSelect.innerHTML = '<option value="">-- 請選擇姓名 --</option>';
+        loginPasswordInput.value = '';
+        checkLoginStatus();
+    });
+
+    otLimitSelect.addEventListener('change', function() {
+        if (!currentSquad || !currentViewSquad || currentViewSquad !== currentSquad) return;
+        if (currentUser !== squadManagers[currentSquad]) return;
+        const year = yearSelect.value;
+        const month = monthSelect.value;
+        const limitKey = `${currentSquad}_otlimit_${year}_${month}`;
+        if (!cloudData.otLimits) cloudData.otLimits = {};
+        cloudData.otLimits[limitKey] = this.value;
+        postCloudData({ action: 'saveOtLimit', key: limitKey, value: this.value });
+    });
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    for (let y = currentYear - 5; y <= currentYear + 5; y++) {
+        let opt = document.createElement('option');
+        opt.value = y; opt.text = y;
+        if (y === currentYear) opt.selected = true;
+        yearSelect.appendChild(opt);
+    }
+    for (let m = 1; m <= 12; m++) {
+        let opt = document.createElement('option');
+        opt.value = m; opt.text = m;
+        if (m === (now.getMonth() + 1)) opt.selected = true;
+        monthSelect.appendChild(opt);
+    }
+
+    yearSelect.addEventListener('change', renderTable);
+    monthSelect.addEventListener('change', renderTable);
+
+    toggleStatsBtn.addEventListener('click', function() {
+        document.body.classList.toggle('hide-stats');
+        this.textContent = document.body.classList.contains('hide-stats') ? '顯示統計' : '隱藏統計';
+    });
+
+    checkLoginStatus();
+</script>
+</body>
+</html>
