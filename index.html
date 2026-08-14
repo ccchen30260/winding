@@ -559,10 +559,10 @@
     </div>
 </div>
 
-<!-- 編輯跑馬燈視窗 -->
+<!-- 編輯跑馬燈視窗 (各班獨立版本) -->
 <div id="marqueeModal" class="login-overlay" style="display: none; z-index: 10000;">
     <div class="login-card">
-        <h2>編輯跑馬燈文字</h2>
+        <h2 id="marqueeModalTitle">編輯跑馬燈文字</h2>
         <div class="login-field">
             <label for="marqueeInput">文字內容</label>
             <textarea id="marqueeInput" rows="3" style="width: 100%;"></textarea>
@@ -758,6 +758,7 @@
     // 跑馬燈相關 DOM
     const editMarqueeBtn = document.getElementById('editMarqueeBtn');
     const marqueeModal = document.getElementById('marqueeModal');
+    const marqueeModalTitle = document.getElementById('marqueeModalTitle');
     const marqueeInput = document.getElementById('marqueeInput');
     const saveMarqueeBtn = document.getElementById('saveMarqueeBtn');
     const cancelMarqueeBtn = document.getElementById('cancelMarqueeBtn');
@@ -1120,16 +1121,24 @@
         editMarqueeBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
         editEmployeeBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
 
-        // 跑馬燈文字載入
+        // ==================================================
+        // ✨ 跑馬燈文字載入 (按班級獨立儲存)
+        // ==================================================
+        const marqueeKey = viewSquad + '_marqueeText';
         const defaultMarquee = `※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。`;
-        if (cloudData.settings && cloudData.settings['marqueeText']) {
-            marqueeText.textContent = cloudData.settings['marqueeText'];
+        
+        if (cloudData.settings && cloudData.settings[marqueeKey]) {
+            marqueeText.textContent = cloudData.settings[marqueeKey];
         } else {
+            // 如果該班沒有專門設定過，自動檢查舊的全局設定或使用預設值來初始化
             if (!cloudData.settings) cloudData.settings = {};
-            cloudData.settings['marqueeText'] = defaultMarquee;
-            postCloudData({ action: 'saveSetting', key: 'marqueeText', value: defaultMarquee });
-            marqueeText.textContent = defaultMarquee;
+            let valToSet = cloudData.settings['marqueeText'] || defaultMarquee;
+            cloudData.settings[marqueeKey] = valToSet;
+            // 將該班的設定寫入雲端，實現自動分離
+            postCloudData({ action: 'saveSetting', key: marqueeKey, value: valToSet });
+            marqueeText.textContent = valToSet;
         }
+        // ==================================================
 
         const year = parseInt(yearSelect.value);
         const month = parseInt(monthSelect.value);
@@ -1487,24 +1496,35 @@
         changePwdModal.style.display = 'none';
     });
 
-    // 【跑馬燈邏輯】
+    // ==================================================
+    // 【跑馬燈邏輯 - 獨立編輯】
+    // ==================================================
     editMarqueeBtn.addEventListener('click', function() {
-        marqueeInput.value = marqueeText.textContent;
+        const marqueeKey = currentSquad + '_marqueeText';
+        const currentText = (cloudData.settings && cloudData.settings[marqueeKey]) 
+                            ? cloudData.settings[marqueeKey] 
+                            : `※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。`;
+        marqueeInput.value = currentText;
         marqueeErrorMsg.style.display = 'none';
+        // 在標題顯示目前編輯的是哪一班
+        marqueeModalTitle.textContent = `編輯跑馬燈文字 (${currentSquad})`;
         marqueeModal.style.display = 'flex';
     });
+    
     cancelMarqueeBtn.addEventListener('click', () => marqueeModal.style.display = 'none');
+    
     saveMarqueeBtn.addEventListener('click', async function() {
         const newText = marqueeInput.value.trim();
         if (!newText) {
             marqueeErrorMsg.textContent = "跑馬燈內容不可空白！";
             marqueeErrorMsg.style.display = "block"; return;
         }
+        const marqueeKey = currentSquad + '_marqueeText';
         if(!cloudData.settings) cloudData.settings = {};
-        cloudData.settings['marqueeText'] = newText;
-        await postCloudData({ action: 'saveSetting', key: 'marqueeText', value: newText });
+        cloudData.settings[marqueeKey] = newText;
+        await postCloudData({ action: 'saveSetting', key: marqueeKey, value: newText });
         marqueeText.textContent = newText;
-        alert("跑馬燈文字已更新！");
+        alert(`「${currentSquad}」跑馬燈文字已更新！`);
         marqueeModal.style.display = 'none';
     });
 
