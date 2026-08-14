@@ -59,7 +59,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             width: 90%;
-            max-width: 450px; /* 調整寬度以容納更多文字 */
+            max-width: 450px;
             text-align: center;
             box-sizing: border-box;
             border: 1px solid #e0e0e0;
@@ -225,7 +225,7 @@
         .highlight-btn.active { background-color: #28a745; }
         .highlight-btn:disabled { cursor: not-allowed; opacity: 0.7; }
         .edit-marquee-btn { background-color: #fd7e14; }
-        .edit-employee-btn { background-color: #e83e8c; } /* 洋紅色，與原本系統的"特"休色調呼應 */
+        .edit-employee-btn { background-color: #e83e8c; }
 
         .form-status-btn.open { background-color: #28a745; }
         .form-status-btn.closed { background-color: #6c757d; }
@@ -878,7 +878,7 @@
     function updateHighlightBtnUI() {
         if (!currentUser || !currentSquad) return;
         const isManager = (currentUser === squadManagers[currentSquad]);
-        highlightBtn.disabled = !isManager;
+        // ✅ 移除 disabled 佈局，統一由 renderTable 控制 display
         highlightBtn.textContent = crosshairEnabled ? '十字高亮：開' : '十字高亮：關';
         highlightBtn.className = 'highlight-btn' + (crosshairEnabled ? ' active' : '');
         document.body.classList.toggle('crosshair-active', crosshairEnabled);
@@ -1117,9 +1117,10 @@
 
         otLimitGroup.style.display = (isMySquad && isManagerOfMy && formOpen) ? 'flex' : 'none';
         
-        // 判斷跑馬燈與管理人員權限
+        // ✅ 修改：判斷跑馬燈、管理人員、十字高亮 開關權限
         editMarqueeBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
         editEmployeeBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
+        highlightBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
 
         // ==================================================
         // ✨ 跑馬燈文字載入 (按班級獨立儲存)
@@ -1130,11 +1131,9 @@
         if (cloudData.settings && cloudData.settings[marqueeKey]) {
             marqueeText.textContent = cloudData.settings[marqueeKey];
         } else {
-            // 如果該班沒有專門設定過，自動檢查舊的全局設定或使用預設值來初始化
             if (!cloudData.settings) cloudData.settings = {};
             let valToSet = cloudData.settings['marqueeText'] || defaultMarquee;
             cloudData.settings[marqueeKey] = valToSet;
-            // 將該班的設定寫入雲端，實現自動分離
             postCloudData({ action: 'saveSetting', key: marqueeKey, value: valToSet });
             marqueeText.textContent = valToSet;
         }
