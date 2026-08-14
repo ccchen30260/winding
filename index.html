@@ -779,7 +779,7 @@
         updateHighlightBtnUI();
     });
 
-    // 十字高亮 hover 事件
+    // 十字高亮 hover 事件 (已修正日期/星期錯位問題)
     const tableContainer = document.querySelector('.table-container');
     tableContainer.addEventListener('mouseover', function(e) {
         if (!crosshairEnabled) return;
@@ -795,14 +795,22 @@
         const rowIndex = cell.parentElement.rowIndex;
         const colIndex = cell.cellIndex;
         
+        // 【修正重點】針對表頭(日期/星期)的 column index 進行重新對應
+        // rowIndex=1 為日期行, rowIndex=2 為星期行
+        // 它們的 colIndex=2 實際上是 "日期/星期" 文字標籤，應映射到真正的第一天數據欄 (colIndex=3)
+        let targetColIndex = colIndex;
+        if ((rowIndex === 1 || rowIndex === 2) && colIndex === 2) {
+            targetColIndex = 3; 
+        }
+        
         // 高亮整列 (該 row 的所有 th, td)
         const row = table.rows[rowIndex];
         if (row) {
             Array.from(row.cells).forEach(c => c.classList.add('crosshair-highlight'));
         }
-        // 高亮整欄 (該 col 的所有 th, td)
+        // 高亮整欄 (該 col 的所有 th, td) - 使用修正後的 targetColIndex
         for (let i = 0; i < table.rows.length; i++) {
-            const cellInCol = table.rows[i].cells[colIndex];
+            const cellInCol = table.rows[i].cells[targetColIndex];
             if (cellInCol) cellInCol.classList.add('crosshair-highlight');
         }
     });
