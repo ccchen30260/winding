@@ -20,14 +20,14 @@
             --border-color: #a0a0a0;
         }
 
+        /* ✅ 手機友善：改為自然滾動，放棄強制固定高度 */
         body {
             font-family: "Microsoft JhengHei", Arial, sans-serif;
             margin: 0;
-            padding: 10px;
+            padding: 10px 10px 20px 10px;
             background-color: #fcfcfc;
             touch-action: manipulation;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
             box-sizing: border-box;
         }
 
@@ -84,16 +84,69 @@
 
         .login-error { color: #dc3545; font-size: 13px; margin-top: 12px; display: none; font-weight: bold; }
 
-        .main-app { display: none; flex-direction: column; height: 100%; overflow: hidden; box-sizing: border-box; gap: 5px; }
+        .main-app { display: none; flex-direction: column; width: 100%; min-height: 100%; gap: 5px; }
 
-        .header-controls { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; width: 100%; box-sizing: border-box; flex-shrink: 0; }
-        .left-controls, .right-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; max-width: 100%; }
+        .header-controls {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: #fcfcfc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 0;
+            padding: 10px 0 8px 0;
+            width: 100%;
+            box-sizing: border-box;
+            border-bottom: 2px solid #e0e0e0;
+            flex-shrink: 0;
+        }
+
+        .left-controls, .right-controls {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-width: 100%;
+        }
+
         .left-controls { flex: 1 1 auto; }
-        .control-group { display: flex; align-items: center; background-color: #00ff00; padding: 2px 4px; border: 1px solid #000; border-radius: 4px; box-sizing: border-box; }
-        .control-group span { font-weight: bold; padding: 0 4px; white-space: nowrap; font-size: 13px; }
 
-        .total-stats-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .stat-badge { font-size: 13px; font-weight: bold; padding: 4px 8px; border-radius: 4px; white-space: nowrap; border: 1px solid #bbb; }
+        .control-group {
+            display: flex;
+            align-items: center;
+            background-color: #00ff00;
+            padding: 2px 4px;
+            border: 1px solid #000;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .control-group span {
+            font-weight: bold;
+            padding: 0 4px;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+
+        .total-stats-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            font-size: 13px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            border: 1px solid #bbb;
+        }
+
         .stat-badge-ot { background-color: #e6f7ff; color: #0073e6; border-color: #91d5ff; }
         .stat-badge-lv { background-color: #ffe6e6; color: #d9363e; border-color: #ffa39e; }
         .stat-badge-ua { background-color: #e2e2e2; color: #495057; border-color: #ced4da; }
@@ -139,12 +192,41 @@
         .modal-btn-cancel { background-color: #e9ecef; color: #333; border: 1px solid #ced4da; }
         .modal-btn-cancel:hover { background-color: #dde0e3; }
 
-        .table-container { overflow: auto; flex: 1; min-height: 0; box-shadow: 0 0 10px rgba(0,0,0,0.1); background-color: white; -webkit-overflow-scrolling: touch; }
-        table { border-collapse: separate; border-spacing: 0; width: 100%; text-align: center; font-size: 14px; background-color: white; white-space: nowrap; }
-        th, td { border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 0; min-width: 32px; height: 38px; box-sizing: border-box; background-clip: padding-box; }
+        .table-container {
+            overflow-x: auto; 
+            overflow-y: visible; 
+            width: 100%;
+            margin-top: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-color: white;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            background-color: white;
+            white-space: nowrap;
+        }
+
+        th, td {
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0;
+            min-width: 32px;
+            height: 38px;
+            box-sizing: border-box;
+            background-clip: padding-box;
+        }
+
         th:first-child, td:first-child { border-left: 1px solid var(--border-color); }
         tr:first-child th { border-top: 1px solid var(--border-color); }
+
         th { background-color: #f2f2f2; font-weight: bold; }
+
         thead tr:nth-child(1) th { position: sticky; top: 0; z-index: 1; }
         thead tr:nth-child(2) th { position: sticky; top: 38px; z-index: 1; }
         thead tr:nth-child(3) th { position: sticky; top: 76px; z-index: 1; }
@@ -152,6 +234,7 @@
         .stats-ot { position: sticky; left: 0; width: 40px; min-width: 40px; z-index: 2; color: #00b0f0; background-color: #e6f7ff; font-weight: bold; }
         .stats-lv { position: sticky; left: 40px; width: 40px; min-width: 40px; z-index: 2; color: #ff0000; background-color: #ffe6e6; font-weight: bold; }
         .col-name { position: sticky; left: 80px; width: 65px; min-width: 65px; z-index: 2; font-weight: bold; background-color: #fafafa; box-shadow: 2px 0 5px -2px rgba(0,0,0,0.3); }
+
         thead th.stats-ot, thead th.stats-lv, thead th.col-name { z-index: 3 !important; background-color: #e0e0e0; color: black; }
 
         body.hide-stats .stats-ot, body.hide-stats .stats-lv { display: none !important; }
@@ -202,7 +285,7 @@
             position: relative; 
             white-space: nowrap; 
             box-sizing: border-box;
-            min-height: 35px; /* 防止無文字時高度塌陷 */
+            margin-top: 10px;
         }
         .marquee-content {
             display: inline-block; 
@@ -401,7 +484,7 @@
 </div>
 
 <script>
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz2gpwtAwV1CMfQFDyEyyfmoCq9Xn3nGqfExpGpmZw4BaTytFO86GQR1rVIMONcQxRP/exec";
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzLY435Gr3k6783bG__8TM0xs04CDLztMghV3Et4LX411iGTEt3so3zYSOVZlo27qPl/exec";
 
     const squadEmployeesDefault = {
         S1: ["方慎之","陳泰安","蔡南嘉","李珮菁","朱建穎","王泳淇","吳峻霖","黃詠綺","蘭狄","凱文","勞倫司","安東尼","明華","艾麥倫","邱立斯","拉特","羅內爾","艾佛森"],
@@ -538,6 +621,7 @@
         }
     }
 
+    // ✅ 強化版：如果寫入失敗，會回傳 false，避免前端誤認為修改成功
     async function postCloudData(payload) {
         showSync();
         try {
@@ -547,8 +631,10 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
+            return true; // 在 no-cors 模式下，無網路異常視為成功
         } catch (err) {
             console.error("雲端寫入失敗", err);
+            return false;
         } finally {
             hideSync();
         }
@@ -1160,7 +1246,7 @@
 
     cancelPwdBtn.addEventListener('click', () => changePwdModal.style.display = 'none');
 
-    // ✅ 採用穩定的輕量密碼修改邏輯
+    // ✅ 修復密碼修改失敗的問題
     savePwdBtn.addEventListener('click', async function() {
         const correctPwd = getUserPassword(currentUser);
         const oldVal = oldPwdInput.value;
@@ -1182,9 +1268,15 @@
         
         if(!cloudData.passwords) cloudData.passwords = {};
         cloudData.passwords[currentUser] = newVal;
-        await postCloudData({ action: 'savePassword', key: currentUser, value: newVal });
+        const isSaved = await postCloudData({ action: 'savePassword', key: currentUser, value: newVal });
         
-        alert("密碼修改成功！");
+        if (!isSaved) {
+             pwdErrorMsg.textContent = "❌ 網路異常！雲端寫入失敗，請稍後再試。";
+             pwdErrorMsg.style.display = "block";
+             return;
+        }
+
+        alert("密碼修改成功！\n\n(如果重新登入時仍是舊密碼，請前往 GAS 後台點選『部署』→『新增部署』，強制清除雲端快取。)");
         changePwdModal.style.display = 'none';
     });
 
