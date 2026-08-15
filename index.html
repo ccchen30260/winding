@@ -854,7 +854,6 @@
             let thMark = document.createElement('th');
             let selectMark = document.createElement('select');
             selectMark.className = 'daily-mark-select';
-            // ✅ 修改備註選項：['', 'C', '換', '颱', '豪', '歲', '旺']
             ['', 'C', '換', '颱', '豪', '歲', '旺'].forEach(opt => {
                 let option = document.createElement('option');
                 option.value = opt;
@@ -1142,7 +1141,7 @@
 
     cancelPwdBtn.addEventListener('click', () => changePwdModal.style.display = 'none');
 
-    // ✅ 強制檢測修改密碼是否真正同步至雲端
+    // ✅ 強制檢測修改密碼是否真正同步至雲端，並針對「0000 變成 0」進行智慧診斷
     savePwdBtn.addEventListener('click', async function() {
         const correctPwd = getUserPassword(currentUser);
         const oldVal = oldPwdInput.value;
@@ -1170,9 +1169,19 @@
         await new Promise(r => setTimeout(r, 800));
         await fetchCloudData();
 
-        // 比對拉回來的真實雲端密碼，如果不等於 newVal，則代表後端寫入失敗！
-        if (getUserPassword(currentUser) !== newVal) {
-            pwdErrorMsg.textContent = "❌ 密碼修改失敗！雲端資料未同步 (GAS 後端無效)。請檢查您的 Google Apps Script 後端程式碼：確認 `doPost` 是否有正確寫入 `e.postData.contents` 的 JSON 資料到試算表。";
+        // 比對拉回來的真實雲端密碼
+        const savedPwd = getUserPassword(currentUser);
+        if (savedPwd !== newVal) {
+            let specificError = "❌ 密碼修改失敗！雲端資料未同步。";
+            
+            // 特殊診斷：如果輸入 0000 被存成 0
+            if (newVal === "0000" && savedPwd === "0") {
+                specificError += " 診斷結果：您的 Google Apps Script 後端將 '0000' 錯誤地自動轉換成了數字 '0'，導致前導零遺失！";
+                specificError += " 請務必修正您的 GAS 後端程式碼：將密碼保存為「字串」型態，避免使用數值型態寫入試算表。";
+            } else {
+                specificError += " 請檢查您的 Google Apps Script 後端程式碼：確認 `doPost` 是否有正確寫入 `e.postData.contents` 的 JSON 資料到試算表。";
+            }
+            pwdErrorMsg.textContent = specificError;
             pwdErrorMsg.style.display = "block";
             return;
         }
