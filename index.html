@@ -82,7 +82,6 @@
 
         .login-btn { width: 100%; padding: 10px; font-size: 16px; font-weight: bold; color: #fff; background-color: #28a745; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; }
         .login-btn:hover { background-color: #218838; }
-        .login-btn:disabled { background-color: #6c757d; cursor: not-allowed; }
 
         .login-error { color: #dc3545; font-size: 13px; margin-top: 12px; display: none; font-weight: bold; }
 
@@ -522,7 +521,7 @@
 </div>
 
 <script>
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzLY435Gr3k6783bG__8TM0xs04CDLztMghV3Et4LX411iGTEt3so3zYSOVZlo27qPl/exec";
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz2gpwtAwV1CMfQFDyEyyfmoCq9Xn3nGqfExpGpmZw4BaTytFO86GQR1rVIMONcQxRP/exec";
 
     const squadEmployeesDefault = {
         S1: ["方慎之","陳泰安","蔡南嘉","李珮菁","朱建穎","王泳淇","吳峻霖","黃詠綺","蘭狄","凱文","勞倫司","安東尼","明華","艾麥倫","邱立斯","拉特","羅內爾","艾佛森"],
@@ -1230,61 +1229,34 @@
         renderTable();
     });
 
-    // ✅ 已優化：登入按鈕現在有「登入中...」的視覺回饋
     loginSubmitBtn.addEventListener('click', async function() {
         const squad = loginSquadSelect.value;
         const selectedUser = loginNameSelect.value;
         const inputPwd = loginPasswordInput.value;
-
-        // 清除舊錯誤
-        loginErrorMsg.style.display = 'none';
-        loginErrorMsg.textContent = '請選擇班級、姓名或密碼錯誤！';
-
         if (!squad || !selectedUser) {
             loginErrorMsg.style.display = 'block';
             return;
         }
-
-        // 按鈕回饋
-        loginSubmitBtn.disabled = true;
-        loginSubmitBtn.textContent = "登入中...";
-        showSync();
-
-        try {
-            const correctPwd = getUserPassword(selectedUser);
-            if (inputPwd !== correctPwd) {
-                loginErrorMsg.style.display = 'block';
-                loginSubmitBtn.disabled = false;
-                loginSubmitBtn.textContent = "登入";
-                hideSync();
-                return;
-            }
-
+        const correctPwd = getUserPassword(selectedUser);
+        if (inputPwd === correctPwd) {
             currentSquad = squad;
             currentUser = selectedUser;
             currentViewSquad = squad;
             sessionStorage.setItem('schedule_current_squad', squad);
             sessionStorage.setItem('schedule_current_user', selectedUser);
-
-            await fetchCloudData(); // 拉取最新資料
-
-            viewSquadSelect.value = squad;
             loginErrorMsg.style.display = 'none';
             loginPasswordInput.value = '';
+            viewSquadSelect.value = squad;
+            showSync();
+            await fetchCloudData();
             mainApp.style.display = 'block';
             loginOverlay.style.display = 'none';
             userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
             updateFormStatusUI();
             updateHighlightBtnUI();
             renderTable();
-        } catch (err) {
-            console.error("登入過程中發生錯誤", err);
-            loginErrorMsg.textContent = "❌ 連線異常或讀取失敗，請稍後再試。";
+        } else {
             loginErrorMsg.style.display = 'block';
-        } finally {
-            loginSubmitBtn.disabled = false;
-            loginSubmitBtn.textContent = "登入";
-            hideSync();
         }
     });
 
