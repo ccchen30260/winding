@@ -20,7 +20,6 @@
             --border-color: #a0a0a0;
         }
 
-        /* 核心布局优化：占满 100vh 屏幕高度，隐藏整体滚动 */
         body {
             font-family: "Microsoft JhengHei", Arial, sans-serif;
             margin: 0;
@@ -112,13 +111,11 @@
         .toggle-btn { background-color: #007bff; }
         .highlight-btn { background-color: #6f42c1; }
         .highlight-btn.active { background-color: #28a745; }
-        .highlight-btn:disabled { cursor: not-allowed; opacity: 0.7; }
         .edit-marquee-btn { background-color: #fd7e14; }
         .edit-employee-btn { background-color: #e83e8c; }
 
         .form-status-btn.open { background-color: #28a745; }
         .form-status-btn.closed { background-color: #6c757d; }
-        .form-status-btn:disabled { cursor: not-allowed; opacity: 0.85; }
 
         .btn-confirm {
             position: fixed; bottom: 25px; right: 25px; z-index: 9999; display: none; padding: 15px 25px;
@@ -190,7 +187,6 @@
 
         td.pending-edit select { outline: 3px solid #ffc107; background-color: #fff3cd !important; }
 
-        /* 十字高亮效果 */
         body.crosshair-active td.crosshair-highlight, body.crosshair-active th.crosshair-highlight { background-color: #ffeaa7 !important; transition: background-color 0.15s ease; }
         body.crosshair-active td.crosshair-highlight select { background-color: #ffeaa7 !important; }
 
@@ -354,7 +350,7 @@
                     <option value="S4">S4</option>
                 </select>
             </div>
-            <button id="highlightBtn" class="highlight-btn" disabled>十字高亮：關</button>
+            <button id="highlightBtn" class="highlight-btn">十字高亮：關</button>
             <button id="formStatusBtn" class="form-status-btn open">填表：開啟</button>
             <div id="userInfoDisplay" class="user-info">👤 未登入</div>
             <button id="changePwdBtn" class="change-pwd-btn">修改密碼</button>
@@ -383,7 +379,6 @@
 <script>
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx10OkkUE1EORRVPYpg8is7gkjKqdzyhfElnZ3nW3F6NzlNXKaz50KwjvQAi8AG6mbX/exec";
 
-    // 預設名單
     const squadEmployeesDefault = {
         S1: ["方慎之","陳泰安","蔡南嘉","李珮菁","朱建穎","王泳淇","吳峻霖","黃詠綺","蘭狄","凱文","勞倫司","安東尼","明華","艾麥倫","邱立斯","拉特","羅內爾","艾佛森"],
         S2: ["黃正忠","張韶眞","陳宥庠","黃威翔","羅翊禎","黃文靖","蔡易良","吳奇玲","詹姆士","達力","山博","羅傑","達路","童氏蓮","羅德","達布","安吉","羅蘭多"],
@@ -391,7 +386,6 @@
         S4: ["陳喬志","楊代億","廖曉彤","蔡靜儀","賴建亦","施榮傑","陰其德","黃譯鋒","楊雅婷","羅啟倫","埃爾默","拉斯特","雷伊","漢斯","達利斯","甘達","特拉多","達爾文"]
     };
 
-    // 各班管理員
     const squadManagers = {
         S1: "方慎之",
         S2: "黃正忠",
@@ -486,11 +480,14 @@
         loginNameSelect.value = '';
     });
 
+    // ✅ 強制禁用瀏覽器快取機制
     async function fetchCloudData() {
         showSync();
         try {
-            // ✅ 在網址加入時間戳，強制繞過 GAS 與瀏覽器的快取！
-            const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData&_=${Date.now()}`);
+            // 同時加上時間戳、隨機數，並設定 cache: 'no-store'
+            const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData&_=${Date.now()}&r=${Math.random()}`, {
+                cache: 'no-store'
+            });
             const data = await resp.json();
             if (data) cloudData = data;
             if (cloudData.settings) {
@@ -572,7 +569,6 @@
 
     function updateHighlightBtnUI() {
         if (!currentUser || !currentSquad) return;
-        highlightBtn.disabled = false;
         highlightBtn.textContent = crosshairEnabled ? '十字高亮：開' : '十字高亮：關';
         highlightBtn.className = 'highlight-btn' + (crosshairEnabled ? ' active' : '');
         document.body.classList.toggle('crosshair-active', crosshairEnabled);
@@ -1142,7 +1138,7 @@
 
     cancelPwdBtn.addEventListener('click', () => changePwdModal.style.display = 'none');
 
-    // ✅ 強制檢測修改密碼是否真正同步至雲端，並針對「0000 變成 0」進行智慧診斷
+    // ✅ 終極修正：寫入密碼後，耗盡一切手段強制繞過 GAS 與瀏覽器的快取
     savePwdBtn.addEventListener('click', async function() {
         const correctPwd = getUserPassword(currentUser);
         const oldVal = oldPwdInput.value;
@@ -1163,24 +1159,27 @@
         }
         
         if(!cloudData.passwords) cloudData.passwords = {};
-        cloudData.passwords[currentUser] = newVal;
-        await postCloudData({ action: 'savePassword', key: currentUser, value: newVal });
+        // ✅ 強制轉成字串，避免 GAS 把 "0000" 自動變成數字 0
+        const finalNewVal = newVal.toString();
+        cloudData.passwords[currentUser] = finalNewVal;
+        await postCloudData({ action: 'savePassword', key: currentUser, value: finalNewVal });
 
-        // ✅ 重要：延遲一秒並強制強制拉取最新資料，繞過 GAS 緩存
-        await new Promise(r => setTimeout(r, 1000));
+        // 1. 延遲 1500 毫秒，給 Google 伺服器足夠的時間更新和刷新快取
+        await new Promise(r => setTimeout(r, 1500));
+        
+        // 2. 用強制無緩存參數重新讀取資料
         await fetchCloudData();
 
-        // 比對拉回來的真實雲端密碼
+        // 3. 確認拉回的資料
         const savedPwd = getUserPassword(currentUser);
-        if (savedPwd !== newVal) {
+        if (savedPwd !== finalNewVal) {
             let specificError = "❌ 密碼修改失敗！雲端資料未同步。";
             
-            // 特殊診斷：如果輸入 0000 被存成 0
-            if (newVal === "0000" && savedPwd === "0") {
+            if (finalNewVal === "0000" && savedPwd === "0") {
                 specificError += " 診斷結果：您的 Google Apps Script 後端將 '0000' 錯誤地自動轉換成了數字 '0'，導致前導零遺失！";
-                specificError += " 請務必修正您的 GAS 後端程式碼：將密碼保存為「字串」型態，避免使用數值型態寫入試算表。";
+                specificError += " 請務必修正您的 GAS 後端程式碼：將密碼保存為「字串」型態。";
             } else {
-                specificError += " 請檢查您的 Google Apps Script 後端程式碼：確認 `doPost` 是否有正確寫入 `e.postData.contents` 的 JSON 資料到試算表。";
+                specificError += " 這通常是 GAS 的 doGet 快取造成的。請在瀏覽器中按下【Ctrl + F5】強制刷新頁面，再試一次！";
             }
             pwdErrorMsg.textContent = specificError;
             pwdErrorMsg.style.display = "block";
