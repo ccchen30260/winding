@@ -20,7 +20,6 @@
             --border-color: #a0a0a0;
         }
 
-        /* ✅ 手機友善：採用 S4 的自適應滾動排版 */
         body {
             font-family: "Microsoft JhengHei", Arial, sans-serif;
             margin: 0;
@@ -86,14 +85,8 @@
 
         .login-error { color: #dc3545; font-size: 13px; margin-top: 12px; display: none; font-weight: bold; }
 
-        /* ✅ 主應用布局改為一般文檔流 */
-        .main-app {
-            display: none;
-            width: 100%;
-            padding-bottom: 10px;
-        }
+        .main-app { display: none; width: 100%; padding-bottom: 10px; }
 
-        /* ✅ 頂部控制列：採用貼頂固定，並帶底部分隔線 */
         .header-controls {
             position: sticky;
             top: 0;
@@ -199,10 +192,9 @@
         .modal-btn-cancel { background-color: #e9ecef; color: #333; border: 1px solid #ced4da; }
         .modal-btn-cancel:hover { background-color: #dde0e3; }
 
-        /* ✅ 表格容器：採用 S4 固定高度讓手機有明確的可滑動空間 */
         .table-container {
             overflow: auto;
-            height: calc(100vh - 110px); /* 預留上方控制列與跑馬燈空間 */
+            height: calc(100vh - 110px);
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             background-color: white;
             -webkit-overflow-scrolling: touch;
@@ -264,7 +256,6 @@
             color: inherit; font-weight: inherit;
         }
 
-        /* ✅ 填表關閉時的外觀：完全保留原樣，僅不可點擊 */
         .shift-select:disabled,
         .daily-mark-select:disabled {
             cursor: default !important;
@@ -298,7 +289,6 @@
         body.crosshair-active td.crosshair-highlight, body.crosshair-active th.crosshair-highlight { background-color: #ffeaa7 !important; transition: background-color 0.15s ease; }
         body.crosshair-active td.crosshair-highlight select { background-color: #ffeaa7 !important; }
 
-        /* ✅ 跑馬燈：完全採用 S4 設計 */
         #tickerContainer {
             width: 100%;
             overflow: hidden;
@@ -440,7 +430,6 @@
 
 <!-- 主應用 -->
 <div id="mainApp" class="main-app">
-    <!-- ========== 控制列已具備 sticky 黏性效果 ========== -->
     <div class="header-controls">
         <div class="left-controls">
             <div class="control-group">
@@ -486,7 +475,6 @@
             <button id="logoutBtn" class="logout-btn">登出</button>
             <button id="toggleStatsBtn" class="toggle-btn">隱藏統計</button>
             
-            <!-- 十字高亮開關 -->
             <div class="control-group" id="crosshairControl" style="display: none; background-color: #e0e0e0; border-color: #999;">
                 <span style="font-size:12px; color:#333;">十字高亮</span>
                 <label class="toggle-switch" style="position: relative; display: inline-block; width: 34px; height: 18px; margin-left: 5px; margin-right: 5px;">
@@ -507,12 +495,10 @@
         </div>
     </div>
 
-    <!-- ✅ 跑馬燈移動到班表上方 -->
     <div id="tickerContainer">
         <div id="tickerText"></div>
     </div>
 
-    <!-- ========== 班表表格 ========== -->
     <div class="table-container">
         <table id="scheduleTable">
             <thead id="tableHead"></thead>
@@ -626,12 +612,18 @@
         loginNameSelect.value = '';
     });
 
+    // ✅ 新增：中止控制器。如果 GAS 卡住超過 10 秒，將會強制斷開，避免無限等待
     async function fetchCloudData() {
         showSync();
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超時
+
         try {
             const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData&_=${Date.now()}&r=${Math.random()}`, {
-                cache: 'no-store'
+                cache: 'no-store',
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
             const data = await resp.json();
             if (data) cloudData = data;
             if (cloudData.settings) {
@@ -654,8 +646,14 @@
             }
             if (!cloudData.otLimits) cloudData.otLimits = {};
         } catch (err) {
-            console.error("雲端讀取失敗", err);
+            console.error("讀取異常", err);
+            let errMsg = "讀取資料失敗";
+            if (err.name === 'AbortError') {
+                errMsg = "連線逾時 (GAS 回應超過 10 秒)";
+            }
+            throw new Error(errMsg);
         } finally {
+            clearTimeout(timeoutId);
             hideSync();
         }
     }
@@ -954,10 +952,9 @@
             tickerTextEl.textContent = valToSet;
         }
         
-        // 採用 S4 的跑馬燈重啟動畫機制
         tickerContainer.style.display = 'block';
         tickerTextEl.style.animation = 'none';
-        tickerTextEl.offsetHeight; /* 觸發 reflow */
+        tickerTextEl.offsetHeight;
         tickerTextEl.style.animation = 'scrollText 35s linear infinite';
 
         const year = parseInt(yearSelect.value);
@@ -1230,7 +1227,7 @@
         renderTable();
     });
 
-    // ✅ 修正：將 fetchCloudData 移到最開頭，讓按鈕有反應並顯示同步狀態
+    // ✅ 加入 catch 捕捉超時與錯誤，讓按鈕永遠都能正常恢復
     loginSubmitBtn.addEventListener('click', async function() {
         const squad = loginSquadSelect.value;
         const selectedUser = loginNameSelect.value;
@@ -1246,10 +1243,10 @@
 
         loginSubmitBtn.disabled = true;
         loginSubmitBtn.textContent = "登入中...";
-        showSync(); // 顯示「雲端同步中」
+        showSync();
 
         try {
-            // ✅ 關鍵修正：先從雲端強制下載最新資料，再來驗證密碼！
+            // ✅ 讀取最新資料
             await fetchCloudData();
 
             const correctPwd = getUserPassword(selectedUser);
@@ -1276,13 +1273,14 @@
             renderTable();
 
         } catch (err) {
-            console.error("登入過程中發生錯誤", err);
-            loginErrorMsg.textContent = "❌ 連線異常或讀取失敗，請稍後再試。";
+            console.error("登入錯誤", err);
+            // ✅ 將錯誤訊息直接顯示在登入框
+            loginErrorMsg.textContent = `❌ ${err.message || '讀取失敗，請稍後再試'}`;
             loginErrorMsg.style.display = 'block';
         } finally {
             loginSubmitBtn.disabled = false;
             loginSubmitBtn.textContent = "登入";
-            hideSync(); // 完成後隱藏「雲端同步中」
+            hideSync();
         }
     });
 
@@ -1315,7 +1313,6 @@
 
     cancelPwdBtn.addEventListener('click', () => changePwdModal.style.display = 'none');
 
-    // ✅ 保護機制：強制轉成字串，避免 0000 被存成 0
     savePwdBtn.addEventListener('click', async function() {
         const correctPwd = getUserPassword(currentUser);
         const oldVal = oldPwdInput.value;
@@ -1336,7 +1333,7 @@
         }
         
         if(!cloudData.passwords) cloudData.passwords = {};
-        cloudData.passwords[currentUser] = newVal.toString(); // 防止 0000 轉成 0
+        cloudData.passwords[currentUser] = newVal.toString();
         const saved = await postCloudData({ action: 'savePassword', key: currentUser, value: newVal.toString() });
         
         if (!saved) {
@@ -1349,7 +1346,6 @@
         changePwdModal.style.display = 'none';
     });
 
-    // 跑馬燈管理邏輯
     editTickerBtn.addEventListener('click', function() {
         const marqueeKey = currentSquad + '_marqueeText';
         const currentText = (cloudData.settings && cloudData.settings[marqueeKey]) 
@@ -1378,7 +1374,6 @@
         tickerEditModal.style.display = 'none';
     });
 
-    // 管理班表人員邏輯
     editEmployeeBtn.addEventListener('click', function() {
         const currentList = getEmployeeList(currentSquad);
         employeeListContainer.innerHTML = '';
@@ -1395,7 +1390,7 @@
                 if (newName && newName.trim() !== '' && newName.trim() !== name) {
                     if (currentList.includes(newName.trim())) { alert("此姓名已存在！"); return; }
                     currentList[index] = newName.trim();
-                    editEmployeeBtn.click(); // 刷新畫面
+                    editEmployeeBtn.click();
                 }
             });
 
@@ -1406,7 +1401,7 @@
                 e.stopPropagation();
                 if (confirm(`確定要刪除 "${name}" 嗎？`)) {
                     currentList.splice(index, 1);
-                    editEmployeeBtn.click(); // 刷新畫面
+                    editEmployeeBtn.click();
                 }
             });
 
@@ -1424,7 +1419,7 @@
         if (currentList.includes(newName)) { alert("此姓名已存在！"); newEmployeeInput.value = ''; return; }
         currentList.push(newName);
         newEmployeeInput.value = '';
-        editEmployeeBtn.click(); // 刷新畫面
+        editEmployeeBtn.click();
     });
     newEmployeeInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') addEmployeeBtn.click(); });
     
