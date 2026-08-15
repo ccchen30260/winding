@@ -83,7 +83,7 @@
         .login-btn:hover { background-color: #218838; }
         .login-btn:disabled { background-color: #6c757d; cursor: not-allowed; }
 
-        .login-error { color: #dc3545; font-size: 13px; margin-top: 12px; display: none; font-weight: bold; }
+        .login-error { color: #dc3545; font-size: 14px; margin-top: 15px; display: none; font-weight: bold; line-height: 1.5; }
 
         .main-app { display: none; width: 100%; padding-bottom: 10px; }
 
@@ -612,11 +612,10 @@
         loginNameSelect.value = '';
     });
 
-    // ✅ 新增：中止控制器。如果 GAS 卡住超過 10 秒，將會強制斷開，避免無限等待
+    // ✅ 強制超時 15 秒。內部沒有 hideSync()，由外部呼叫者控制顯示與隱藏
     async function fetchCloudData() {
-        showSync();
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超時
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
 
         try {
             const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData&_=${Date.now()}&r=${Math.random()}`, {
@@ -649,17 +648,18 @@
             console.error("讀取異常", err);
             let errMsg = "讀取資料失敗";
             if (err.name === 'AbortError') {
-                errMsg = "連線逾時 (GAS 回應超過 10 秒)";
+                errMsg = "連線逾時！GAS 伺服器回應超過 15 秒，請檢查網路或 GAS 狀態。";
+            } else if (err.name === 'TypeError') {
+                errMsg = "網路連線異常！請確認您已連上網際網路。";
             }
             throw new Error(errMsg);
         } finally {
             clearTimeout(timeoutId);
-            hideSync();
         }
     }
 
+    // ✅ 內部不自行隱藏 loading，交由外層呼叫者決定何時 hideSync()
     async function postCloudData(payload) {
-        showSync();
         try {
             await fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
@@ -671,8 +671,6 @@
         } catch (err) {
             console.error("雲端寫入失敗", err);
             return false;
-        } finally {
-            hideSync();
         }
     }
 
@@ -756,14 +754,20 @@
         document.querySelectorAll('.crosshair-highlight').forEach(el => el.classList.remove('crosshair-highlight'));
     });
 
-    formStatusBtn.addEventListener('click', function() {
+    formStatusBtn.addEventListener('click', async function() {
         if (!currentSquad || !currentViewSquad || currentViewSquad !== currentSquad) return;
         if (currentUser !== squadManagers[currentSquad]) return;
         const nextState = isFormOpen(currentSquad) ? 'closed' : 'open';
         const key = currentSquad + '_form_status';
         if (!cloudData.settings) cloudData.settings = {};
         cloudData.settings[key] = nextState;
-        postCloudData({ action: 'saveSetting', key: key, value: nextState });
+        
+        showSync();
+        try {
+            await postCloudData({ action: 'saveSetting', key: key, value: nextState });
+        } finally {
+            hideSync();
+        }
         updateFormStatusUI();
         renderTable();
     });
@@ -1227,7 +1231,7 @@
         renderTable();
     });
 
-    // ✅ 加入 catch 捕捉超時與錯誤，讓按鈕永遠都能正常恢復
+    // ✅ 無論成功或失敗，「雲端同步中」一定會顯示 15 秒或直到結束
     loginSubmitBtn.addEventListener('click', async function() {
         const squad = loginSquadSelect.value;
         const selectedUser = loginNameSelect.value;
@@ -1246,8 +1250,7 @@
         showSync();
 
         try {
-            // ✅ 讀取最新資料
-            await fetchCloudData();
+            await fetchCloudData(); // 先同步最新資料
 
             const correctPwd = getUserPassword(selectedUser);
             if (inputPwd !== correctPwd) {
@@ -1274,13 +1277,12 @@
 
         } catch (err) {
             console.error("登入錯誤", err);
-            // ✅ 將錯誤訊息直接顯示在登入框
             loginErrorMsg.textContent = `❌ ${err.message || '讀取失敗，請稍後再試'}`;
             loginErrorMsg.style.display = 'block';
         } finally {
             loginSubmitBtn.disabled = false;
             loginSubmitBtn.textContent = "登入";
-            hideSync();
+            hideSync(); // 做完才隱藏
         }
     });
 
@@ -1288,17 +1290,22 @@
         const savedSquad = sessionStorage.getItem('schedule_current_squad');
         const savedUser = sessionStorage.getItem('schedule_current_user');
         if (savedSquad && savedUser) {
-            await fetchCloudData();
-            currentSquad = savedSquad;
-            currentUser = savedUser;
-            currentViewSquad = savedSquad;
-            viewSquadSelect.value = savedSquad;
-            mainApp.style.display = 'block';
-            loginOverlay.style.display = 'none';
-            userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
-            updateFormStatusUI();
-            updateHighlightBtnUI();
-            renderTable();
+            showSync();
+            try {
+                await fetchCloudData();
+                currentSquad = savedSquad;
+                currentUser = savedUser;
+                currentViewSquad = savedSquad;
+                viewSquadSelect.value = savedSquad;
+                mainApp.style.display = 'block';
+                loginOverlay.style.display = 'none';
+                userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
+                updateFormStatusUI();
+                updateHighlightBtnUI();
+                renderTable();
+            } finally {
+                hideSync();
+            }
         } else {
             loginOverlay.style.display = 'flex';
             mainApp.style.display = 'none';
@@ -1334,16 +1341,20 @@
         
         if(!cloudData.passwords) cloudData.passwords = {};
         cloudData.passwords[currentUser] = newVal.toString();
-        const saved = await postCloudData({ action: 'savePassword', key: currentUser, value: newVal.toString() });
         
-        if (!saved) {
-             pwdErrorMsg.textContent = "❌ 寫入雲端失敗，請稍後再試。";
-             pwdErrorMsg.style.display = "block";
-             return;
+        showSync();
+        try {
+            const saved = await postCloudData({ action: 'savePassword', key: currentUser, value: newVal.toString() });
+            if (!saved) {
+                pwdErrorMsg.textContent = "❌ 寫入雲端失敗，請稍後再試。";
+                pwdErrorMsg.style.display = "block";
+                return;
+            }
+            alert("密碼修改成功！");
+            changePwdModal.style.display = 'none';
+        } finally {
+            hideSync();
         }
-
-        alert("密碼修改成功！");
-        changePwdModal.style.display = 'none';
     });
 
     editTickerBtn.addEventListener('click', function() {
@@ -1365,13 +1376,19 @@
         const marqueeKey = currentSquad + '_marqueeText';
         if(!cloudData.settings) cloudData.settings = {};
         cloudData.settings[marqueeKey] = newText;
-        await postCloudData({ action: 'saveSetting', key: marqueeKey, value: newText });
-        tickerTextEl.textContent = newText;
-        tickerTextEl.style.animation = 'none';
-        tickerTextEl.offsetHeight;
-        tickerTextEl.style.animation = 'scrollText 35s linear infinite';
-        alert(`「${currentSquad}」跑馬燈文字已更新！`);
-        tickerEditModal.style.display = 'none';
+        
+        showSync();
+        try {
+            await postCloudData({ action: 'saveSetting', key: marqueeKey, value: newText });
+            tickerTextEl.textContent = newText;
+            tickerTextEl.style.animation = 'none';
+            tickerTextEl.offsetHeight;
+            tickerTextEl.style.animation = 'scrollText 35s linear infinite';
+            alert(`「${currentSquad}」跑馬燈文字已更新！`);
+            tickerEditModal.style.display = 'none';
+        } finally {
+            hideSync();
+        }
     });
 
     editEmployeeBtn.addEventListener('click', function() {
@@ -1428,10 +1445,16 @@
         if (currentList.length === 0) { alert("名單不能為空！"); return; }
         if(!cloudData.settings) cloudData.settings = {};
         cloudData.settings[currentSquad + '_employees'] = JSON.stringify(currentList);
-        await postCloudData({ action: 'saveSetting', key: currentSquad + '_employees', value: JSON.stringify(currentList) });
-        employeeEditModal.style.display = 'none';
-        renderTable();
-        alert(`人員名單已更新！共 ${currentList.length} 人。`);
+        
+        showSync();
+        try {
+            await postCloudData({ action: 'saveSetting', key: currentSquad + '_employees', value: JSON.stringify(currentList) });
+            employeeEditModal.style.display = 'none';
+            renderTable();
+            alert(`人員名單已更新！共 ${currentList.length} 人。`);
+        } finally {
+            hideSync();
+        }
     });
 
     logoutBtn.addEventListener('click', function() {
@@ -1443,14 +1466,20 @@
         loginPasswordInput.value = ''; checkLoginStatus();
     });
 
-    otLimitSelect.addEventListener('change', function() {
+    otLimitSelect.addEventListener('change', async function() {
         if (!currentSquad || !currentViewSquad || currentViewSquad !== currentSquad) return;
         if (currentUser !== squadManagers[currentSquad]) return;
         const year = yearSelect.value; const month = monthSelect.value;
         const limitKey = `${currentSquad}_otlimit_${year}_${month}`;
         if (!cloudData.otLimits) cloudData.otLimits = {};
         cloudData.otLimits[limitKey] = this.value;
-        postCloudData({ action: 'saveOtLimit', key: limitKey, value: this.value });
+        
+        showSync();
+        try {
+            await postCloudData({ action: 'saveOtLimit', key: limitKey, value: this.value });
+        } finally {
+            hideSync();
+        }
     });
 
     const now = new Date(); const currentYear = now.getFullYear();
