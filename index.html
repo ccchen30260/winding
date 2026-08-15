@@ -20,7 +20,7 @@
             --border-color: #a0a0a0;
         }
 
-        /* ✅ 核心布局优化：让 body 占满 100vh 高度，且隐藏整体滚动条 */
+        /* 核心布局优化：占满 100vh 屏幕高度，隐藏整体滚动 */
         body {
             font-family: "Microsoft JhengHei", Arial, sans-serif;
             margin: 0;
@@ -70,167 +70,43 @@
             border: 1px solid #e0e0e0;
         }
 
-        .login-card h2 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            color: #333;
-            font-size: 20px;
-        }
+        .login-card h2 { margin-top: 0; margin-bottom: 20px; color: #333; font-size: 20px; }
 
-        .login-field {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-
-        .login-field label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #555;
-        }
-
+        .login-field { margin-bottom: 15px; text-align: left; }
+        .login-field label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: bold; color: #555; }
         .login-field input, .login-field select, .login-field textarea {
-            width: 100%;
-            padding: 10px;
-            font-size: 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-            background-color: #fff;
-            outline: none;
-            resize: vertical;
-            font-family: inherit;
+            width: 100%; padding: 10px; font-size: 15px; border: 1px solid #ccc;
+            border-radius: 6px; box-sizing: border-box; background-color: #fff; outline: none;
+            resize: vertical; font-family: inherit;
         }
 
-        .login-btn {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            color: #fff;
-            background-color: #28a745;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.2s;
-        }
-
+        .login-btn { width: 100%; padding: 10px; font-size: 16px; font-weight: bold; color: #fff; background-color: #28a745; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; }
         .login-btn:hover { background-color: #218838; }
 
-        .login-error {
-            color: #dc3545;
-            font-size: 13px;
-            margin-top: 12px;
-            display: none;
-            font-weight: bold;
-        }
+        .login-error { color: #dc3545; font-size: 13px; margin-top: 12px; display: none; font-weight: bold; }
 
-        /* ✅ 核心布局优化：主应用采用弹性布局，自动撑满屏幕 */
-        .main-app {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-            overflow: hidden;
-            box-sizing: border-box;
-            gap: 5px; /* 各区块之间的间距 */
-        }
+        .main-app { display: none; flex-direction: column; height: 100%; overflow: hidden; box-sizing: border-box; gap: 5px; }
 
-        .header-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
-            width: 100%;
-            box-sizing: border-box;
-            flex-shrink: 0; /* 防止顶部被压缩 */
-        }
-
-        .left-controls, .right-controls {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 6px;
-            max-width: 100%;
-        }
-
+        .header-controls { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; width: 100%; box-sizing: border-box; flex-shrink: 0; }
+        .left-controls, .right-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; max-width: 100%; }
         .left-controls { flex: 1 1 auto; }
+        .control-group { display: flex; align-items: center; background-color: #00ff00; padding: 2px 4px; border: 1px solid #000; border-radius: 4px; box-sizing: border-box; }
+        .control-group span { font-weight: bold; padding: 0 4px; white-space: nowrap; font-size: 13px; }
 
-        .control-group {
-            display: flex;
-            align-items: center;
-            background-color: #00ff00;
-            padding: 2px 4px;
-            border: 1px solid #000;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        .control-group span {
-            font-weight: bold;
-            padding: 0 4px;
-            white-space: nowrap;
-            font-size: 13px;
-        }
-
-        .total-stats-group {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .stat-badge {
-            font-size: 13px;
-            font-weight: bold;
-            padding: 4px 8px;
-            border-radius: 4px;
-            white-space: nowrap;
-            border: 1px solid #bbb;
-        }
-
+        .total-stats-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .stat-badge { font-size: 13px; font-weight: bold; padding: 4px 8px; border-radius: 4px; white-space: nowrap; border: 1px solid #bbb; }
         .stat-badge-ot { background-color: #e6f7ff; color: #0073e6; border-color: #91d5ff; }
         .stat-badge-lv { background-color: #ffe6e6; color: #d9363e; border-color: #ffa39e; }
         .stat-badge-ua { background-color: #e2e2e2; color: #495057; border-color: #ced4da; }
 
-        select {
-            font-size: 14px;
-            padding: 4px;
-            border: 1px solid #ccc;
-            background-color: #ffe6e6;
-            border-radius: 4px;
-            outline: none;
-        }
+        select { font-size: 14px; padding: 4px; border: 1px solid #ccc; background-color: #ffe6e6; border-radius: 4px; outline: none; }
+        select:disabled { background-color: #e0e0e0; color: #666; cursor: not-allowed; }
 
-        select:disabled {
-            background-color: #e0e0e0;
-            color: #666;
-            cursor: not-allowed;
-        }
-
-        .user-info {
-            font-size: 13px;
-            font-weight: bold;
-            color: #333;
-            background-color: #e9ecef;
-            padding: 5px 8px;
-            border-radius: 4px;
-            white-space: nowrap;
-        }
+        .user-info { font-size: 13px; font-weight: bold; color: #333; background-color: #e9ecef; padding: 5px 8px; border-radius: 4px; white-space: nowrap; }
 
         .change-pwd-btn, .logout-btn, .toggle-btn, .form-status-btn, .highlight-btn, .edit-marquee-btn, .edit-employee-btn {
-            padding: 6px 8px;
-            font-size: 12px;
-            font-weight: bold;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            white-space: nowrap;
+            padding: 6px 8px; font-size: 12px; font-weight: bold; color: #fff; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;
         }
-
         .change-pwd-btn { background-color: #17a2b8; }
         .logout-btn { background-color: #dc3545; }
         .toggle-btn { background-color: #007bff; }
@@ -245,147 +121,33 @@
         .form-status-btn:disabled { cursor: not-allowed; opacity: 0.85; }
 
         .btn-confirm {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            z-index: 9999;
-            display: none;
-            padding: 15px 25px;
-            font-size: 20px;
-            font-weight: bold;
-            color: #fff;
-            background-color: #28a745;
-            border: none;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.5);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            user-select: none;
+            position: fixed; bottom: 25px; right: 25px; z-index: 9999; display: none; padding: 15px 25px;
+            font-size: 20px; font-weight: bold; color: #fff; background-color: #28a745; border: none;
+            border-radius: 50px; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.5); cursor: pointer;
+            transition: all 0.3s ease; user-select: none;
         }
-        .btn-confirm:hover:not(:disabled) {
-            background-color: #218838;
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.6);
-        }
-        .btn-confirm:active:not(:disabled) {
-            transform: scale(0.95);
-        }
-        .btn-confirm:disabled {
-            background-color: #a0a0a0 !important;
-            box-shadow: none !important;
-            cursor: default !important;
-            transform: scale(1) !important;
-            opacity: 1 !important;
-        }
-        @media screen and (max-width: 600px) {
-            .btn-confirm {
-                bottom: 15px;
-                right: 15px;
-                padding: 12px 18px;
-                font-size: 17px;
-            }
-        }
+        .btn-confirm:hover:not(:disabled) { background-color: #218838; transform: scale(1.05); box-shadow: 0 6px 20px rgba(40, 167, 69, 0.6); }
+        .btn-confirm:active:not(:disabled) { transform: scale(0.95); }
+        .btn-confirm:disabled { background-color: #a0a0a0 !important; box-shadow: none !important; cursor: default !important; transform: scale(1) !important; opacity: 1 !important; }
 
-        .custom-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-        }
-        .custom-modal-box {
-            background-color: #ffffff;
-            padding: 40px 30px;
-            border-radius: 16px;
-            max-width: 450px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            animation: fadeIn 0.3s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .custom-modal-box h3 {
-            margin-top: 0;
-            margin-bottom: 25px;
-            font-size: 22px;
-            line-height: 1.5;
-        }
-        .custom-modal-box p {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-        .modal-btn-group {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-        .modal-btn-confirm, .modal-btn-cancel {
-            padding: 12px 30px;
-            font-size: 17px;
-            font-weight: bold;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .modal-btn-confirm {
-            background-color: #28a745;
-            color: #fff;
-        }
-        .modal-btn-confirm:hover {
-            background-color: #218838;
-        }
-        .modal-btn-cancel {
-            background-color: #e9ecef;
-            color: #333;
-            border: 1px solid #ced4da;
-        }
-        .modal-btn-cancel:hover {
-            background-color: #dde0e3;
-        }
+        .custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 10000; }
+        .custom-modal-box { background-color: #ffffff; padding: 40px 30px; border-radius: 16px; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .custom-modal-box h3 { margin-top: 0; margin-bottom: 25px; font-size: 22px; line-height: 1.5; }
+        .custom-modal-box p { font-size: 16px; color: #333; margin-bottom: 25px; line-height: 1.6; }
+        .modal-btn-group { display: flex; justify-content: center; gap: 15px; }
+        .modal-btn-confirm, .modal-btn-cancel { padding: 12px 30px; font-size: 17px; font-weight: bold; border: none; border-radius: 30px; cursor: pointer; transition: 0.2s; }
+        .modal-btn-confirm { background-color: #28a745; color: #fff; }
+        .modal-btn-confirm:hover { background-color: #218838; }
+        .modal-btn-cancel { background-color: #e9ecef; color: #333; border: 1px solid #ced4da; }
+        .modal-btn-cancel:hover { background-color: #dde0e3; }
 
-        /* ✅ 核心布局优化：表格容器占满剩余全部空间 */
-        .table-container {
-            overflow: auto;
-            flex: 1;          /* 撑满剩余全部高度 */
-            min-height: 0;    /* 防止 flex 溢出 */
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            background-color: white;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        table {
-            border-collapse: separate;
-            border-spacing: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 14px;
-            background-color: white;
-            white-space: nowrap;
-        }
-
-        th, td {
-            border-right: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            padding: 0;
-            min-width: 32px;
-            height: 38px;
-            box-sizing: border-box;
-            background-clip: padding-box;
-        }
-
+        .table-container { overflow: auto; flex: 1; min-height: 0; box-shadow: 0 0 10px rgba(0,0,0,0.1); background-color: white; -webkit-overflow-scrolling: touch; }
+        table { border-collapse: separate; border-spacing: 0; width: 100%; text-align: center; font-size: 14px; background-color: white; white-space: nowrap; }
+        th, td { border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 0; min-width: 32px; height: 38px; box-sizing: border-box; background-clip: padding-box; }
         th:first-child, td:first-child { border-left: 1px solid var(--border-color); }
         tr:first-child th { border-top: 1px solid var(--border-color); }
-
         th { background-color: #f2f2f2; font-weight: bold; }
-
         thead tr:nth-child(1) th { position: sticky; top: 0; z-index: 1; }
         thead tr:nth-child(2) th { position: sticky; top: 38px; z-index: 1; }
         thead tr:nth-child(3) th { position: sticky; top: 76px; z-index: 1; }
@@ -393,7 +155,6 @@
         .stats-ot { position: sticky; left: 0; width: 40px; min-width: 40px; z-index: 2; color: #00b0f0; background-color: #e6f7ff; font-weight: bold; }
         .stats-lv { position: sticky; left: 40px; width: 40px; min-width: 40px; z-index: 2; color: #ff0000; background-color: #ffe6e6; font-weight: bold; }
         .col-name { position: sticky; left: 80px; width: 65px; min-width: 65px; z-index: 2; font-weight: bold; background-color: #fafafa; box-shadow: 2px 0 5px -2px rgba(0,0,0,0.3); }
-
         thead th.stats-ot, thead th.stats-lv, thead th.col-name { z-index: 3 !important; background-color: #e0e0e0; color: black; }
 
         body.hide-stats .stats-ot, body.hide-stats .stats-lv { display: none !important; }
@@ -402,39 +163,14 @@
         .weekend-header { color: red; }
         .today-header { background-color: #00ffff !important; }
 
-        tr.daily-ot-row {
-            background-color: #fffbe6;
-            font-weight: bold;
-        }
-        tr.daily-ot-row td {
-            background-color: #fffbe6;
-            color: #d48806;
-            border-top: 2px solid #ffe58f;
-        }
-        tr.daily-ot-row td.col-name {
-            background-color: #fff1b8;
-            color: #873800;
-        }
-        tr.daily-ot-row td.stats-ot, tr.daily-ot-row td.stats-lv {
-            background-color: #fff1b8;
-        }
+        tr.daily-ot-row { background-color: #fffbe6; font-weight: bold; }
+        tr.daily-ot-row td { background-color: #fffbe6; color: #d48806; border-top: 2px solid #ffe58f; }
+        tr.daily-ot-row td.col-name { background-color: #fff1b8; color: #873800; }
+        tr.daily-ot-row td.stats-ot, tr.daily-ot-row td.stats-lv { background-color: #fff1b8; }
 
         .cell-content { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; min-height: 38px; box-sizing: border-box; }
-
-        .shift-select {
-            width: 100%; height: 38px; border: none; background-color: transparent;
-            font-size: 15px; font-family: inherit; text-align: center; text-align-last: center;
-            appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer; outline: none;
-            color: inherit; font-weight: inherit;
-        }
-
-        /* ✅ 核心修改：讓 disabled 狀態的外觀與正常完全一致，只取消點擊功能 */
-        .shift-select:disabled {
-            cursor: not-allowed;
-            opacity: 1 !important;
-            background-color: transparent !important;
-            color: inherit !important;
-        }
+        .shift-select { width: 100%; height: 38px; border: none; background-color: transparent; font-size: 15px; font-family: inherit; text-align: center; text-align-last: center; appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer; outline: none; color: inherit; font-weight: inherit; }
+        .shift-select:disabled { cursor: not-allowed; opacity: 1 !important; background-color: transparent !important; color: inherit !important; }
 
         .shift-day { background-color: var(--bg-day); }
         .shift-night { background-color: var(--bg-night); }
@@ -449,77 +185,20 @@
         .shift-business { background-color: #fff9c4; color: black; font-weight: bold; }
         .shift-absent { background-color: #ffccbc; color: black; font-weight: bold; }
 
-        .daily-mark-select {
-            width: 100%;
-            height: 38px;
-            border: 1px solid #ccc;
-            background-color: #ffffff;
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            text-align-last: center;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            cursor: pointer;
-            outline: none;
-        }
-        .daily-mark-select:disabled {
-            cursor: not-allowed;
-            opacity: 1 !important;
-            background-color: #ffffff !important;
-            color: inherit !important;
-        }
+        .daily-mark-select { width: 100%; height: 38px; border: 1px solid #ccc; background-color: #ffffff; font-size: 16px; font-weight: bold; text-align: center; text-align-last: center; appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer; outline: none; }
+        .daily-mark-select:disabled { cursor: not-allowed; opacity: 1 !important; background-color: #ffffff !important; color: inherit !important; }
 
-        td.pending-edit select {
-            outline: 3px solid #ffc107;
-            background-color: #fff3cd !important;
-        }
+        td.pending-edit select { outline: 3px solid #ffc107; background-color: #fff3cd !important; }
 
         /* 十字高亮效果 */
-        body.crosshair-active td.crosshair-highlight,
-        body.crosshair-active th.crosshair-highlight {
-            background-color: #ffeaa7 !important;
-            transition: background-color 0.15s ease;
-        }
-        body.crosshair-active td.crosshair-highlight select {
-            background-color: #ffeaa7 !important;
-        }
+        body.crosshair-active td.crosshair-highlight, body.crosshair-active th.crosshair-highlight { background-color: #ffeaa7 !important; transition: background-color 0.15s ease; }
+        body.crosshair-active td.crosshair-highlight select { background-color: #ffeaa7 !important; }
 
-        /* ✅ 跑馬燈樣式：固定底部 */
-        .marquee-container {
-            flex-shrink: 0;
-            border: 1px solid #e2e2e2;
-            border-radius: 4px;
-            background: #fffdf7;
-            padding: 6px 0;
-            overflow: hidden;
-            position: relative;
-            white-space: nowrap;
-            box-sizing: border-box;
-        }
-        .marquee-content {
-            display: inline-block;
-            padding-left: 100%;
-            animation: scrollMarquee 30s linear infinite;
-            font-weight: bold;
-            color: #d9534f;
-            font-size: 14px;
-        }
-        @keyframes scrollMarquee {
-            0% { transform: translateX(0%); }
-            100% { transform: translateX(-200%); }
-        }
+        .marquee-container { flex-shrink: 0; border: 1px solid #e2e2e2; border-radius: 4px; background: #fffdf7; padding: 6px 0; overflow: hidden; position: relative; white-space: nowrap; box-sizing: border-box; }
+        .marquee-content { display: inline-block; padding-left: 100%; animation: scrollMarquee 30s linear infinite; font-weight: bold; color: #d9534f; font-size: 14px; }
+        @keyframes scrollMarquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-200%); } }
         
-        /* 額外控制工具列 */
-        .extra-controls {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 6px;
-            width: 100%;
-            flex-shrink: 0;
-        }
+        .extra-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; width: 100%; flex-shrink: 0; }
     </style>
 </head>
 <body>
@@ -580,7 +259,7 @@
     </div>
 </div>
 
-<!-- 編輯跑馬燈視窗 (各班獨立版本) -->
+<!-- 編輯跑馬燈視窗 -->
 <div id="marqueeModal" class="login-overlay" style="display: none; z-index: 10000;">
     <div class="login-card">
         <h2 id="marqueeModalTitle">編輯跑馬燈文字</h2>
@@ -596,7 +275,7 @@
     </div>
 </div>
 
-<!-- ✨ 新增：管理班表人員視窗 -->
+<!-- 管理班表人員視窗 -->
 <div id="employeeModal" class="login-overlay" style="display: none; z-index: 10000;">
     <div class="login-card" style="text-align: left;">
         <h2 id="empModalTitle">管理班表人員</h2>
@@ -675,7 +354,6 @@
                     <option value="S4">S4</option>
                 </select>
             </div>
-            <!-- 十字高亮開關 -->
             <button id="highlightBtn" class="highlight-btn" disabled>十字高亮：關</button>
             <button id="formStatusBtn" class="form-status-btn open">填表：開啟</button>
             <div id="userInfoDisplay" class="user-info">👤 未登入</div>
@@ -685,7 +363,6 @@
         </div>
     </div>
     
-    <!-- 額外管理工具列 -->
     <div class="extra-controls">
         <button id="editMarqueeBtn" class="edit-marquee-btn" style="display:none;">📝 編輯跑馬燈</button>
         <button id="editEmployeeBtn" class="edit-employee-btn" style="display:none;">👥 管理班表人員</button>
@@ -698,7 +375,6 @@
         </table>
     </div>
 
-    <!-- 底部跑馬燈 -->
     <div class="marquee-container">
         <div id="marqueeText" class="marquee-content">※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。</div>
     </div>
@@ -707,7 +383,7 @@
 <script>
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzLY435Gr3k6783bG__8TM0xs04CDLztMghV3Et4LX411iGTEt3so3zYSOVZlo27qPl/exec";
 
-    // 硬編碼初始名單 (若管理者尚未新增自訂名單時的預設值)
+    // 預設名單
     const squadEmployeesDefault = {
         S1: ["方慎之","陳泰安","蔡南嘉","李珮菁","朱建穎","王泳淇","吳峻霖","黃詠綺","蘭狄","凱文","勞倫司","安東尼","明華","艾麥倫","邱立斯","拉特","羅內爾","艾佛森"],
         S2: ["黃正忠","張韶眞","陳宥庠","黃威翔","羅翊禎","黃文靖","蔡易良","吳奇玲","詹姆士","達力","山博","羅傑","達路","童氏蓮","羅德","達布","安吉","羅蘭多"],
@@ -776,7 +452,6 @@
     const totalLvDisplay = document.getElementById('totalLvDisplay');
     const totalUaDisplay = document.getElementById('totalUaDisplay');
 
-    // 跑馬燈相關 DOM
     const editMarqueeBtn = document.getElementById('editMarqueeBtn');
     const marqueeModal = document.getElementById('marqueeModal');
     const marqueeModalTitle = document.getElementById('marqueeModalTitle');
@@ -786,7 +461,6 @@
     const marqueeErrorMsg = document.getElementById('marqueeErrorMsg');
     const marqueeText = document.getElementById('marqueeText');
 
-    // ✨ 管理人員相關 DOM
     const editEmployeeBtn = document.getElementById('editEmployeeBtn');
     const employeeModal = document.getElementById('employeeModal');
     const empModalTitle = document.getElementById('empModalTitle');
@@ -874,14 +548,13 @@
         return (cloudData.settings && cloudData.settings[key]) ? cloudData.settings[key] : {};
     }
 
-    // ✨ 獲取當前班表人員清單（雲端優先，沒有則讀取硬編碼）
     function getEmployeeList(squad) {
         const key = squad + '_employees';
         if (cloudData.settings && cloudData.settings[key]) {
             try {
                 const parsed = JSON.parse(cloudData.settings[key]);
                 if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-            } catch(e) { /* 解析失敗則回退 */ }
+            } catch(e) {}
         }
         return squadEmployeesDefault[squad] || [];
     }
@@ -898,7 +571,6 @@
 
     function updateHighlightBtnUI() {
         if (!currentUser || !currentSquad) return;
-        // ✅ 確保 disabled 為 false，讓管理員可以正常點擊開關
         highlightBtn.disabled = false;
         highlightBtn.textContent = crosshairEnabled ? '十字高亮：開' : '十字高亮：關';
         highlightBtn.className = 'highlight-btn' + (crosshairEnabled ? ' active' : '');
@@ -911,19 +583,15 @@
         updateHighlightBtnUI();
     });
 
-    // ✅ 完美修正：使用 getBoundingClientRect 計算物理座標
     const tableContainer = document.querySelector('.table-container');
     tableContainer.addEventListener('mouseover', function(e) {
         if (!crosshairEnabled) return;
         const targetCell = e.target.closest('th, td');
         if (!targetCell) return;
-
         document.querySelectorAll('.crosshair-highlight').forEach(el => el.classList.remove('crosshair-highlight'));
 
         const targetRow = targetCell.parentElement;
-        if (targetRow) {
-            Array.from(targetRow.cells).forEach(c => c.classList.add('crosshair-highlight'));
-        }
+        if (targetRow) { Array.from(targetRow.cells).forEach(c => c.classList.add('crosshair-highlight')); }
 
         const rect = targetCell.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
@@ -937,17 +605,11 @@
                 const cellRect = row.cells[j].getBoundingClientRect();
                 const cellCenterX = cellRect.left + cellRect.width / 2;
                 const dist = Math.abs(cellCenterX - centerX);
-                if (dist < minDist) {
-                    minDist = dist;
-                    closestCell = row.cells[j];
-                }
+                if (dist < minDist) { minDist = dist; closestCell = row.cells[j]; }
             }
-            if (closestCell) {
-                closestCell.classList.add('crosshair-highlight');
-            }
+            if (closestCell) { closestCell.classList.add('crosshair-highlight'); }
         }
     });
-
     tableContainer.addEventListener('mouseleave', function() {
         if (!crosshairEnabled) return;
         document.querySelectorAll('.crosshair-highlight').forEach(el => el.classList.remove('crosshair-highlight'));
@@ -999,7 +661,6 @@
         return '';
     }
 
-    // ✨ 調整：全班統計現在讀取雲端或硬編碼中的動態名單
     function calculateTotalClassStats(squad, year, month, daysInMonth) {
         const empList = getEmployeeList(squad);
         if (!empList) return;
@@ -1025,7 +686,6 @@
         if (totalUaDisplay) totalUaDisplay.textContent = `加班未到: ${grandTotalUa}天`;
     }
 
-    // ✨ 調整：每日加班統計現在讀取動態名單
     function calculateDailyOtStats(squad, year, month, daysInMonth) {
         const empList = getEmployeeList(squad);
         if (!empList) return;
@@ -1093,15 +753,13 @@
             `Are you sure you want to save the ${keys.length} pending change(s)? / 確定要儲存目前 ${keys.length} 筆異動資料嗎？`
         );
         if (!confirmSave) return;
-
         showSync();
         confirmBtn.disabled = true;
         try {
             const promises = [];
             for (const [key, val] of Object.entries(pendingChanges)) {
                 promises.push(fetch(GAS_WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
+                    method: 'POST', mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'saveShift', key: key, value: val })
                 }));
@@ -1137,18 +795,12 @@
         const formOpen = isFormOpen(viewSquad);
 
         otLimitGroup.style.display = (isMySquad && isManagerOfMy && formOpen) ? 'flex' : 'none';
-        
-        // ✅ 判斷跑馬燈、管理人員、十字高亮 開關權限
         editMarqueeBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
         editEmployeeBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
         highlightBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
 
-        // ==================================================
-        // ✨ 跑馬燈文字載入 (按班級獨立儲存)
-        // ==================================================
         const marqueeKey = viewSquad + '_marqueeText';
         const defaultMarquee = `※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。`;
-        
         if (cloudData.settings && cloudData.settings[marqueeKey]) {
             marqueeText.textContent = cloudData.settings[marqueeKey];
         } else {
@@ -1158,7 +810,6 @@
             postCloudData({ action: 'saveSetting', key: marqueeKey, value: valToSet });
             marqueeText.textContent = valToSet;
         }
-        // ==================================================
 
         const year = parseInt(yearSelect.value);
         const month = parseInt(monthSelect.value);
@@ -1203,7 +854,8 @@
             let thMark = document.createElement('th');
             let selectMark = document.createElement('select');
             selectMark.className = 'daily-mark-select';
-            ['', 'C', '颱', '豪', '歲', '旺'].forEach(opt => {
+            // ✅ 修改備註選項：['', 'C', '換', '颱', '豪', '歲', '旺']
+            ['', 'C', '換', '颱', '豪', '歲', '旺'].forEach(opt => {
                 let option = document.createElement('option');
                 option.value = opt;
                 option.textContent = opt;
@@ -1237,7 +889,6 @@
         thead.appendChild(trDate);
         thead.appendChild(trDay);
 
-        // ✨ 改用動態取得名單
         let allEmployees = getEmployeeList(viewSquad);
         let visibleEmployees;
         if (isMySquad) {
@@ -1268,7 +919,6 @@
 
                 let select = document.createElement('select');
                 select.className = 'shift-select';
-                // ✅ 權限控制：填表關閉時，只設定 disabled，CSS 會讓它看起來正常！
                 if (readOnly || !formOpen) {
                     select.disabled = true;
                 } else if (!isMySquad) {
@@ -1308,7 +958,6 @@
                     if (newVal === 'G' && defaultShift === '' && limitVal !== '') {
                         const limit = parseInt(limitVal, 10);
                         let otherOtCount = 0;
-                        // ✨ 改成動態取得名單計算加班上限
                         let empList = getEmployeeList(viewSquad);
                         empList.forEach(otherEmp => {
                             if (otherEmp === empName) return;
@@ -1453,7 +1102,6 @@
             viewSquadSelect.value = squad;
             showSync();
             await fetchCloudData();
-            // ✅ 改用 display = 'flex' 實現完美自適應填充
             mainApp.style.display = 'flex';
             loginOverlay.style.display = 'none';
             userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
@@ -1474,7 +1122,6 @@
             currentUser = savedUser;
             currentViewSquad = savedSquad;
             viewSquadSelect.value = savedSquad;
-            // ✅ 改用 display = 'flex' 實現完美自適應填充
             mainApp.style.display = 'flex';
             loginOverlay.style.display = 'none';
             userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
@@ -1495,7 +1142,7 @@
 
     cancelPwdBtn.addEventListener('click', () => changePwdModal.style.display = 'none');
 
-    // ✅ 【關鍵修復】修改密碼的邏輯增加了雲端同步驗證
+    // ✅ 強制檢測修改密碼是否真正同步至雲端
     savePwdBtn.addEventListener('click', async function() {
         const correctPwd = getUserPassword(currentUser);
         const oldVal = oldPwdInput.value;
@@ -1515,17 +1162,17 @@
             pwdErrorMsg.style.display = "block"; return;
         }
         
-        // 1. 寫入雲端
         if(!cloudData.passwords) cloudData.passwords = {};
         cloudData.passwords[currentUser] = newVal;
         await postCloudData({ action: 'savePassword', key: currentUser, value: newVal });
 
-        // 2. 強制重新讀取雲端資料，驗證密碼是否真的存進去了
+        // 因為 no-cors 無法讀取回傳值，我們延遲 800ms 後強制重新拉取一次雲端
+        await new Promise(r => setTimeout(r, 800));
         await fetchCloudData();
 
-        // 3. 驗證新密碼是否正確 (如果後端因為錯誤沒存進去，就會等於舊密碼)
+        // 比對拉回來的真實雲端密碼，如果不等於 newVal，則代表後端寫入失敗！
         if (getUserPassword(currentUser) !== newVal) {
-            pwdErrorMsg.textContent = "❌ 雲端寫入失敗！可能是 Google Apps Script 的 doPost 沒有正確解析 JSON (需使用 e.postData.contents)。";
+            pwdErrorMsg.textContent = "❌ 密碼修改失敗！雲端資料未同步 (GAS 後端無效)。請檢查您的 Google Apps Script 後端程式碼：確認 `doPost` 是否有正確寫入 `e.postData.contents` 的 JSON 資料到試算表。";
             pwdErrorMsg.style.display = "block";
             return;
         }
@@ -1534,9 +1181,7 @@
         changePwdModal.style.display = 'none';
     });
 
-    // ==================================================
-    // 【跑馬燈邏輯 - 獨立編輯】
-    // ==================================================
+    // 跑馬燈邏輯
     editMarqueeBtn.addEventListener('click', function() {
         const marqueeKey = currentSquad + '_marqueeText';
         const currentText = (cloudData.settings && cloudData.settings[marqueeKey]) 
@@ -1544,13 +1189,10 @@
                             : `※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。`;
         marqueeInput.value = currentText;
         marqueeErrorMsg.style.display = 'none';
-        // 在標題顯示目前編輯的是哪一班
         marqueeModalTitle.textContent = `編輯跑馬燈文字 (${currentSquad})`;
         marqueeModal.style.display = 'flex';
     });
-    
     cancelMarqueeBtn.addEventListener('click', () => marqueeModal.style.display = 'none');
-    
     saveMarqueeBtn.addEventListener('click', async function() {
         const newText = marqueeInput.value.trim();
         if (!newText) {
@@ -1566,10 +1208,10 @@
         marqueeModal.style.display = 'none';
     });
 
-    // ✨ 【管理班表人員邏輯】
+    // 管理班表人員邏輯
     editEmployeeBtn.addEventListener('click', function() {
         const currentList = getEmployeeList(currentSquad);
-        employeeListInput.value = currentList.join('\n'); // 用換行符號分割顯示
+        employeeListInput.value = currentList.join('\n');
         empErrorMsg.style.display = 'none';
         empModalTitle.textContent = `管理班表人員 (${currentSquad})`;
         employeeModal.style.display = 'flex';
@@ -1577,67 +1219,50 @@
     cancelEmpBtn.addEventListener('click', () => employeeModal.style.display = 'none');
     saveEmpBtn.addEventListener('click', async function() {
         const rawText = employeeListInput.value;
-        // 切分並且過濾空白行
         let newList = rawText.split(/\r?\n/).map(n => n.trim()).filter(n => n !== '');
-        
         if (newList.length === 0) {
             empErrorMsg.textContent = "名單不可為空！至少需要一個人。";
             empErrorMsg.style.display = "block"; return;
         }
-
-        // (貼心設計) 確保管理員自己一定在名單中，如果手誤刪除會自動補上
         const manager = squadManagers[currentSquad];
         if (!newList.includes(manager)) {
-            newList.unshift(manager); // 把管理員放到第一順位
+            newList.unshift(manager);
         }
-
-        // 存成 JSON 字串到雲端
         if(!cloudData.settings) cloudData.settings = {};
         cloudData.settings[currentSquad + '_employees'] = JSON.stringify(newList);
         await postCloudData({ action: 'saveSetting', key: currentSquad + '_employees', value: JSON.stringify(newList) });
-        
         alert(`人員名單已更新！共 ${newList.length} 人。`);
         employeeModal.style.display = 'none';
-        renderTable(); // 立即重整頁面
+        renderTable();
     });
 
     logoutBtn.addEventListener('click', function() {
         sessionStorage.removeItem('schedule_current_squad');
         sessionStorage.removeItem('schedule_current_user');
-        currentUser = null;
-        currentSquad = null;
-        currentViewSquad = null;
+        currentUser = null; currentSquad = null; currentViewSquad = null;
         pendingChanges = {};
-        loginSquadSelect.value = '';
-        loginNameSelect.innerHTML = '<option value="">-- 請選擇姓名 --</option>';
-        loginPasswordInput.value = '';
-        checkLoginStatus();
+        loginSquadSelect.value = ''; loginNameSelect.innerHTML = '<option value="">-- 請選擇姓名 --</option>';
+        loginPasswordInput.value = ''; checkLoginStatus();
     });
 
     otLimitSelect.addEventListener('change', function() {
         if (!currentSquad || !currentViewSquad || currentViewSquad !== currentSquad) return;
         if (currentUser !== squadManagers[currentSquad]) return;
-        const year = yearSelect.value;
-        const month = monthSelect.value;
+        const year = yearSelect.value; const month = monthSelect.value;
         const limitKey = `${currentSquad}_otlimit_${year}_${month}`;
         if (!cloudData.otLimits) cloudData.otLimits = {};
         cloudData.otLimits[limitKey] = this.value;
         postCloudData({ action: 'saveOtLimit', key: limitKey, value: this.value });
     });
 
-    const now = new Date();
-    const currentYear = now.getFullYear();
+    const now = new Date(); const currentYear = now.getFullYear();
     for (let y = currentYear - 5; y <= currentYear + 5; y++) {
-        let opt = document.createElement('option');
-        opt.value = y; opt.text = y;
-        if (y === currentYear) opt.selected = true;
-        yearSelect.appendChild(opt);
+        let opt = document.createElement('option'); opt.value = y; opt.text = y;
+        if (y === currentYear) opt.selected = true; yearSelect.appendChild(opt);
     }
     for (let m = 1; m <= 12; m++) {
-        let opt = document.createElement('option');
-        opt.value = m; opt.text = m;
-        if (m === (now.getMonth() + 1)) opt.selected = true;
-        monthSelect.appendChild(opt);
+        let opt = document.createElement('option'); opt.value = m; opt.text = m;
+        if (m === (now.getMonth() + 1)) opt.selected = true; monthSelect.appendChild(opt);
     }
 
     yearSelect.addEventListener('change', renderTable);
