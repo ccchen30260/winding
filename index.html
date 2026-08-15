@@ -82,6 +82,7 @@
 
         .login-btn { width: 100%; padding: 10px; font-size: 16px; font-weight: bold; color: #fff; background-color: #28a745; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; }
         .login-btn:hover { background-color: #218838; }
+        .login-btn:disabled { background-color: #6c757d; cursor: not-allowed; }
 
         .login-error { color: #dc3545; font-size: 13px; margin-top: 12px; display: none; font-weight: bold; }
 
@@ -521,7 +522,7 @@
 </div>
 
 <script>
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz2gpwtAwV1CMfQFDyEyyfmoCq9Xn3nGqfExpGpmZw4BaTytFO86GQR1rVIMONcQxRP/exec";
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzLY435Gr3k6783bG__8TM0xs04CDLztMghV3Et4LX411iGTEt3so3zYSOVZlo27qPl/exec";
 
     const squadEmployeesDefault = {
         S1: ["方慎之","陳泰安","蔡南嘉","李珮菁","朱建穎","王泳淇","吳峻霖","黃詠綺","蘭狄","凱文","勞倫司","安東尼","明華","艾麥倫","邱立斯","拉特","羅內爾","艾佛森"],
@@ -1229,34 +1230,59 @@
         renderTable();
     });
 
+    // ✅ 修正：將 fetchCloudData 移到最開頭，讓按鈕有反應並顯示同步狀態
     loginSubmitBtn.addEventListener('click', async function() {
         const squad = loginSquadSelect.value;
         const selectedUser = loginNameSelect.value;
         const inputPwd = loginPasswordInput.value;
+
+        loginErrorMsg.style.display = 'none';
+        loginErrorMsg.textContent = '請選擇班級、姓名或密碼錯誤！';
+
         if (!squad || !selectedUser) {
             loginErrorMsg.style.display = 'block';
             return;
         }
-        const correctPwd = getUserPassword(selectedUser);
-        if (inputPwd === correctPwd) {
+
+        loginSubmitBtn.disabled = true;
+        loginSubmitBtn.textContent = "登入中...";
+        showSync(); // 顯示「雲端同步中」
+
+        try {
+            // ✅ 關鍵修正：先從雲端強制下載最新資料，再來驗證密碼！
+            await fetchCloudData();
+
+            const correctPwd = getUserPassword(selectedUser);
+            if (inputPwd !== correctPwd) {
+                loginErrorMsg.style.display = 'block';
+                loginSubmitBtn.disabled = false;
+                loginSubmitBtn.textContent = "登入";
+                return;
+            }
+
             currentSquad = squad;
             currentUser = selectedUser;
             currentViewSquad = squad;
             sessionStorage.setItem('schedule_current_squad', squad);
             sessionStorage.setItem('schedule_current_user', selectedUser);
-            loginErrorMsg.style.display = 'none';
-            loginPasswordInput.value = '';
+
             viewSquadSelect.value = squad;
-            showSync();
-            await fetchCloudData();
+            loginPasswordInput.value = '';
             mainApp.style.display = 'block';
             loginOverlay.style.display = 'none';
             userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
             updateFormStatusUI();
             updateHighlightBtnUI();
             renderTable();
-        } else {
+
+        } catch (err) {
+            console.error("登入過程中發生錯誤", err);
+            loginErrorMsg.textContent = "❌ 連線異常或讀取失敗，請稍後再試。";
             loginErrorMsg.style.display = 'block';
+        } finally {
+            loginSubmitBtn.disabled = false;
+            loginSubmitBtn.textContent = "登入";
+            hideSync(); // 完成後隱藏「雲端同步中」
         }
     });
 
@@ -1289,6 +1315,7 @@
 
     cancelPwdBtn.addEventListener('click', () => changePwdModal.style.display = 'none');
 
+    // ✅ 保護機制：強制轉成字串，避免 0000 被存成 0
     savePwdBtn.addEventListener('click', async function() {
         const correctPwd = getUserPassword(currentUser);
         const oldVal = oldPwdInput.value;
@@ -1309,8 +1336,8 @@
         }
         
         if(!cloudData.passwords) cloudData.passwords = {};
-        cloudData.passwords[currentUser] = newVal;
-        const saved = await postCloudData({ action: 'savePassword', key: currentUser, value: newVal });
+        cloudData.passwords[currentUser] = newVal.toString(); // 防止 0000 轉成 0
+        const saved = await postCloudData({ action: 'savePassword', key: currentUser, value: newVal.toString() });
         
         if (!saved) {
              pwdErrorMsg.textContent = "❌ 寫入雲端失敗，請稍後再試。";
