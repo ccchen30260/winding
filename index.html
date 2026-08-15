@@ -20,16 +20,16 @@
             --border-color: #a0a0a0;
         }
 
-        /* ✅ 手機友善優化：完美彈性布局 */
+        /* ✅ 手機友善：採用 S4 的自適應滾動排版 */
         body {
             font-family: "Microsoft JhengHei", Arial, sans-serif;
             margin: 0;
-            padding: 10px;
+            padding: 10px 10px 20px 10px;
             background-color: #fcfcfc;
             touch-action: manipulation;
-            height: 100vh;           /* 鎖定視窗高度 */
-            overflow: hidden;        /* 禁止整個網頁滾動 */
+            min-height: 100vh;
             box-sizing: border-box;
+            overflow-y: auto;
         }
 
         .sync-status {
@@ -85,18 +85,18 @@
 
         .login-error { color: #dc3545; font-size: 13px; margin-top: 12px; display: none; font-weight: bold; }
 
-        /* ✅ 主應用層高度佔滿 100% */
+        /* ✅ 主應用布局改為一般文檔流 */
         .main-app {
             display: none;
-            flex-direction: column;
-            height: 100%;
             width: 100%;
-            overflow: hidden;
+            padding-bottom: 10px;
         }
 
-        /* ✅ 頂部控制列：貼頂固定，不縮放 */
+        /* ✅ 頂部控制列：採用貼頂固定，並帶底部分隔線 */
         .header-controls {
-            flex-shrink: 0; /* 防止被壓縮 */
+            position: sticky;
+            top: 0;
+            z-index: 100;
             background-color: #fcfcfc;
             display: flex;
             align-items: center;
@@ -198,15 +198,14 @@
         .modal-btn-cancel { background-color: #e9ecef; color: #333; border: 1px solid #ced4da; }
         .modal-btn-cancel:hover { background-color: #dde0e3; }
 
-        /* ✅ 表格容器：利用 flex: 1 完美填滿剩餘空間 */
+        /* ✅ 表格容器：採用 S4 固定高度讓手機有明確的可滑動空間 */
         .table-container {
-            flex: 1;                 /* 佔據剩餘所有高度 */
-            overflow: auto;          /* 只在表格內部滑動 */
+            overflow: auto;
+            height: calc(100vh - 110px); /* 預留上方控制列與跑馬燈空間 */
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             background-color: white;
             -webkit-overflow-scrolling: touch;
             margin-top: 5px;
-            padding-bottom: 5px;
         }
 
         table {
@@ -298,9 +297,8 @@
         body.crosshair-active td.crosshair-highlight, body.crosshair-active th.crosshair-highlight { background-color: #ffeaa7 !important; transition: background-color 0.15s ease; }
         body.crosshair-active td.crosshair-highlight select { background-color: #ffeaa7 !important; }
 
-        /* ✅ 跑馬燈：移動到頂部，彈性布局不壓縮 */
+        /* ✅ 跑馬燈：完全採用 S4 設計 */
         #tickerContainer {
-            flex-shrink: 0;
             width: 100%;
             overflow: hidden;
             background-color: #fffbe6;
@@ -311,6 +309,7 @@
             box-sizing: border-box;
             position: relative;
             display: block;
+            margin-top: 5px;
         }
         #tickerText {
             display: inline-block;
@@ -440,7 +439,7 @@
 
 <!-- 主應用 -->
 <div id="mainApp" class="main-app">
-    <!-- ========== 頂部控制列 ========== -->
+    <!-- ========== 控制列已具備 sticky 黏性效果 ========== -->
     <div class="header-controls">
         <div class="left-controls">
             <div class="control-group">
@@ -1250,7 +1249,7 @@
             viewSquadSelect.value = squad;
             showSync();
             await fetchCloudData();
-            mainApp.style.display = 'flex';
+            mainApp.style.display = 'block';
             loginOverlay.style.display = 'none';
             userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
             updateFormStatusUI();
@@ -1270,7 +1269,7 @@
             currentUser = savedUser;
             currentViewSquad = savedSquad;
             viewSquadSelect.value = savedSquad;
-            mainApp.style.display = 'flex';
+            mainApp.style.display = 'block';
             loginOverlay.style.display = 'none';
             userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
             updateFormStatusUI();
