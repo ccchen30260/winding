@@ -1471,11 +1471,13 @@
 
     cancelPwdBtn.addEventListener('click', () => changePwdModal.style.display = 'none');
 
+    // ✅ 【關鍵修復】修改密碼的邏輯增加了雲端同步驗證
     savePwdBtn.addEventListener('click', async function() {
         const correctPwd = getUserPassword(currentUser);
         const oldVal = oldPwdInput.value;
         const newVal = newPwdInput.value;
         const confirmVal = confirmPwdInput.value;
+        
         if (oldVal !== correctPwd) {
             pwdErrorMsg.textContent = "舊密碼錯誤！";
             pwdErrorMsg.style.display = "block"; return;
@@ -1488,9 +1490,22 @@
             pwdErrorMsg.textContent = "兩次輸入的新密碼不一致！";
             pwdErrorMsg.style.display = "block"; return;
         }
+        
+        // 1. 寫入雲端
         if(!cloudData.passwords) cloudData.passwords = {};
         cloudData.passwords[currentUser] = newVal;
         await postCloudData({ action: 'savePassword', key: currentUser, value: newVal });
+
+        // 2. 強制重新讀取雲端資料，驗證密碼是否真的存進去了
+        await fetchCloudData();
+
+        // 3. 驗證新密碼是否正確 (如果後端因為錯誤沒存進去，就會等於舊密碼)
+        if (getUserPassword(currentUser) !== newVal) {
+            pwdErrorMsg.textContent = "❌ 雲端寫入失敗！可能是 Google Apps Script 的 doPost 沒有正確解析 JSON (需使用 e.postData.contents)。";
+            pwdErrorMsg.style.display = "block";
+            return;
+        }
+
         alert("密碼修改成功！");
         changePwdModal.style.display = 'none';
     });
