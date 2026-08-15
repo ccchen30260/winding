@@ -489,7 +489,8 @@
     async function fetchCloudData() {
         showSync();
         try {
-            const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData`);
+            // ✅ 在網址加入時間戳，強制繞過 GAS 與瀏覽器的快取！
+            const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData&_=${Date.now()}`);
             const data = await resp.json();
             if (data) cloudData = data;
             if (cloudData.settings) {
@@ -1165,8 +1166,8 @@
         cloudData.passwords[currentUser] = newVal;
         await postCloudData({ action: 'savePassword', key: currentUser, value: newVal });
 
-        // 因為 no-cors 無法讀取回傳值，我們延遲 800ms 後強制重新拉取一次雲端
-        await new Promise(r => setTimeout(r, 800));
+        // ✅ 重要：延遲一秒並強制強制拉取最新資料，繞過 GAS 緩存
+        await new Promise(r => setTimeout(r, 1000));
         await fetchCloudData();
 
         // 比對拉回來的真實雲端密碼
