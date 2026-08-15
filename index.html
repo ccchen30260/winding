@@ -428,9 +428,12 @@
             color: inherit; font-weight: inherit;
         }
 
+        /* ✅ 核心修改：讓 disabled 狀態的外觀與正常完全一致，只取消點擊功能 */
         .shift-select:disabled {
             cursor: not-allowed;
-            opacity: 0.9;
+            opacity: 1 !important;
+            background-color: transparent !important;
+            color: inherit !important;
         }
 
         .shift-day { background-color: var(--bg-day); }
@@ -462,8 +465,10 @@
             outline: none;
         }
         .daily-mark-select:disabled {
-            background-color: #f0f0f0;
             cursor: not-allowed;
+            opacity: 1 !important;
+            background-color: #ffffff !important;
+            color: inherit !important;
         }
 
         td.pending-edit select {
@@ -1263,6 +1268,7 @@
 
                 let select = document.createElement('select');
                 select.className = 'shift-select';
+                // ✅ 權限控制：填表關閉時，只設定 disabled，CSS 會讓它看起來正常！
                 if (readOnly || !formOpen) {
                     select.disabled = true;
                 } else if (!isMySquad) {
