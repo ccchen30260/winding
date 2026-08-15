@@ -20,32 +20,92 @@
             --border-color: #a0a0a0;
         }
 
-        body { font-family: "Microsoft JhengHei", Arial, sans-serif; margin: 0; padding: 10px; background-color: #fcfcfc; touch-action: manipulation; height: 100vh; overflow: hidden; box-sizing: border-box; }
-        .sync-status { position: fixed; bottom: 10px; right: 110px; background-color: rgba(0,0,0,0.75); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 12px; display: none; z-index: 10001; }
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(245, 247, 250, 0.98); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .login-card { background-color: #ffffff; padding: 30px 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); width: 90%; max-width: 450px; text-align: center; box-sizing: border-box; border: 1px solid #e0e0e0; }
+        body {
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: #fcfcfc;
+            touch-action: manipulation;
+            height: 100vh;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .sync-status {
+            position: fixed;
+            bottom: 10px;
+            right: 110px;
+            background-color: rgba(0,0,0,0.75);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: none;
+            z-index: 10001;
+        }
+
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(245, 247, 250, 0.98);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .login-card {
+            background-color: #ffffff;
+            padding: 30px 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-sizing: border-box;
+            border: 1px solid #e0e0e0;
+        }
+
         .login-card h2 { margin-top: 0; margin-bottom: 20px; color: #333; font-size: 20px; }
+
         .login-field { margin-bottom: 15px; text-align: left; }
         .login-field label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: bold; color: #555; }
-        .login-field input, .login-field select, .login-field textarea { width: 100%; padding: 10px; font-size: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; background-color: #fff; outline: none; resize: vertical; font-family: inherit; }
+        .login-field input, .login-field select, .login-field textarea {
+            width: 100%; padding: 10px; font-size: 15px; border: 1px solid #ccc;
+            border-radius: 6px; box-sizing: border-box; background-color: #fff; outline: none;
+            resize: vertical; font-family: inherit;
+        }
+
         .login-btn { width: 100%; padding: 10px; font-size: 16px; font-weight: bold; color: #fff; background-color: #28a745; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; }
         .login-btn:hover { background-color: #218838; }
+
         .login-error { color: #dc3545; font-size: 13px; margin-top: 12px; display: none; font-weight: bold; }
+
         .main-app { display: none; flex-direction: column; height: 100%; overflow: hidden; box-sizing: border-box; gap: 5px; }
+
         .header-controls { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; width: 100%; box-sizing: border-box; flex-shrink: 0; }
         .left-controls, .right-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; max-width: 100%; }
         .left-controls { flex: 1 1 auto; }
         .control-group { display: flex; align-items: center; background-color: #00ff00; padding: 2px 4px; border: 1px solid #000; border-radius: 4px; box-sizing: border-box; }
         .control-group span { font-weight: bold; padding: 0 4px; white-space: nowrap; font-size: 13px; }
+
         .total-stats-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
         .stat-badge { font-size: 13px; font-weight: bold; padding: 4px 8px; border-radius: 4px; white-space: nowrap; border: 1px solid #bbb; }
         .stat-badge-ot { background-color: #e6f7ff; color: #0073e6; border-color: #91d5ff; }
         .stat-badge-lv { background-color: #ffe6e6; color: #d9363e; border-color: #ffa39e; }
         .stat-badge-ua { background-color: #e2e2e2; color: #495057; border-color: #ced4da; }
+
         select { font-size: 14px; padding: 4px; border: 1px solid #ccc; background-color: #ffe6e6; border-radius: 4px; outline: none; }
         select:disabled { background-color: #e0e0e0; color: #666; cursor: not-allowed; }
+
         .user-info { font-size: 13px; font-weight: bold; color: #333; background-color: #e9ecef; padding: 5px 8px; border-radius: 4px; white-space: nowrap; }
-        .change-pwd-btn, .logout-btn, .toggle-btn, .form-status-btn, .highlight-btn, .edit-marquee-btn, .edit-employee-btn { padding: 6px 8px; font-size: 12px; font-weight: bold; color: #fff; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap; }
+
+        .change-pwd-btn, .logout-btn, .toggle-btn, .form-status-btn, .highlight-btn, .edit-marquee-btn, .edit-employee-btn {
+            padding: 6px 8px; font-size: 12px; font-weight: bold; color: #fff; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;
+        }
         .change-pwd-btn { background-color: #17a2b8; }
         .logout-btn { background-color: #dc3545; }
         .toggle-btn { background-color: #007bff; }
@@ -53,12 +113,20 @@
         .highlight-btn.active { background-color: #28a745; }
         .edit-marquee-btn { background-color: #fd7e14; }
         .edit-employee-btn { background-color: #e83e8c; }
+
         .form-status-btn.open { background-color: #28a745; }
         .form-status-btn.closed { background-color: #6c757d; }
-        .btn-confirm { position: fixed; bottom: 25px; right: 25px; z-index: 9999; display: none; padding: 15px 25px; font-size: 20px; font-weight: bold; color: #fff; background-color: #28a745; border: none; border-radius: 50px; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.5); cursor: pointer; transition: all 0.3s ease; user-select: none; }
+
+        .btn-confirm {
+            position: fixed; bottom: 25px; right: 25px; z-index: 9999; display: none; padding: 15px 25px;
+            font-size: 20px; font-weight: bold; color: #fff; background-color: #28a745; border: none;
+            border-radius: 50px; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.5); cursor: pointer;
+            transition: all 0.3s ease; user-select: none;
+        }
         .btn-confirm:hover:not(:disabled) { background-color: #218838; transform: scale(1.05); box-shadow: 0 6px 20px rgba(40, 167, 69, 0.6); }
         .btn-confirm:active:not(:disabled) { transform: scale(0.95); }
         .btn-confirm:disabled { background-color: #a0a0a0 !important; box-shadow: none !important; cursor: default !important; transform: scale(1) !important; opacity: 1 !important; }
+
         .custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 10000; }
         .custom-modal-box { background-color: #ffffff; padding: 40px 30px; border-radius: 16px; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
@@ -70,6 +138,7 @@
         .modal-btn-confirm:hover { background-color: #218838; }
         .modal-btn-cancel { background-color: #e9ecef; color: #333; border: 1px solid #ced4da; }
         .modal-btn-cancel:hover { background-color: #dde0e3; }
+
         .table-container { overflow: auto; flex: 1; min-height: 0; box-shadow: 0 0 10px rgba(0,0,0,0.1); background-color: white; -webkit-overflow-scrolling: touch; }
         table { border-collapse: separate; border-spacing: 0; width: 100%; text-align: center; font-size: 14px; background-color: white; white-space: nowrap; }
         th, td { border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 0; min-width: 32px; height: 38px; box-sizing: border-box; background-clip: padding-box; }
@@ -79,21 +148,27 @@
         thead tr:nth-child(1) th { position: sticky; top: 0; z-index: 1; }
         thead tr:nth-child(2) th { position: sticky; top: 38px; z-index: 1; }
         thead tr:nth-child(3) th { position: sticky; top: 76px; z-index: 1; }
+
         .stats-ot { position: sticky; left: 0; width: 40px; min-width: 40px; z-index: 2; color: #00b0f0; background-color: #e6f7ff; font-weight: bold; }
         .stats-lv { position: sticky; left: 40px; width: 40px; min-width: 40px; z-index: 2; color: #ff0000; background-color: #ffe6e6; font-weight: bold; }
         .col-name { position: sticky; left: 80px; width: 65px; min-width: 65px; z-index: 2; font-weight: bold; background-color: #fafafa; box-shadow: 2px 0 5px -2px rgba(0,0,0,0.3); }
         thead th.stats-ot, thead th.stats-lv, thead th.col-name { z-index: 3 !important; background-color: #e0e0e0; color: black; }
+
         body.hide-stats .stats-ot, body.hide-stats .stats-lv { display: none !important; }
         body.hide-stats .col-name { left: 0 !important; }
+
         .weekend-header { color: red; }
         .today-header { background-color: #00ffff !important; }
+
         tr.daily-ot-row { background-color: #fffbe6; font-weight: bold; }
         tr.daily-ot-row td { background-color: #fffbe6; color: #d48806; border-top: 2px solid #ffe58f; }
         tr.daily-ot-row td.col-name { background-color: #fff1b8; color: #873800; }
         tr.daily-ot-row td.stats-ot, tr.daily-ot-row td.stats-lv { background-color: #fff1b8; }
+
         .cell-content { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; min-height: 38px; box-sizing: border-box; }
         .shift-select { width: 100%; height: 38px; border: none; background-color: transparent; font-size: 15px; font-family: inherit; text-align: center; text-align-last: center; appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer; outline: none; color: inherit; font-weight: inherit; }
         .shift-select:disabled { cursor: not-allowed; opacity: 1 !important; background-color: transparent !important; color: inherit !important; }
+
         .shift-day { background-color: var(--bg-day); }
         .shift-night { background-color: var(--bg-night); }
         .shift-g { background-color: var(--bg-g); color: black; font-weight: bold; }
@@ -106,14 +181,19 @@
         .shift-return { background-color: #b3e5fc; color: black; font-weight: bold; }
         .shift-business { background-color: #fff9c4; color: black; font-weight: bold; }
         .shift-absent { background-color: #ffccbc; color: black; font-weight: bold; }
+
         .daily-mark-select { width: 100%; height: 38px; border: 1px solid #ccc; background-color: #ffffff; font-size: 16px; font-weight: bold; text-align: center; text-align-last: center; appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer; outline: none; }
         .daily-mark-select:disabled { cursor: not-allowed; opacity: 1 !important; background-color: #ffffff !important; color: inherit !important; }
+
         td.pending-edit select { outline: 3px solid #ffc107; background-color: #fff3cd !important; }
+
         body.crosshair-active td.crosshair-highlight, body.crosshair-active th.crosshair-highlight { background-color: #ffeaa7 !important; transition: background-color 0.15s ease; }
         body.crosshair-active td.crosshair-highlight select { background-color: #ffeaa7 !important; }
+
         .marquee-container { flex-shrink: 0; border: 1px solid #e2e2e2; border-radius: 4px; background: #fffdf7; padding: 6px 0; overflow: hidden; position: relative; white-space: nowrap; box-sizing: border-box; }
         .marquee-content { display: inline-block; padding-left: 100%; animation: scrollMarquee 30s linear infinite; font-weight: bold; color: #d9534f; font-size: 14px; }
         @keyframes scrollMarquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-200%); } }
+        
         .extra-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; width: 100%; flex-shrink: 0; }
     </style>
 </head>
@@ -122,6 +202,7 @@
 <button id="confirmBtn" class="btn-confirm" disabled>✔ Confirm / 確認儲存 (0)</button>
 <div id="syncStatus" class="sync-status">☁️ 雲端同步中...</div>
 
+<!-- 登入視窗 -->
 <div id="loginOverlay" class="login-overlay">
     <div class="login-card">
         <h2>系統登入(S1~S4)</h2>
@@ -150,6 +231,7 @@
     </div>
 </div>
 
+<!-- 修改密碼視窗 -->
 <div id="changePwdModal" class="login-overlay" style="display: none; z-index: 10000;">
     <div class="login-card">
         <h2>修改密碼</h2>
@@ -173,6 +255,7 @@
     </div>
 </div>
 
+<!-- 編輯跑馬燈視窗 -->
 <div id="marqueeModal" class="login-overlay" style="display: none; z-index: 10000;">
     <div class="login-card">
         <h2 id="marqueeModalTitle">編輯跑馬燈文字</h2>
@@ -188,6 +271,7 @@
     </div>
 </div>
 
+<!-- 管理班表人員視窗 -->
 <div id="employeeModal" class="login-overlay" style="display: none; z-index: 10000;">
     <div class="login-card" style="text-align: left;">
         <h2 id="empModalTitle">管理班表人員</h2>
@@ -203,6 +287,7 @@
     </div>
 </div>
 
+<!-- 自定義雙語確認視窗 -->
 <div id="confirmModal" class="custom-modal-overlay">
     <div class="custom-modal-box">
         <h3 id="confirmModalTitle">Confirm / 確認動作</h3>
@@ -214,6 +299,7 @@
     </div>
 </div>
 
+<!-- 成功提示視窗 -->
 <div id="successModal" class="custom-modal-overlay">
     <div class="custom-modal-box">
         <h3>Data saved successfully!<br>資料儲存成功！</h3>
@@ -223,16 +309,47 @@
     </div>
 </div>
 
+<!-- 主應用 -->
 <div id="mainApp" class="main-app">
     <div class="header-controls">
         <div class="left-controls">
-            <div class="control-group"><span>年份</span><select id="yearSelect"></select></div>
-            <div class="control-group"><span>月份</span><select id="monthSelect"></select></div>
-            <div class="control-group" id="otLimitGroup"><span>加班限制</span><select id="otLimitSelect"><option value="">空白</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option></select></div>
-            <div class="total-stats-group"><span id="totalOtDisplay" class="stat-badge stat-badge-ot">全班加班: 0天</span><span id="totalLvDisplay" class="stat-badge stat-badge-lv">全班請假: 0天</span><span id="totalUaDisplay" class="stat-badge stat-badge-ua">加班未到: 0天</span></div>
+            <div class="control-group">
+                <span>年份</span>
+                <select id="yearSelect"></select>
+            </div>
+            <div class="control-group">
+                <span>月份</span>
+                <select id="monthSelect"></select>
+            </div>
+            <div class="control-group" id="otLimitGroup">
+                <span>加班限制</span>
+                <select id="otLimitSelect">
+                    <option value="">空白</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                </select>
+            </div>
+            <div class="total-stats-group">
+                <span id="totalOtDisplay" class="stat-badge stat-badge-ot">全班加班: 0天</span>
+                <span id="totalLvDisplay" class="stat-badge stat-badge-lv">全班請假: 0天</span>
+                <span id="totalUaDisplay" class="stat-badge stat-badge-ua">加班未到: 0天</span>
+            </div>
         </div>
         <div class="right-controls">
-            <div class="control-group"><span>查看班表</span><select id="viewSquadSelect"><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option></select></div>
+            <div class="control-group">
+                <span>查看班表</span>
+                <select id="viewSquadSelect">
+                    <option value="S1">S1</option>
+                    <option value="S2">S2</option>
+                    <option value="S3">S3</option>
+                    <option value="S4">S4</option>
+                </select>
+            </div>
             <button id="highlightBtn" class="highlight-btn">十字高亮：關</button>
             <button id="formStatusBtn" class="form-status-btn open">填表：開啟</button>
             <div id="userInfoDisplay" class="user-info">👤 未登入</div>
@@ -247,25 +364,44 @@
         <button id="editEmployeeBtn" class="edit-employee-btn" style="display:none;">👥 管理班表人員</button>
     </div>
 
-    <div class="table-container"><table id="scheduleTable"><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table></div>
+    <div class="table-container">
+        <table id="scheduleTable">
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
 
-    <div class="marquee-container"><div id="marqueeText" class="marquee-content">※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。</div></div>
+    <div class="marquee-container">
+        <div id="marqueeText" class="marquee-content">※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。</div>
+    </div>
 </div>
 
 <script>
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz2gpwtAwV1CMfQFDyEyyfmoCq9Xn3nGqfExpGpmZw4BaTytFO86GQR1rVIMONcQxRP/exec";
+
     const squadEmployeesDefault = {
         S1: ["方慎之","陳泰安","蔡南嘉","李珮菁","朱建穎","王泳淇","吳峻霖","黃詠綺","蘭狄","凱文","勞倫司","安東尼","明華","艾麥倫","邱立斯","拉特","羅內爾","艾佛森"],
         S2: ["黃正忠","張韶眞","陳宥庠","黃威翔","羅翊禎","黃文靖","蔡易良","吳奇玲","詹姆士","達力","山博","羅傑","達路","童氏蓮","羅德","達布","安吉","羅蘭多"],
         S3: ["陳文全","吳國隆","李茂玄","葉秀芬","王俊智","吳慧如","黃筱珊","吳明珠","蘇炫元","托弗","杰倫","艾諾","吳氏莊","納撒","格林","喬司華","喬丹","吉姆"],
         S4: ["陳喬志","楊代億","廖曉彤","蔡靜儀","賴建亦","施榮傑","陰其德","黃譯鋒","楊雅婷","羅啟倫","埃爾默","拉斯特","雷伊","漢斯","達利斯","甘達","特拉多","達爾文"]
     };
-    const squadManagers = { S1: "方慎之", S2: "黃正忠", S3: "陳文全", S4: "陳喬志" };
+
+    const squadManagers = {
+        S1: "方慎之",
+        S2: "黃正忠",
+        S3: "陳文全",
+        S4: "陳喬志"
+    };
+
     const weekDaysTW = ["日", "一", "二", "三", "四", "五", "六"];
 
     let cloudData = { shifts: {}, passwords: {}, otLimits: {}, settings: {} };
     let pendingChanges = {};
-    let currentUser = null, currentSquad = null, currentViewSquad = null, crosshairEnabled = false; 
+
+    let currentUser = null;
+    let currentSquad = null;
+    let currentViewSquad = null;
+    let crosshairEnabled = false; 
 
     const syncStatus = document.getElementById('syncStatus');
     const loginOverlay = document.getElementById('loginOverlay');
@@ -274,6 +410,7 @@
     const loginPasswordInput = document.getElementById('loginPasswordInput');
     const loginSubmitBtn = document.getElementById('loginSubmitBtn');
     const loginErrorMsg = document.getElementById('loginErrorMsg');
+
     const changePwdModal = document.getElementById('changePwdModal');
     const oldPwdInput = document.getElementById('oldPwdInput');
     const newPwdInput = document.getElementById('newPwdInput');
@@ -282,27 +419,33 @@
     const savePwdBtn = document.getElementById('savePwdBtn');
     const pwdErrorMsg = document.getElementById('pwdErrorMsg');
     const changePwdBtn = document.getElementById('changePwdBtn');
+
     const mainApp = document.getElementById('mainApp');
     const userInfoDisplay = document.getElementById('userInfoDisplay');
     const logoutBtn = document.getElementById('logoutBtn');
     const formStatusBtn = document.getElementById('formStatusBtn');
     const highlightBtn = document.getElementById('highlightBtn');
+    
     const confirmBtn = document.getElementById('confirmBtn');
     const confirmModal = document.getElementById('confirmModal');
     const confirmModalText = document.getElementById('confirmModalText');
     const confirmModalYes = document.getElementById('confirmModalYes');
     const confirmModalNo = document.getElementById('confirmModalNo');
+
     const successModal = document.getElementById('successModal');
     const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+
     const yearSelect = document.getElementById('yearSelect');
     const monthSelect = document.getElementById('monthSelect');
     const otLimitSelect = document.getElementById('otLimitSelect');
     const otLimitGroup = document.getElementById('otLimitGroup');
     const toggleStatsBtn = document.getElementById('toggleStatsBtn');
     const viewSquadSelect = document.getElementById('viewSquadSelect');
+
     const totalOtDisplay = document.getElementById('totalOtDisplay');
     const totalLvDisplay = document.getElementById('totalLvDisplay');
     const totalUaDisplay = document.getElementById('totalUaDisplay');
+
     const editMarqueeBtn = document.getElementById('editMarqueeBtn');
     const marqueeModal = document.getElementById('marqueeModal');
     const marqueeModalTitle = document.getElementById('marqueeModalTitle');
@@ -311,6 +454,7 @@
     const cancelMarqueeBtn = document.getElementById('cancelMarqueeBtn');
     const marqueeErrorMsg = document.getElementById('marqueeErrorMsg');
     const marqueeText = document.getElementById('marqueeText');
+
     const editEmployeeBtn = document.getElementById('editEmployeeBtn');
     const employeeModal = document.getElementById('employeeModal');
     const empModalTitle = document.getElementById('empModalTitle');
@@ -336,7 +480,7 @@
         loginNameSelect.value = '';
     });
 
-    // ✅ 極致防快取機制：時間戳 + 隨機數 + 強制 no-store
+    // ✅ 強制禁用瀏覽器與 GAS 快取機制
     async function fetchCloudData() {
         showSync();
         try {
@@ -346,13 +490,21 @@
             const data = await resp.json();
             if (data) cloudData = data;
             if (cloudData.settings) {
-                if (cloudData.settings['form_status'] && !cloudData.settings['S4_form_status']) cloudData.settings['S4_form_status'] = cloudData.settings['form_status'];
-                if (cloudData.settings['dailyMarks'] && !cloudData.settings['S4_dailyMarks']) cloudData.settings['S4_dailyMarks'] = cloudData.settings['dailyMarks'];
+                if (cloudData.settings['form_status'] && !cloudData.settings['S4_form_status']) {
+                    cloudData.settings['S4_form_status'] = cloudData.settings['form_status'];
+                }
+                if (cloudData.settings['dailyMarks'] && !cloudData.settings['S4_dailyMarks']) {
+                    cloudData.settings['S4_dailyMarks'] = cloudData.settings['dailyMarks'];
+                }
                 ['S1','S2','S3','S4'].forEach(sq => {
                     const key = sq + '_dailyMarks';
                     if (cloudData.settings[key]) {
-                        try { cloudData.settings[key] = JSON.parse(cloudData.settings[key]); } catch(e) { cloudData.settings[key] = {}; }
-                    } else { cloudData.settings[key] = {}; }
+                        try {
+                            cloudData.settings[key] = JSON.parse(cloudData.settings[key]);
+                        } catch(e) { cloudData.settings[key] = {}; }
+                    } else {
+                        cloudData.settings[key] = {};
+                    }
                 });
             }
             if (!cloudData.otLimits) cloudData.otLimits = {};
@@ -382,14 +534,17 @@
     function getUserPassword(empName) {
         return (cloudData.passwords && cloudData.passwords[empName]) ? cloudData.passwords[empName] : "0000";
     }
+
     function isFormOpen(squad) {
         const key = squad + '_form_status';
         return !(cloudData.settings && cloudData.settings[key] === 'closed');
     }
+
     function getDailyMarks(squad) {
         const key = squad + '_dailyMarks';
         return (cloudData.settings && cloudData.settings[key]) ? cloudData.settings[key] : {};
     }
+
     function getEmployeeList(squad) {
         const key = squad + '_employees';
         if (cloudData.settings && cloudData.settings[key]) {
@@ -400,6 +555,7 @@
         }
         return squadEmployeesDefault[squad] || [];
     }
+
     function updateFormStatusUI() {
         if (!currentSquad || !currentViewSquad) return;
         const isMySquad = (currentViewSquad === currentSquad);
@@ -409,31 +565,38 @@
         formStatusBtn.className = 'form-status-btn ' + (open ? 'open' : 'closed');
         formStatusBtn.style.display = (isMySquad && isManager) ? '' : 'none';
     }
+
     function updateHighlightBtnUI() {
         if (!currentUser || !currentSquad) return;
         highlightBtn.textContent = crosshairEnabled ? '十字高亮：開' : '十字高亮：關';
         highlightBtn.className = 'highlight-btn' + (crosshairEnabled ? ' active' : '');
         document.body.classList.toggle('crosshair-active', crosshairEnabled);
     }
+
     highlightBtn.addEventListener('click', function() {
         if (!currentUser || currentUser !== squadManagers[currentSquad]) return;
         crosshairEnabled = !crosshairEnabled;
         updateHighlightBtnUI();
     });
+
     const tableContainer = document.querySelector('.table-container');
     tableContainer.addEventListener('mouseover', function(e) {
         if (!crosshairEnabled) return;
         const targetCell = e.target.closest('th, td');
         if (!targetCell) return;
         document.querySelectorAll('.crosshair-highlight').forEach(el => el.classList.remove('crosshair-highlight'));
+
         const targetRow = targetCell.parentElement;
         if (targetRow) { Array.from(targetRow.cells).forEach(c => c.classList.add('crosshair-highlight')); }
+
         const rect = targetCell.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
+
         const table = document.getElementById('scheduleTable');
         for (let i = 0; i < table.rows.length; i++) {
             const row = table.rows[i];
-            let closestCell = null, minDist = Infinity;
+            let closestCell = null;
+            let minDist = Infinity;
             for (let j = 0; j < row.cells.length; j++) {
                 const cellRect = row.cells[j].getBoundingClientRect();
                 const cellCenterX = cellRect.left + cellRect.width / 2;
@@ -447,6 +610,7 @@
         if (!crosshairEnabled) return;
         document.querySelectorAll('.crosshair-highlight').forEach(el => el.classList.remove('crosshair-highlight'));
     });
+
     formStatusBtn.addEventListener('click', function() {
         if (!currentSquad || !currentViewSquad || currentViewSquad !== currentSquad) return;
         if (currentUser !== squadManagers[currentSquad]) return;
@@ -458,6 +622,7 @@
         updateFormStatusUI();
         renderTable();
     });
+
     function getS4Default(year, month, day) {
         const shiftCycle = ['日', '夜', '夜', '日', '日', '夜', '夜', '日', '日', '夜', '夜', '日'];
         const utcEpoch = Date.UTC(2025, 11, 31);
@@ -474,6 +639,7 @@
         }
         return '';
     }
+
     function getDefaultShift(squad, year, month, day) {
         const s4Val = getS4Default(year, month, day);
         if (squad === 'S4') return s4Val;
@@ -490,6 +656,7 @@
         if (s2Val === '夜') return '日';
         return '';
     }
+
     function calculateTotalClassStats(squad, year, month, daysInMonth) {
         const empList = getEmployeeList(squad);
         if (!empList) return;
@@ -514,6 +681,7 @@
         if (totalLvDisplay) totalLvDisplay.textContent = `全班請假: ${grandTotalLv}天`;
         if (totalUaDisplay) totalUaDisplay.textContent = `加班未到: ${grandTotalUa}天`;
     }
+
     function calculateDailyOtStats(squad, year, month, daysInMonth) {
         const empList = getEmployeeList(squad);
         if (!empList) return;
@@ -521,7 +689,10 @@
             const dailyElem = document.getElementById(`daily_ot_${squad}_${year}_${month}_${i}`);
             if (!dailyElem) continue;
             const defaultShift = getDefaultShift(squad, year, month, i);
-            if (defaultShift !== '') { dailyElem.textContent = ''; continue; }
+            if (defaultShift !== '') {
+                dailyElem.textContent = '';
+                continue;
+            }
             let dailyOtCount = 0;
             empList.forEach(empName => {
                 const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
@@ -537,20 +708,27 @@
             dailyElem.textContent = dailyOtCount;
         }
     }
+
     function updateConfirmBtnState() {
         if (!currentSquad || !currentViewSquad || currentViewSquad !== currentSquad) {
             confirmBtn.style.display = 'none';
             return;
         }
         const isManager = (currentUser === squadManagers[currentSquad]);
-        if (isManager) { confirmBtn.style.display = 'none'; return; }
+        if (isManager) {
+            confirmBtn.style.display = 'none';
+            return;
+        }
         const count = Object.keys(pendingChanges).length;
         if (count > 0) {
             confirmBtn.innerHTML = `✔ Confirm / 確認儲存 (${count})`;
             confirmBtn.style.display = 'block';
             confirmBtn.disabled = false;
-        } else { confirmBtn.style.display = 'none'; }
+        } else {
+            confirmBtn.style.display = 'none';
+        }
     }
+
     function showConfirmModal(message) {
         return new Promise((resolve) => {
             confirmModalText.textContent = message;
@@ -560,12 +738,16 @@
             confirmModal.onclick = (e) => { if (e.target === confirmModal) { confirmModal.style.display = 'none'; resolve(false); } };
         });
     }
+
     modalConfirmBtn.addEventListener('click', () => successModal.style.display = 'none');
     successModal.addEventListener('click', (e) => { if (e.target === successModal) successModal.style.display = 'none'; });
+
     confirmBtn.addEventListener('click', async function() {
         const keys = Object.keys(pendingChanges);
         if (keys.length === 0) return;
-        const confirmSave = await showConfirmModal(`Are you sure you want to save the ${keys.length} pending change(s)? / 確定要儲存目前 ${keys.length} 筆異動資料嗎？`);
+        const confirmSave = await showConfirmModal(
+            `Are you sure you want to save the ${keys.length} pending change(s)? / 確定要儲存目前 ${keys.length} 筆異動資料嗎？`
+        );
         if (!confirmSave) return;
         showSync();
         confirmBtn.disabled = true;
@@ -640,28 +822,39 @@
         const thead = document.getElementById('tableHead');
         const tbody = document.getElementById('tableBody');
         thead.innerHTML = ''; tbody.innerHTML = '';
+
         let trMark = document.createElement('tr');
-        trMark.innerHTML = `<th class="stats-ot" rowspan="3"><div class="cell-content">當月<br>加班</div></th><th class="stats-lv" rowspan="3"><div class="cell-content">當月<br>請假</div></th><th class="col-name"><div class="cell-content">${viewSquad}</div></th>`;
+        trMark.innerHTML = `
+            <th class="stats-ot" rowspan="3"><div class="cell-content">當月<br>加班</div></th>
+            <th class="stats-lv" rowspan="3"><div class="cell-content">當月<br>請假</div></th>
+            <th class="col-name"><div class="cell-content">${viewSquad}</div></th>
+        `;
         let trDate = document.createElement('tr');
         trDate.innerHTML = `<th class="col-name"><div class="cell-content">日期</div></th>`;
         let trDay = document.createElement('tr');
         trDay.innerHTML = `<th class="col-name"><div class="cell-content">星期</div></th>`;
+
         const today = new Date();
         const todayY = today.getFullYear();
         const todayM = today.getMonth() + 1;
         const todayD = today.getDate();
+
         const dailyMarks = getDailyMarks(viewSquad);
+
         for (let i = 1; i <= daysInMonth; i++) {
             const markKey = `${viewSquad}_mark_${year}_${month}_${i}`;
             const dateObj = new Date(year, month - 1, i);
             const dayOfWeek = dateObj.getDay();
             const isToday = (year === todayY && month === todayM && i === todayD);
+
             let thMark = document.createElement('th');
             let selectMark = document.createElement('select');
             selectMark.className = 'daily-mark-select';
             ['', 'C', '換', '颱', '豪', '歲', '旺'].forEach(opt => {
                 let option = document.createElement('option');
-                option.value = opt; option.textContent = opt; selectMark.appendChild(option);
+                option.value = opt;
+                option.textContent = opt;
+                selectMark.appendChild(option);
             });
             selectMark.value = dailyMarks[markKey] || '';
             selectMark.disabled = !(isMySquad && isManagerOfMy);
@@ -674,55 +867,87 @@
             });
             thMark.appendChild(selectMark);
             trMark.appendChild(thMark);
+
             let thDate = document.createElement('th');
             thDate.innerHTML = `<div class="cell-content">${i}</div>`;
             if (isToday) thDate.classList.add('today-header');
             trDate.appendChild(thDate);
+
             let thDay = document.createElement('th');
             thDay.innerHTML = `<div class="cell-content">${weekDaysTW[dayOfWeek]}</div>`;
             if (dayOfWeek === 0 || dayOfWeek === 6) thDay.classList.add('weekend-header');
             if (isToday) thDay.classList.add('today-header');
             trDay.appendChild(thDay);
         }
-        thead.appendChild(trMark); thead.appendChild(trDate); thead.appendChild(trDay);
+
+        thead.appendChild(trMark);
+        thead.appendChild(trDate);
+        thead.appendChild(trDay);
 
         let allEmployees = getEmployeeList(viewSquad);
         let visibleEmployees;
         if (isMySquad) {
             visibleEmployees = isManagerOfMy ? allEmployees : [currentUser];
-        } else { visibleEmployees = allEmployees; }
+        } else {
+            visibleEmployees = allEmployees;
+        }
 
         visibleEmployees.forEach(empName => {
             let tr = document.createElement('tr');
             const otCellId = `ot_${viewSquad}_${year}_${month}_${empName}`;
             const lvCellId = `lv_${viewSquad}_${year}_${month}_${empName}`;
-            tr.innerHTML = `<td class="stats-ot"><div class="cell-content" id="${otCellId}">0</div></td><td class="stats-lv"><div class="cell-content" id="${lvCellId}">0</div></td><td class="col-name"><div class="cell-content">${empName}</div></td>`;
+            tr.innerHTML = `
+                <td class="stats-ot"><div class="cell-content" id="${otCellId}">0</div></td>
+                <td class="stats-lv"><div class="cell-content" id="${lvCellId}">0</div></td>
+                <td class="col-name"><div class="cell-content">${empName}</div></td>
+            `;
+
             for (let i = 1; i <= daysInMonth; i++) {
                 let td = document.createElement('td');
                 const defaultShift = getDefaultShift(viewSquad, year, month, i);
                 const shiftKey = `${viewSquad}_shift_${year}_${month}_${empName}_${i}`;
                 const savedValue = (cloudData.shifts) ? cloudData.shifts[shiftKey] : undefined;
                 let finalValue = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
-                if (pendingChanges[shiftKey] !== undefined) { finalValue = pendingChanges[shiftKey]; }
+                if (pendingChanges[shiftKey] !== undefined) {
+                    finalValue = pendingChanges[shiftKey];
+                }
+
                 let select = document.createElement('select');
                 select.className = 'shift-select';
-                if (readOnly || !formOpen) { select.disabled = true; }
-                else if (!isMySquad) { select.disabled = true; }
+                if (readOnly || !formOpen) {
+                    select.disabled = true;
+                } else if (!isMySquad) {
+                    select.disabled = true;
+                }
+
                 let baseOptions;
-                if (defaultShift === '') { baseOptions = ['', 'G', '未']; }
-                else { baseOptions = [defaultShift, '特', '病', '事', '生', '颱', '返', '差', '曠']; }
+                if (defaultShift === '') {
+                    baseOptions = ['', 'G', '未'];
+                } else {
+                    baseOptions = [defaultShift, '特', '病', '事', '生', '颱', '返', '差', '曠'];
+                }
                 const isCurrentManager = (isMySquad && currentUser === squadManagers[viewSquad]);
-                if (!isCurrentManager) { baseOptions = baseOptions.filter(opt => opt !== '未'); }
-                if (finalValue !== '' && !baseOptions.includes(finalValue)) { baseOptions.push(finalValue); }
+                if (!isCurrentManager) {
+                    baseOptions = baseOptions.filter(opt => opt !== '未');
+                }
+                if (finalValue !== '' && !baseOptions.includes(finalValue)) {
+                    baseOptions.push(finalValue);
+                }
                 baseOptions.forEach(opt => {
                     let option = document.createElement('option');
-                    option.value = opt; option.textContent = opt;
+                    option.value = opt;
+                    option.textContent = opt;
                     if (opt === finalValue) option.selected = true;
                     select.appendChild(option);
                 });
+
                 select.addEventListener('change', function() {
                     if (!isMySquad || readOnly) return;
-                    if (!isFormOpen(viewSquad)) { alert("目前填表已關閉，無法修改班表！"); this.value = finalValue; return; }
+                    if (!isFormOpen(viewSquad)) {
+                        alert("目前填表已關閉，無法修改班表！");
+                        this.value = finalValue;
+                        return;
+                    }
                     const newVal = this.value;
                     const limitVal = otLimitSelect.value;
                     if (newVal === 'G' && defaultShift === '' && limitVal !== '') {
@@ -741,13 +966,20 @@
                             }
                             if (val === 'G') otherOtCount++;
                         });
-                        if (otherOtCount >= limit) { alert(`${month}月${i}日 (非上班日) 加班人數已達上限 (${limit} 人)！`); this.value = finalValue; return; }
+                        if (otherOtCount >= limit) {
+                            alert(`${month}月${i}日 (非上班日) 加班人數已達上限 (${limit} 人)！`);
+                            this.value = finalValue;
+                            return;
+                        }
                     }
+
                     if (isCurrentManager) {
                         if (!cloudData.shifts) cloudData.shifts = {};
                         cloudData.shifts[shiftKey] = newVal;
                         postCloudData({ action: 'saveShift', key: shiftKey, value: newVal });
-                        finalValue = newVal; updateCellColor(td, newVal); renderTable();
+                        finalValue = newVal;
+                        updateCellColor(td, newVal);
+                        renderTable();
                     } else {
                         pendingChanges[shiftKey] = newVal;
                         finalValue = newVal;
@@ -759,8 +991,11 @@
                         updateConfirmBtnState();
                     }
                 });
+
                 td.appendChild(select);
-                if (pendingChanges[shiftKey] !== undefined) { td.classList.add('pending-edit'); }
+                if (pendingChanges[shiftKey] !== undefined) {
+                    td.classList.add('pending-edit');
+                }
                 updateCellColor(td, finalValue);
                 tr.appendChild(td);
             }
@@ -770,13 +1005,18 @@
 
         let trDailyOt = document.createElement('tr');
         trDailyOt.className = 'daily-ot-row';
-        trDailyOt.innerHTML = `<td class="stats-ot"><div class="cell-content">-</div></td><td class="stats-lv"><div class="cell-content">-</div></td><td class="col-name"><div class="cell-content">加班人數</div></td>`;
+        trDailyOt.innerHTML = `
+            <td class="stats-ot"><div class="cell-content">-</div></td>
+            <td class="stats-lv"><div class="cell-content">-</div></td>
+            <td class="col-name"><div class="cell-content">加班人數</div></td>
+        `;
         for (let i = 1; i <= daysInMonth; i++) {
             let td = document.createElement('td');
             td.innerHTML = `<div class="cell-content" id="daily_ot_${viewSquad}_${year}_${month}_${i}"></div>`;
             trDailyOt.appendChild(td);
         }
         tbody.appendChild(trDailyOt);
+
         calculateTotalClassStats(viewSquad, year, month, daysInMonth);
         calculateDailyOtStats(viewSquad, year, month, daysInMonth);
         updateConfirmBtnState();
@@ -788,8 +1028,9 @@
             const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
             const defaultShift = getDefaultShift(squad, year, month, i);
             let val;
-            if (pendingChanges[shiftKey] !== undefined) { val = pendingChanges[shiftKey]; }
-            else {
+            if (pendingChanges[shiftKey] !== undefined) {
+                val = pendingChanges[shiftKey];
+            } else {
                 const savedValue = (cloudData.shifts) ? cloudData.shifts[shiftKey] : undefined;
                 val = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
             }
@@ -801,6 +1042,7 @@
         if (otElem) otElem.textContent = otCount;
         if (lvElem) lvElem.textContent = lvCount;
     }
+
     function updateCellColor(td, value) {
         td.classList.remove('shift-day', 'shift-night', 'shift-g', 'shift-unattended', 'shift-special', 'shift-personal', 'shift-sick', 'shift-physio', 'shift-typhoon', 'shift-return', 'shift-business', 'shift-absent');
         switch (value) {
@@ -818,104 +1060,130 @@
             case '曠': td.classList.add('shift-absent'); break;
         }
     }
+
     viewSquadSelect.addEventListener('change', function() {
         const newSquad = this.value;
         if (newSquad === currentViewSquad) return;
         if (currentViewSquad === currentSquad && Object.keys(pendingChanges).length > 0 && currentUser !== squadManagers[currentSquad]) {
-            if (!confirm('切換班表將捨棄目前未儲存的變更，確定要繼續嗎？')) { this.value = currentViewSquad; return; }
+            if (!confirm('切換班表將捨棄目前未儲存的變更，確定要繼續嗎？')) {
+                this.value = currentViewSquad;
+                return;
+            }
         }
-        pendingChanges = {}; currentViewSquad = newSquad;
-        updateFormStatusUI(); updateHighlightBtnUI(); renderTable();
+        pendingChanges = {};
+        currentViewSquad = newSquad;
+        updateFormStatusUI();
+        updateHighlightBtnUI();
+        renderTable();
     });
+
     loginSubmitBtn.addEventListener('click', async function() {
         const squad = loginSquadSelect.value;
         const selectedUser = loginNameSelect.value;
         const inputPwd = loginPasswordInput.value;
-        if (!squad || !selectedUser) { loginErrorMsg.style.display = 'block'; return; }
+        if (!squad || !selectedUser) {
+            loginErrorMsg.style.display = 'block';
+            return;
+        }
         const correctPwd = getUserPassword(selectedUser);
         if (inputPwd === correctPwd) {
-            currentSquad = squad; currentUser = selectedUser; currentViewSquad = squad;
+            currentSquad = squad;
+            currentUser = selectedUser;
+            currentViewSquad = squad;
             sessionStorage.setItem('schedule_current_squad', squad);
             sessionStorage.setItem('schedule_current_user', selectedUser);
-            loginErrorMsg.style.display = 'none'; loginPasswordInput.value = '';
+            loginErrorMsg.style.display = 'none';
+            loginPasswordInput.value = '';
             viewSquadSelect.value = squad;
-            showSync(); await fetchCloudData();
-            mainApp.style.display = 'flex'; loginOverlay.style.display = 'none';
+            showSync();
+            await fetchCloudData();
+            mainApp.style.display = 'flex';
+            loginOverlay.style.display = 'none';
             userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
-            updateFormStatusUI(); updateHighlightBtnUI(); renderTable();
+            updateFormStatusUI();
+            updateHighlightBtnUI();
+            renderTable();
         } else {
             loginErrorMsg.style.display = 'block';
         }
     });
+
     async function checkLoginStatus() {
         const savedSquad = sessionStorage.getItem('schedule_current_squad');
         const savedUser = sessionStorage.getItem('schedule_current_user');
         if (savedSquad && savedUser) {
             await fetchCloudData();
-            currentSquad = savedSquad; currentUser = savedUser; currentViewSquad = savedSquad;
+            currentSquad = savedSquad;
+            currentUser = savedUser;
+            currentViewSquad = savedSquad;
             viewSquadSelect.value = savedSquad;
-            mainApp.style.display = 'flex'; loginOverlay.style.display = 'none';
+            mainApp.style.display = 'flex';
+            loginOverlay.style.display = 'none';
             userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
-            updateFormStatusUI(); updateHighlightBtnUI(); renderTable();
+            updateFormStatusUI();
+            updateHighlightBtnUI();
+            renderTable();
         } else {
-            loginOverlay.style.display = 'flex'; mainApp.style.display = 'none';
+            loginOverlay.style.display = 'flex';
+            mainApp.style.display = 'none';
         }
     }
+
     changePwdBtn.addEventListener('click', function() {
         oldPwdInput.value = ''; newPwdInput.value = ''; confirmPwdInput.value = '';
-        pwdErrorMsg.style.display = 'none'; changePwdModal.style.display = 'flex';
+        pwdErrorMsg.style.display = 'none';
+        changePwdModal.style.display = 'flex';
     });
+
     cancelPwdBtn.addEventListener('click', () => changePwdModal.style.display = 'none');
 
-    // ✅ 終極修正：強制延遲與重試，確保 GAS 快取被清除
+    // ✅ 終極修正：採用您提供的 S4 版本邏輯，不做二次讀取驗證
+    // 避免因為 GAS 快取未更新導致的前端誤報錯誤
     savePwdBtn.addEventListener('click', async function() {
         const correctPwd = getUserPassword(currentUser);
         const oldVal = oldPwdInput.value;
         const newVal = newPwdInput.value;
         const confirmVal = confirmPwdInput.value;
         
-        if (oldVal !== correctPwd) { pwdErrorMsg.textContent = "舊密碼錯誤！"; pwdErrorMsg.style.display = "block"; return; }
-        if (!newVal) { pwdErrorMsg.textContent = "新密碼不可空白！"; pwdErrorMsg.style.display = "block"; return; }
-        if (newVal !== confirmVal) { pwdErrorMsg.textContent = "兩次輸入的新密碼不一致！"; pwdErrorMsg.style.display = "block"; return; }
+        if (oldVal !== correctPwd) {
+            pwdErrorMsg.textContent = "舊密碼錯誤！";
+            pwdErrorMsg.style.display = "block"; return;
+        }
+        if (!newVal) {
+            pwdErrorMsg.textContent = "新密碼不可空白！";
+            pwdErrorMsg.style.display = "block"; return;
+        }
+        if (newVal !== confirmVal) {
+            pwdErrorMsg.textContent = "兩次輸入的新密碼不一致！";
+            pwdErrorMsg.style.display = "block"; return;
+        }
         
         if(!cloudData.passwords) cloudData.passwords = {};
-        const finalNewVal = newVal.toString();
-        cloudData.passwords[currentUser] = finalNewVal;
-        await postCloudData({ action: 'savePassword', key: currentUser, value: finalNewVal });
-
-        // 1. 強制等待 2 秒，給 GAS 伺服器寫入與刷新快取的時間
-        await new Promise(r => setTimeout(r, 2000));
+        cloudData.passwords[currentUser] = newVal;
+        await postCloudData({ action: 'savePassword', key: currentUser, value: newVal });
         
-        // 2. 使用極致防快取參數重新讀取
-        await fetchCloudData();
-
-        // 3. 比對拉回來的真實雲端密碼
-        const savedPwd = getUserPassword(currentUser);
-        if (savedPwd !== finalNewVal) {
-            let specificError = "❌ 密碼修改失敗！雲端資料未同步。";
-            if (finalNewVal === "0000" && savedPwd === "0") {
-                specificError += " 您的 GAS 後端把 '0000' 自動轉成了 '0'，請修正後端確保以「字串」儲存。";
-            } else {
-                specificError += " 強烈建議您前往 GAS 後台，點選「部署」->「新增部署」-> 發布一個新版網頁應用程式來強制清除雲端快取。";
-            }
-            pwdErrorMsg.textContent = specificError; pwdErrorMsg.style.display = "block"; return;
-        }
-
-        alert("密碼修改成功！"); changePwdModal.style.display = 'none';
+        alert("密碼修改成功！");
+        changePwdModal.style.display = 'none';
     });
 
     // 跑馬燈邏輯
     editMarqueeBtn.addEventListener('click', function() {
         const marqueeKey = currentSquad + '_marqueeText';
-        const currentText = (cloudData.settings && cloudData.settings[marqueeKey]) ? cloudData.settings[marqueeKey] : `※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。`;
-        marqueeInput.value = currentText; marqueeErrorMsg.style.display = 'none';
+        const currentText = (cloudData.settings && cloudData.settings[marqueeKey]) 
+                            ? cloudData.settings[marqueeKey] 
+                            : `※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。`;
+        marqueeInput.value = currentText;
+        marqueeErrorMsg.style.display = 'none';
         marqueeModalTitle.textContent = `編輯跑馬燈文字 (${currentSquad})`;
         marqueeModal.style.display = 'flex';
     });
     cancelMarqueeBtn.addEventListener('click', () => marqueeModal.style.display = 'none');
     saveMarqueeBtn.addEventListener('click', async function() {
         const newText = marqueeInput.value.trim();
-        if (!newText) { marqueeErrorMsg.textContent = "跑馬燈內容不可空白！"; marqueeErrorMsg.style.display = "block"; return; }
+        if (!newText) {
+            marqueeErrorMsg.textContent = "跑馬燈內容不可空白！";
+            marqueeErrorMsg.style.display = "block"; return;
+        }
         const marqueeKey = currentSquad + '_marqueeText';
         if(!cloudData.settings) cloudData.settings = {};
         cloudData.settings[marqueeKey] = newText;
@@ -929,21 +1197,28 @@
     editEmployeeBtn.addEventListener('click', function() {
         const currentList = getEmployeeList(currentSquad);
         employeeListInput.value = currentList.join('\n');
-        empErrorMsg.style.display = 'none'; empModalTitle.textContent = `管理班表人員 (${currentSquad})`;
+        empErrorMsg.style.display = 'none';
+        empModalTitle.textContent = `管理班表人員 (${currentSquad})`;
         employeeModal.style.display = 'flex';
     });
     cancelEmpBtn.addEventListener('click', () => employeeModal.style.display = 'none');
     saveEmpBtn.addEventListener('click', async function() {
         const rawText = employeeListInput.value;
         let newList = rawText.split(/\r?\n/).map(n => n.trim()).filter(n => n !== '');
-        if (newList.length === 0) { empErrorMsg.textContent = "名單不可為空！至少需要一個人。"; empErrorMsg.style.display = "block"; return; }
+        if (newList.length === 0) {
+            empErrorMsg.textContent = "名單不可為空！至少需要一個人。";
+            empErrorMsg.style.display = "block"; return;
+        }
         const manager = squadManagers[currentSquad];
-        if (!newList.includes(manager)) { newList.unshift(manager); }
+        if (!newList.includes(manager)) {
+            newList.unshift(manager);
+        }
         if(!cloudData.settings) cloudData.settings = {};
         cloudData.settings[currentSquad + '_employees'] = JSON.stringify(newList);
         await postCloudData({ action: 'saveSetting', key: currentSquad + '_employees', value: JSON.stringify(newList) });
         alert(`人員名單已更新！共 ${newList.length} 人。`);
-        employeeModal.style.display = 'none'; renderTable();
+        employeeModal.style.display = 'none';
+        renderTable();
     });
 
     logoutBtn.addEventListener('click', function() {
@@ -954,6 +1229,7 @@
         loginSquadSelect.value = ''; loginNameSelect.innerHTML = '<option value="">-- 請選擇姓名 --</option>';
         loginPasswordInput.value = ''; checkLoginStatus();
     });
+
     otLimitSelect.addEventListener('change', function() {
         if (!currentSquad || !currentViewSquad || currentViewSquad !== currentSquad) return;
         if (currentUser !== squadManagers[currentSquad]) return;
@@ -963,6 +1239,7 @@
         cloudData.otLimits[limitKey] = this.value;
         postCloudData({ action: 'saveOtLimit', key: limitKey, value: this.value });
     });
+
     const now = new Date(); const currentYear = now.getFullYear();
     for (let y = currentYear - 5; y <= currentYear + 5; y++) {
         let opt = document.createElement('option'); opt.value = y; opt.text = y;
@@ -972,12 +1249,15 @@
         let opt = document.createElement('option'); opt.value = m; opt.text = m;
         if (m === (now.getMonth() + 1)) opt.selected = true; monthSelect.appendChild(opt);
     }
+
     yearSelect.addEventListener('change', renderTable);
     monthSelect.addEventListener('change', renderTable);
+
     toggleStatsBtn.addEventListener('click', function() {
         document.body.classList.toggle('hide-stats');
         this.textContent = document.body.classList.contains('hide-stats') ? '顯示統計' : '隱藏統計';
     });
+
     checkLoginStatus();
 </script>
 </body>
