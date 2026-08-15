@@ -201,7 +201,7 @@
         /* ✅ 表格容器：採用 S4 固定高度讓手機有明確的可滑動空間 */
         .table-container {
             overflow: auto;
-            height: calc(100vh - 110px); /* 預留上方控制列與跑馬燈空間 */
+            height: calc(100vh - 110px); /* 預留上方控制列與下方跑馬燈空間 */
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             background-color: white;
             -webkit-overflow-scrolling: touch;
@@ -309,7 +309,7 @@
             box-sizing: border-box;
             position: relative;
             display: block;
-            margin-top: 5px;
+            margin-top: 10px;
         }
         #tickerText {
             display: inline-block;
@@ -506,17 +506,16 @@
         </div>
     </div>
 
-    <!-- ✅ 跑馬燈移動到班表上方 -->
-    <div id="tickerContainer">
-        <div id="tickerText"></div>
-    </div>
-
-    <!-- ========== 班表表格 ========== -->
     <div class="table-container">
         <table id="scheduleTable">
             <thead id="tableHead"></thead>
             <tbody id="tableBody"></tbody>
         </table>
+    </div>
+
+    <!-- 跑馬燈顯示區塊 -->
+    <div id="tickerContainer">
+        <div id="tickerText"></div>
     </div>
 </div>
 
