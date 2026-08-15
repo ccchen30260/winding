@@ -192,9 +192,10 @@
         .modal-btn-cancel { background-color: #e9ecef; color: #333; border: 1px solid #ced4da; }
         .modal-btn-cancel:hover { background-color: #dde0e3; }
 
+        /* ✅ 高度調整，預留下方跑馬燈的空間 */
         .table-container {
             overflow: auto;
-            height: calc(100vh - 110px);
+            height: calc(100vh - 160px); /* 預留上方控制列與下方跑馬燈空間 */
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             background-color: white;
             -webkit-overflow-scrolling: touch;
@@ -289,6 +290,7 @@
         body.crosshair-active td.crosshair-highlight, body.crosshair-active th.crosshair-highlight { background-color: #ffeaa7 !important; transition: background-color 0.15s ease; }
         body.crosshair-active td.crosshair-highlight select { background-color: #ffeaa7 !important; }
 
+        /* ✅ 跑馬燈：移動到班表下方 */
         #tickerContainer {
             width: 100%;
             overflow: hidden;
@@ -495,15 +497,17 @@
         </div>
     </div>
 
-    <div id="tickerContainer">
-        <div id="tickerText"></div>
-    </div>
-
+    <!-- ========== 班表表格 ========== -->
     <div class="table-container">
         <table id="scheduleTable">
             <thead id="tableHead"></thead>
             <tbody id="tableBody"></tbody>
         </table>
+    </div>
+
+    <!-- ✅ 跑馬燈移動回班表下方 -->
+    <div id="tickerContainer">
+        <div id="tickerText"></div>
     </div>
 </div>
 
@@ -612,7 +616,7 @@
         loginNameSelect.value = '';
     });
 
-    // ✅ 強制超時 15 秒。內部沒有 hideSync()，由外部呼叫者控制顯示與隱藏
+    // ✅ 強制超時 15 秒
     async function fetchCloudData() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 15000);
@@ -658,7 +662,6 @@
         }
     }
 
-    // ✅ 內部不自行隱藏 loading，交由外層呼叫者決定何時 hideSync()
     async function postCloudData(payload) {
         try {
             await fetch(GAS_WEB_APP_URL, {
@@ -1231,7 +1234,7 @@
         renderTable();
     });
 
-    // ✅ 無論成功或失敗，「雲端同步中」一定會顯示 15 秒或直到結束
+    // ✅ 點擊登入，異步同步
     loginSubmitBtn.addEventListener('click', async function() {
         const squad = loginSquadSelect.value;
         const selectedUser = loginNameSelect.value;
@@ -1282,7 +1285,7 @@
         } finally {
             loginSubmitBtn.disabled = false;
             loginSubmitBtn.textContent = "登入";
-            hideSync(); // 做完才隱藏
+            hideSync();
         }
     });
 
