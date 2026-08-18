@@ -14,9 +14,13 @@
             --text-personal: #ffffff;
             --bg-sick: #ff0000;
             --text-sick: #ffffff;
-            --bg-physio: #ffe6cc;
+            --bg-physio: #ffab91;          /* 生 改為亮橙色 */
             --bg-typhoon: #dae8fc;
             --bg-unattended: #d0d0d0;
+            --bg-absent: #a5d6a7;          /* 曠 改為淺綠色 */
+            --bg-marriage: #f48fb1;        /* 婚 粉紅 */
+            --bg-mourning: #90a4ae;        /* 喪 藍灰 */
+            --bg-public: #ce93d8;          /* 公 淡紫 */
             --border-color: #a0a0a0;
         }
 
@@ -356,12 +360,13 @@
             white-space: nowrap;
         }
 
+        /* 行高進一步縮小至 28px */
         th, td {
             border-right: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
             padding: 0;
             min-width: 32px;
-            height: 32px;
+            height: 28px;
             box-sizing: border-box;
             background-clip: padding-box;
         }
@@ -371,9 +376,10 @@
 
         th { background-color: #f2f2f2; font-weight: bold; }
 
+        /* 粘性表頭位置對應 28px 行高 */
         thead tr:nth-child(1) th { position: sticky; top: 0; z-index: 1; }
-        thead tr:nth-child(2) th { position: sticky; top: 32px; z-index: 1; }
-        thead tr:nth-child(3) th { position: sticky; top: 64px; z-index: 1; }
+        thead tr:nth-child(2) th { position: sticky; top: 28px; z-index: 1; }
+        thead tr:nth-child(3) th { position: sticky; top: 56px; z-index: 1; }
 
         .stats-ot { position: sticky; left: 0; width: 40px; min-width: 40px; z-index: 2; color: #00b0f0; background-color: #e6f7ff; font-weight: bold; }
         .stats-lv { position: sticky; left: 40px; width: 40px; min-width: 40px; z-index: 2; color: #ff0000; background-color: #ffe6e6; font-weight: bold; }
@@ -404,10 +410,10 @@
             background-color: #fff1b8;
         }
 
-        .cell-content { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; min-height: 32px; box-sizing: border-box; }
+        .cell-content { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; min-height: 28px; box-sizing: border-box; }
 
         .shift-select {
-            width: 100%; height: 32px; border: none; background-color: transparent;
+            width: 100%; height: 28px; border: none; background-color: transparent;
             font-size: 15px; font-family: inherit; text-align: center; text-align-last: center;
             appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer; outline: none;
             color: inherit; font-weight: inherit;
@@ -430,11 +436,14 @@
         .shift-typhoon { background-color: var(--bg-typhoon); color: black; font-weight: bold; }
         .shift-return { background-color: #b3e5fc; color: black; font-weight: bold; }
         .shift-business { background-color: #fff9c4; color: black; font-weight: bold; }
-        .shift-absent { background-color: #ffccbc; color: black; font-weight: bold; }
+        .shift-absent { background-color: var(--bg-absent); color: black; font-weight: bold; }          /* 曠 新色 */
+        .shift-marriage { background-color: var(--bg-marriage); color: black; font-weight: bold; }    /* 婚 */
+        .shift-mourning { background-color: var(--bg-mourning); color: white; font-weight: bold; }    /* 喪 (白色文字較清晰) */
+        .shift-public { background-color: var(--bg-public); color: black; font-weight: bold; }        /* 公 */
 
         .daily-mark-select {
             width: 100%;
-            height: 32px;
+            height: 28px;
             border: 1px solid #ccc;
             background-color: #ffffff;
             font-size: 16px;
@@ -458,9 +467,11 @@
             background-color: #fff3cd !important;
         }
 
+        /* 十字高亮：保持文字顏色不變 */
         body.crosshair-active td.crosshair-highlight,
         body.crosshair-active th.crosshair-highlight {
             background-color: #ffeaa7 !important;
+            color: inherit !important;
             transition: background-color 0.15s ease;
         }
         body.crosshair-active td.crosshair-highlight select {
@@ -786,7 +797,6 @@
     async function fetchCloudData() {
         showSync();
         try {
-            // 加入時間戳記避免 Google 快取舊資料
             const timestamp = new Date().getTime();
             const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData&t=${timestamp}`);
             const data = await resp.json();
@@ -822,7 +832,6 @@
         try {
             await fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
-                // 將 Content-Type 改為 text/plain，能有效避免 CORS 阻擋導致的寫入失敗
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             });
@@ -974,6 +983,7 @@
         const empList = getEmployeeList(squad);
         if (!empList) return;
         let grandTotalOt = 0, grandTotalLv = 0, grandTotalUa = 0;
+        const lvTypes = ['特', '病', '事', '生', '婚', '喪', '公']; // 新增假別計入請假
         empList.forEach(empName => {
             for (let i = 1; i <= daysInMonth; i++) {
                 const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
@@ -986,7 +996,7 @@
                     val = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
                 }
                 if (val === 'G') grandTotalOt++;
-                if (['特', '病', '事', '生'].includes(val)) grandTotalLv++;
+                if (lvTypes.includes(val)) grandTotalLv++;
                 if (val === '未') grandTotalUa++;
             }
         });
@@ -1205,6 +1215,10 @@
             visibleEmployees = allEmployees;
         }
 
+        // 定義所有可能的假別（包含新增）
+        const extraLeaveTypes = ['婚', '喪', '公'];
+        const allLeaveTypes = ['特', '病', '事', '生', ...extraLeaveTypes];
+
         visibleEmployees.forEach(empName => {
             let tr = document.createElement('tr');
             const otCellId = `ot_${viewSquad}_${year}_${month}_${empName}`;
@@ -1239,6 +1253,10 @@
                 } else {
                     baseOptions = [defaultShift, '特', '病', '事', '生', '颱', '返', '差', '曠'];
                 }
+                // 統一加入新增假別
+                extraLeaveTypes.forEach(opt => {
+                    if (!baseOptions.includes(opt)) baseOptions.push(opt);
+                });
                 const isCurrentManager = (isMySquad && currentUser === squadManagers[viewSquad]);
                 if (!isCurrentManager) {
                     baseOptions = baseOptions.filter(opt => opt !== '未');
@@ -1337,6 +1355,7 @@
 
     function calculateStats(empName, squad, year, month, daysInMonth, otCellId, lvCellId) {
         let otCount = 0, lvCount = 0;
+        const lvTypes = ['特', '病', '事', '生', '婚', '喪', '公'];
         for (let i = 1; i <= daysInMonth; i++) {
             const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
             const defaultShift = getDefaultShift(squad, year, month, i);
@@ -1348,7 +1367,7 @@
                 val = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
             }
             if (val === 'G') otCount++;
-            if (['特', '病', '事', '生'].includes(val)) lvCount++;
+            if (lvTypes.includes(val)) lvCount++;
         }
         const otElem = document.getElementById(otCellId);
         const lvElem = document.getElementById(lvCellId);
@@ -1357,7 +1376,7 @@
     }
 
     function updateCellColor(td, value) {
-        td.classList.remove('shift-day', 'shift-night', 'shift-g', 'shift-unattended', 'shift-special', 'shift-personal', 'shift-sick', 'shift-physio', 'shift-typhoon', 'shift-return', 'shift-business', 'shift-absent');
+        td.classList.remove('shift-day', 'shift-night', 'shift-g', 'shift-unattended', 'shift-special', 'shift-personal', 'shift-sick', 'shift-physio', 'shift-typhoon', 'shift-return', 'shift-business', 'shift-absent', 'shift-marriage', 'shift-mourning', 'shift-public');
         switch (value) {
             case '日': td.classList.add('shift-day'); break;
             case '夜': td.classList.add('shift-night'); break;
@@ -1371,6 +1390,9 @@
             case '返': td.classList.add('shift-return'); break;
             case '差': td.classList.add('shift-business'); break;
             case '曠': td.classList.add('shift-absent'); break;
+            case '婚': td.classList.add('shift-marriage'); break;
+            case '喪': td.classList.add('shift-mourning'); break;
+            case '公': td.classList.add('shift-public'); break;
         }
     }
 
@@ -1399,7 +1421,6 @@
             return;
         }
 
-        // 💡 登入比對密碼前，務必先去雲端抓取最新的密碼清單
         showSync();
         await fetchCloudData();
 
@@ -1428,7 +1449,6 @@
     });
 
     async function checkLoginStatus() {
-        // 💡 網頁一打開，無論是否登入過，都先抓取最新資料
         await fetchCloudData();
         
         const savedSquad = sessionStorage.getItem('schedule_current_squad');
@@ -1458,7 +1478,6 @@
 
     cancelPwdBtn.addEventListener('click', () => changePwdModal.style.display = 'none');
 
-    // 修改密碼後重新加載雲端數據並驗證
     savePwdBtn.addEventListener('click', async function() {
         const correctPwd = getUserPassword(currentUser);
         const oldVal = oldPwdInput.value;
@@ -1476,14 +1495,10 @@
             pwdErrorMsg.textContent = "兩次輸入的新密碼不一致！";
             pwdErrorMsg.style.display = "block"; return;
         }
-        // 先更新內存
         if(!cloudData.passwords) cloudData.passwords = {};
         cloudData.passwords[currentUser] = newVal;
-        // 保存到雲端
         await postCloudData({ action: 'savePassword', key: currentUser, value: newVal });
-        // 重新從雲端加載數據，確認是否保存成功
         await fetchCloudData();
-        // 檢查是否真的更新了
         if (cloudData.passwords[currentUser] !== newVal) {
             pwdErrorMsg.textContent = "密碼保存失敗，請檢查網路或重新嘗試！";
             pwdErrorMsg.style.display = "block";
