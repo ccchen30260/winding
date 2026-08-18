@@ -361,7 +361,7 @@
             border-bottom: 1px solid var(--border-color);
             padding: 0;
             min-width: 32px;
-            height: 38px;
+            height: 32px;          /* 縮小行高 */
             box-sizing: border-box;
             background-clip: padding-box;
         }
@@ -371,9 +371,10 @@
 
         th { background-color: #f2f2f2; font-weight: bold; }
 
+        /* 修正粘性表頭位置，對應新行高 */
         thead tr:nth-child(1) th { position: sticky; top: 0; z-index: 1; }
-        thead tr:nth-child(2) th { position: sticky; top: 38px; z-index: 1; }
-        thead tr:nth-child(3) th { position: sticky; top: 76px; z-index: 1; }
+        thead tr:nth-child(2) th { position: sticky; top: 32px; z-index: 1; }
+        thead tr:nth-child(3) th { position: sticky; top: 64px; z-index: 1; }
 
         .stats-ot { position: sticky; left: 0; width: 40px; min-width: 40px; z-index: 2; color: #00b0f0; background-color: #e6f7ff; font-weight: bold; }
         .stats-lv { position: sticky; left: 40px; width: 40px; min-width: 40px; z-index: 2; color: #ff0000; background-color: #ffe6e6; font-weight: bold; }
@@ -404,18 +405,20 @@
             background-color: #fff1b8;
         }
 
-        .cell-content { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; min-height: 38px; box-sizing: border-box; }
+        .cell-content { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; min-height: 32px; box-sizing: border-box; }
 
         .shift-select {
-            width: 100%; height: 38px; border: none; background-color: transparent;
+            width: 100%; height: 32px; border: none; background-color: transparent;
             font-size: 15px; font-family: inherit; text-align: center; text-align-last: center;
             appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer; outline: none;
             color: inherit; font-weight: inherit;
         }
 
         .shift-select:disabled {
-            cursor: not-allowed;
-            opacity: 0.9;
+            /* 禁用時不變灰，保持原有外觀 */
+            opacity: 1;
+            background-color: transparent;
+            cursor: default;
         }
 
         .shift-day { background-color: var(--bg-day); }
@@ -433,7 +436,7 @@
 
         .daily-mark-select {
             width: 100%;
-            height: 38px;
+            height: 32px;
             border: 1px solid #ccc;
             background-color: #ffffff;
             font-size: 16px;
@@ -447,8 +450,10 @@
             outline: none;
         }
         .daily-mark-select:disabled {
-            background-color: #f0f0f0;
-            cursor: not-allowed;
+            /* 禁用時不變灰 */
+            opacity: 1;
+            background-color: #ffffff;
+            cursor: default;
         }
 
         td.pending-edit select {
@@ -466,10 +471,10 @@
             background-color: #ffeaa7 !important;
         }
 
-        /* 跑馬燈樣式 — 調整貼近表格 */
+        /* 跑馬燈樣式 — 貼近表格 */
         .marquee-container {
             margin-top: 0;
-            margin-bottom: 2px;   /* 貼著表格上方，留極小間隙 */
+            margin-bottom: 2px;
             border: 1px solid #e2e2e2;
             border-radius: 4px;
             background: #fffdf7;
@@ -671,7 +676,7 @@
         <button id="editEmployeeBtn" class="edit-employee-btn" style="display:none;">👥 管理班表人員</button>
     </div>
 
-    <!-- 跑馬燈移至班表上方，貼著表格 -->
+    <!-- 跑馬燈移至班表上方 -->
     <div class="marquee-container">
         <div id="marqueeText" class="marquee-content">※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。</div>
     </div>
@@ -682,8 +687,6 @@
             <tbody id="tableBody"></tbody>
         </table>
     </div>
-
-    <!-- 原底部跑馬燈已移除，僅保留上方一處 -->
 </div>
 
 <script>
