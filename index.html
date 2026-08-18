@@ -361,7 +361,7 @@
             border-bottom: 1px solid var(--border-color);
             padding: 0;
             min-width: 32px;
-            height: 32px;          /* 縮小行高 */
+            height: 32px;
             box-sizing: border-box;
             background-clip: padding-box;
         }
@@ -371,7 +371,6 @@
 
         th { background-color: #f2f2f2; font-weight: bold; }
 
-        /* 修正粘性表頭位置，對應新行高 */
         thead tr:nth-child(1) th { position: sticky; top: 0; z-index: 1; }
         thead tr:nth-child(2) th { position: sticky; top: 32px; z-index: 1; }
         thead tr:nth-child(3) th { position: sticky; top: 64px; z-index: 1; }
@@ -415,7 +414,6 @@
         }
 
         .shift-select:disabled {
-            /* 禁用時不變灰，保持原有外觀 */
             opacity: 1;
             background-color: transparent;
             cursor: default;
@@ -450,7 +448,6 @@
             outline: none;
         }
         .daily-mark-select:disabled {
-            /* 禁用時不變灰 */
             opacity: 1;
             background-color: #ffffff;
             cursor: default;
@@ -461,7 +458,6 @@
             background-color: #fff3cd !important;
         }
 
-        /* 十字高亮效果 */
         body.crosshair-active td.crosshair-highlight,
         body.crosshair-active th.crosshair-highlight {
             background-color: #ffeaa7 !important;
@@ -471,7 +467,6 @@
             background-color: #ffeaa7 !important;
         }
 
-        /* 跑馬燈樣式 — 貼近表格 */
         .marquee-container {
             margin-top: 0;
             margin-bottom: 2px;
@@ -496,7 +491,6 @@
             0% { transform: translateX(0%); }
             100% { transform: translateX(-200%); }
         }
-        /* 按鈕列表行 */
         .extra-controls {
             display: flex;
             align-items: center;
@@ -660,7 +654,6 @@
                     <option value="S4">S4</option>
                 </select>
             </div>
-            <!-- 十字高亮開關 -->
             <button id="highlightBtn" class="highlight-btn" disabled>十字高亮：關</button>
             <button id="formStatusBtn" class="form-status-btn open">填表：開啟</button>
             <div id="userInfoDisplay" class="user-info">👤 未登入</div>
@@ -670,13 +663,11 @@
         </div>
     </div>
     
-    <!-- 額外管理工具列 -->
     <div class="extra-controls">
         <button id="editMarqueeBtn" class="edit-marquee-btn" style="display:none;">📝 編輯跑馬燈</button>
         <button id="editEmployeeBtn" class="edit-employee-btn" style="display:none;">👥 管理班表人員</button>
     </div>
 
-    <!-- 跑馬燈移至班表上方 -->
     <div class="marquee-container">
         <div id="marqueeText" class="marquee-content">※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。</div>
     </div>
@@ -692,7 +683,6 @@
 <script>
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzLY435Gr3k6783bG__8TM0xs04CDLztMghV3Et4LX411iGTEt3so3zYSOVZlo27qPl/exec";
 
-    // 硬編碼初始名單 (若管理者尚未新增自訂名單時的預設值)
     const squadEmployeesDefault = {
         S1: ["方慎之","陳泰安","蔡南嘉","李珮菁","朱建穎","王泳淇","吳峻霖","黃詠綺","蘭狄","凱文","勞倫司","安東尼","明華","艾麥倫","邱立斯","拉特","羅內爾","艾佛森"],
         S2: ["黃正忠","張韶眞","陳宥庠","黃威翔","羅翊禎","黃文靖","蔡易良","吳奇玲","詹姆士","達力","山博","羅傑","達路","童氏蓮","羅德","達布","安吉","羅蘭多"],
@@ -700,7 +690,6 @@
         S4: ["陳喬志","楊代億","廖曉彤","蔡靜儀","賴建亦","施榮傑","陰其德","黃譯鋒","楊雅婷","羅啟倫","埃爾默","拉斯特","雷伊","漢斯","達利斯","甘達","特拉多","達爾文"]
     };
 
-    // 各班管理員
     const squadManagers = {
         S1: "方慎之",
         S2: "黃正忠",
@@ -761,7 +750,6 @@
     const totalLvDisplay = document.getElementById('totalLvDisplay');
     const totalUaDisplay = document.getElementById('totalUaDisplay');
 
-    // 跑馬燈相關 DOM
     const editMarqueeBtn = document.getElementById('editMarqueeBtn');
     const marqueeModal = document.getElementById('marqueeModal');
     const marqueeInput = document.getElementById('marqueeInput');
@@ -770,7 +758,6 @@
     const marqueeErrorMsg = document.getElementById('marqueeErrorMsg');
     const marqueeText = document.getElementById('marqueeText');
 
-    // 管理人員相關 DOM
     const editEmployeeBtn = document.getElementById('editEmployeeBtn');
     const employeeModal = document.getElementById('employeeModal');
     const empModalTitle = document.getElementById('empModalTitle');
@@ -858,7 +845,6 @@
         return (cloudData.settings && cloudData.settings[key]) ? cloudData.settings[key] : {};
     }
 
-    // 獲取當前班表人員清單（雲端優先，沒有則讀取硬編碼）
     function getEmployeeList(squad) {
         const key = squad + '_employees';
         if (cloudData.settings && cloudData.settings[key]) {
@@ -895,7 +881,6 @@
         updateHighlightBtnUI();
     });
 
-    // 十字高亮
     const tableContainer = document.querySelector('.table-container');
     tableContainer.addEventListener('mouseover', function(e) {
         if (!crosshairEnabled) return;
@@ -1120,11 +1105,9 @@
 
         otLimitGroup.style.display = (isMySquad && isManagerOfMy && formOpen) ? 'flex' : 'none';
         
-        // 判斷跑馬燈與管理人員權限
         editMarqueeBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
         editEmployeeBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
 
-        // 跑馬燈文字載入
         const defaultMarquee = `※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。`;
         if (cloudData.settings && cloudData.settings['marqueeText']) {
             marqueeText.textContent = cloudData.settings['marqueeText'];
@@ -1465,6 +1448,7 @@
 
     cancelPwdBtn.addEventListener('click', () => changePwdModal.style.display = 'none');
 
+    // ===== 修正：修改密码后重新加载云端数据并验证 =====
     savePwdBtn.addEventListener('click', async function() {
         const correctPwd = getUserPassword(currentUser);
         const oldVal = oldPwdInput.value;
@@ -1482,9 +1466,19 @@
             pwdErrorMsg.textContent = "兩次輸入的新密碼不一致！";
             pwdErrorMsg.style.display = "block"; return;
         }
+        // 先更新内存
         if(!cloudData.passwords) cloudData.passwords = {};
         cloudData.passwords[currentUser] = newVal;
+        // 保存到云端
         await postCloudData({ action: 'savePassword', key: currentUser, value: newVal });
+        // 重新从云端加载数据，确认是否保存成功
+        await fetchCloudData();
+        // 检查是否真的更新了
+        if (cloudData.passwords[currentUser] !== newVal) {
+            pwdErrorMsg.textContent = "密碼保存失敗，請檢查網路或重新嘗試！";
+            pwdErrorMsg.style.display = "block";
+            return;
+        }
         alert("密碼修改成功！");
         changePwdModal.style.display = 'none';
     });
