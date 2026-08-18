@@ -786,7 +786,9 @@
     async function fetchCloudData() {
         showSync();
         try {
-            const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData`);
+            // 加入時間戳記避免 Google 快取舊資料
+            const timestamp = new Date().getTime();
+            const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData&t=${timestamp}`);
             const data = await resp.json();
             if (data) cloudData = data;
             if (cloudData.settings) {
@@ -820,8 +822,8 @@
         try {
             await fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
+                // 將 Content-Type 改為 text/plain，能有效避免 CORS 阻擋導致的寫入失敗
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             });
         } catch (err) {
@@ -1069,7 +1071,7 @@
                 promises.push(fetch(GAS_WEB_APP_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: 'saveShift', key: key, value: val })
                 }));
             }
@@ -1396,6 +1398,11 @@
             loginErrorMsg.style.display = 'block';
             return;
         }
+
+        // 💡 登入比對密碼前，務必先去雲端抓取最新的密碼清單
+        showSync();
+        await fetchCloudData();
+
         const correctPwd = getUserPassword(selectedUser);
         if (inputPwd === correctPwd) {
             currentSquad = squad;
@@ -1406,8 +1413,7 @@
             loginErrorMsg.style.display = 'none';
             loginPasswordInput.value = '';
             viewSquadSelect.value = squad;
-            showSync();
-            await fetchCloudData();
+            
             loginOverlay.style.display = 'none';
             mainApp.style.display = 'block';
             userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
@@ -1415,15 +1421,19 @@
             updateHighlightBtnUI();
             renderTable();
         } else {
+            loginErrorMsg.textContent = "請選擇班級、姓名或密碼錯誤！";
             loginErrorMsg.style.display = 'block';
+            hideSync();
         }
     });
 
     async function checkLoginStatus() {
+        // 💡 網頁一打開，無論是否登入過，都先抓取最新資料
+        await fetchCloudData();
+        
         const savedSquad = sessionStorage.getItem('schedule_current_squad');
         const savedUser = sessionStorage.getItem('schedule_current_user');
         if (savedSquad && savedUser) {
-            await fetchCloudData();
             currentSquad = savedSquad;
             currentUser = savedUser;
             currentViewSquad = savedSquad;
@@ -1448,7 +1458,7 @@
 
     cancelPwdBtn.addEventListener('click', () => changePwdModal.style.display = 'none');
 
-    // ===== 修正：修改密码后重新加载云端数据并验证 =====
+    // 修改密碼後重新加載雲端數據並驗證
     savePwdBtn.addEventListener('click', async function() {
         const correctPwd = getUserPassword(currentUser);
         const oldVal = oldPwdInput.value;
@@ -1466,14 +1476,14 @@
             pwdErrorMsg.textContent = "兩次輸入的新密碼不一致！";
             pwdErrorMsg.style.display = "block"; return;
         }
-        // 先更新内存
+        // 先更新內存
         if(!cloudData.passwords) cloudData.passwords = {};
         cloudData.passwords[currentUser] = newVal;
-        // 保存到云端
+        // 保存到雲端
         await postCloudData({ action: 'savePassword', key: currentUser, value: newVal });
-        // 重新从云端加载数据，确认是否保存成功
+        // 重新從雲端加載數據，確認是否保存成功
         await fetchCloudData();
-        // 检查是否真的更新了
+        // 檢查是否真的更新了
         if (cloudData.passwords[currentUser] !== newVal) {
             pwdErrorMsg.textContent = "密碼保存失敗，請檢查網路或重新嘗試！";
             pwdErrorMsg.style.display = "block";
