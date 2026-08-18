@@ -465,7 +465,6 @@
             background-color: #fff3cd !important;
         }
 
-        /* 十字高亮：純白背景 + 淺陰影，不帶顏色 */
         body.crosshair-active td.crosshair-highlight,
         body.crosshair-active th.crosshair-highlight {
             background-color: #ffffff !important;
@@ -1171,7 +1170,7 @@
             let thMark = document.createElement('th');
             let selectMark = document.createElement('select');
             selectMark.className = 'daily-mark-select';
-            ['', 'C', '颱', '豪', '歲', '旺','換'].forEach(opt => {
+            ['', 'C', '颱', '豪', '歲', '旺', '換'].forEach(opt => {
                 let option = document.createElement('option');
                 option.value = opt;
                 option.textContent = opt;
@@ -1245,13 +1244,15 @@
 
                 let baseOptions;
                 if (defaultShift === '') {
+                    // 非上班日：僅空白、G、未，不包含任何請假類型
                     baseOptions = ['', 'G', '未'];
                 } else {
+                    // 有班日：包含 defaultShift 及所有請假/特殊類型（含婚喪公）
                     baseOptions = [defaultShift, '特', '病', '事', '生', '颱', '返', '差', '曠'];
+                    extraLeaveTypes.forEach(opt => {
+                        if (!baseOptions.includes(opt)) baseOptions.push(opt);
+                    });
                 }
-                extraLeaveTypes.forEach(opt => {
-                    if (!baseOptions.includes(opt)) baseOptions.push(opt);
-                });
                 const isCurrentManager = (isMySquad && currentUser === squadManagers[viewSquad]);
                 if (!isCurrentManager) {
                     baseOptions = baseOptions.filter(opt => opt !== '未');
