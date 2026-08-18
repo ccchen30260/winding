@@ -14,13 +14,13 @@
             --text-personal: #ffffff;
             --bg-sick: #ff0000;
             --text-sick: #ffffff;
-            --bg-physio: #ffab91;          /* 生 改為亮橙色 */
+            --bg-physio: #ffab91;
             --bg-typhoon: #dae8fc;
             --bg-unattended: #d0d0d0;
-            --bg-absent: #a5d6a7;          /* 曠 改為淺綠色 */
-            --bg-marriage: #f48fb1;        /* 婚 粉紅 */
-            --bg-mourning: #90a4ae;        /* 喪 藍灰 */
-            --bg-public: #ce93d8;          /* 公 淡紫 */
+            --bg-absent: #a5d6a7;
+            --bg-marriage: #f48fb1;
+            --bg-mourning: #90a4ae;
+            --bg-public: #ce93d8;
             --border-color: #a0a0a0;
         }
 
@@ -360,7 +360,6 @@
             white-space: nowrap;
         }
 
-        /* 行高進一步縮小至 28px */
         th, td {
             border-right: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
@@ -376,7 +375,6 @@
 
         th { background-color: #f2f2f2; font-weight: bold; }
 
-        /* 粘性表頭位置對應 28px 行高 */
         thead tr:nth-child(1) th { position: sticky; top: 0; z-index: 1; }
         thead tr:nth-child(2) th { position: sticky; top: 28px; z-index: 1; }
         thead tr:nth-child(3) th { position: sticky; top: 56px; z-index: 1; }
@@ -436,10 +434,10 @@
         .shift-typhoon { background-color: var(--bg-typhoon); color: black; font-weight: bold; }
         .shift-return { background-color: #b3e5fc; color: black; font-weight: bold; }
         .shift-business { background-color: #fff9c4; color: black; font-weight: bold; }
-        .shift-absent { background-color: var(--bg-absent); color: black; font-weight: bold; }          /* 曠 新色 */
-        .shift-marriage { background-color: var(--bg-marriage); color: black; font-weight: bold; }    /* 婚 */
-        .shift-mourning { background-color: var(--bg-mourning); color: white; font-weight: bold; }    /* 喪 (白色文字較清晰) */
-        .shift-public { background-color: var(--bg-public); color: black; font-weight: bold; }        /* 公 */
+        .shift-absent { background-color: var(--bg-absent); color: black; font-weight: bold; }
+        .shift-marriage { background-color: var(--bg-marriage); color: black; font-weight: bold; }
+        .shift-mourning { background-color: var(--bg-mourning); color: white; font-weight: bold; }
+        .shift-public { background-color: var(--bg-public); color: black; font-weight: bold; }
 
         .daily-mark-select {
             width: 100%;
@@ -467,15 +465,15 @@
             background-color: #fff3cd !important;
         }
 
-        /* 十字高亮：保持文字顏色不變 */
+        /* 十字高亮：純白背景 + 淺陰影，不帶顏色 */
         body.crosshair-active td.crosshair-highlight,
         body.crosshair-active th.crosshair-highlight {
-            background-color: #ffeaa7 !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.12);
             color: inherit !important;
-            transition: background-color 0.15s ease;
         }
         body.crosshair-active td.crosshair-highlight select {
-            background-color: #ffeaa7 !important;
+            background-color: #ffffff !important;
         }
 
         .marquee-container {
@@ -983,7 +981,7 @@
         const empList = getEmployeeList(squad);
         if (!empList) return;
         let grandTotalOt = 0, grandTotalLv = 0, grandTotalUa = 0;
-        const lvTypes = ['特', '病', '事', '生', '婚', '喪', '公']; // 新增假別計入請假
+        const lvTypes = ['特', '病', '事', '生', '婚', '喪', '公'];
         empList.forEach(empName => {
             for (let i = 1; i <= daysInMonth; i++) {
                 const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
@@ -1215,9 +1213,7 @@
             visibleEmployees = allEmployees;
         }
 
-        // 定義所有可能的假別（包含新增）
         const extraLeaveTypes = ['婚', '喪', '公'];
-        const allLeaveTypes = ['特', '病', '事', '生', ...extraLeaveTypes];
 
         visibleEmployees.forEach(empName => {
             let tr = document.createElement('tr');
@@ -1253,7 +1249,6 @@
                 } else {
                     baseOptions = [defaultShift, '特', '病', '事', '生', '颱', '返', '差', '曠'];
                 }
-                // 統一加入新增假別
                 extraLeaveTypes.forEach(opt => {
                     if (!baseOptions.includes(opt)) baseOptions.push(opt);
                 });
