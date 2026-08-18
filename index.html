@@ -59,7 +59,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             width: 90%;
-            max-width: 450px; /* 調整寬度以容納更多文字 */
+            max-width: 450px;
             text-align: center;
             box-sizing: border-box;
             border: 1px solid #e0e0e0;
@@ -225,7 +225,7 @@
         .highlight-btn.active { background-color: #28a745; }
         .highlight-btn:disabled { cursor: not-allowed; opacity: 0.7; }
         .edit-marquee-btn { background-color: #fd7e14; }
-        .edit-employee-btn { background-color: #e83e8c; } /* 洋紅色，與原本系統的"特"休色調呼應 */
+        .edit-employee-btn { background-color: #e83e8c; }
 
         .form-status-btn.open { background-color: #28a745; }
         .form-status-btn.closed { background-color: #6c757d; }
@@ -466,9 +466,10 @@
             background-color: #ffeaa7 !important;
         }
 
-        /* 跑馬燈樣式 */
+        /* 跑馬燈樣式 — 調整貼近表格 */
         .marquee-container {
-            margin-top: 10px;
+            margin-top: 0;
+            margin-bottom: 2px;   /* 貼著表格上方，留極小間隙 */
             border: 1px solid #e2e2e2;
             border-radius: 4px;
             background: #fffdf7;
@@ -575,7 +576,7 @@
     </div>
 </div>
 
-<!-- ✨ 新增：管理班表人員視窗 -->
+<!-- 管理班表人員視窗 -->
 <div id="employeeModal" class="login-overlay" style="display: none; z-index: 10000;">
     <div class="login-card" style="text-align: left;">
         <h2 id="empModalTitle">管理班表人員</h2>
@@ -670,6 +671,11 @@
         <button id="editEmployeeBtn" class="edit-employee-btn" style="display:none;">👥 管理班表人員</button>
     </div>
 
+    <!-- 跑馬燈移至班表上方，貼著表格 -->
+    <div class="marquee-container">
+        <div id="marqueeText" class="marquee-content">※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。</div>
+    </div>
+
     <div class="table-container">
         <table id="scheduleTable">
             <thead id="tableHead"></thead>
@@ -677,10 +683,7 @@
         </table>
     </div>
 
-    <!-- 底部跑馬燈 -->
-    <div class="marquee-container">
-        <div id="marqueeText" class="marquee-content">※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。</div>
-    </div>
+    <!-- 原底部跑馬燈已移除，僅保留上方一處 -->
 </div>
 
 <script>
@@ -764,7 +767,7 @@
     const marqueeErrorMsg = document.getElementById('marqueeErrorMsg');
     const marqueeText = document.getElementById('marqueeText');
 
-    // ✨ 管理人員相關 DOM
+    // 管理人員相關 DOM
     const editEmployeeBtn = document.getElementById('editEmployeeBtn');
     const employeeModal = document.getElementById('employeeModal');
     const empModalTitle = document.getElementById('empModalTitle');
@@ -852,7 +855,7 @@
         return (cloudData.settings && cloudData.settings[key]) ? cloudData.settings[key] : {};
     }
 
-    // ✨ 獲取當前班表人員清單（雲端優先，沒有則讀取硬編碼）
+    // 獲取當前班表人員清單（雲端優先，沒有則讀取硬編碼）
     function getEmployeeList(squad) {
         const key = squad + '_employees';
         if (cloudData.settings && cloudData.settings[key]) {
@@ -889,7 +892,7 @@
         updateHighlightBtnUI();
     });
 
-    // ✅ 完美修正：使用 getBoundingClientRect 計算物理座標
+    // 十字高亮
     const tableContainer = document.querySelector('.table-container');
     tableContainer.addEventListener('mouseover', function(e) {
         if (!crosshairEnabled) return;
@@ -977,7 +980,6 @@
         return '';
     }
 
-    // ✨ 調整：全班統計現在讀取雲端或硬編碼中的動態名單
     function calculateTotalClassStats(squad, year, month, daysInMonth) {
         const empList = getEmployeeList(squad);
         if (!empList) return;
@@ -1003,7 +1005,6 @@
         if (totalUaDisplay) totalUaDisplay.textContent = `加班未到: ${grandTotalUa}天`;
     }
 
-    // ✨ 調整：每日加班統計現在讀取動態名單
     function calculateDailyOtStats(squad, year, month, daysInMonth) {
         const empList = getEmployeeList(squad);
         if (!empList) return;
@@ -1208,7 +1209,6 @@
         thead.appendChild(trDate);
         thead.appendChild(trDay);
 
-        // ✨ 改用動態取得名單
         let allEmployees = getEmployeeList(viewSquad);
         let visibleEmployees;
         if (isMySquad) {
@@ -1278,7 +1278,6 @@
                     if (newVal === 'G' && defaultShift === '' && limitVal !== '') {
                         const limit = parseInt(limitVal, 10);
                         let otherOtCount = 0;
-                        // ✨ 改成動態取得名單計算加班上限
                         let empList = getEmployeeList(viewSquad);
                         empList.forEach(otherEmp => {
                             if (otherEmp === empName) return;
@@ -1487,7 +1486,7 @@
         changePwdModal.style.display = 'none';
     });
 
-    // 【跑馬燈邏輯】
+    // 跑馬燈邏輯
     editMarqueeBtn.addEventListener('click', function() {
         marqueeInput.value = marqueeText.textContent;
         marqueeErrorMsg.style.display = 'none';
@@ -1508,10 +1507,10 @@
         marqueeModal.style.display = 'none';
     });
 
-    // ✨ 【管理班表人員邏輯】
+    // 管理班表人員邏輯
     editEmployeeBtn.addEventListener('click', function() {
         const currentList = getEmployeeList(currentSquad);
-        employeeListInput.value = currentList.join('\n'); // 用換行符號分割顯示
+        employeeListInput.value = currentList.join('\n');
         empErrorMsg.style.display = 'none';
         empModalTitle.textContent = `管理班表人員 (${currentSquad})`;
         employeeModal.style.display = 'flex';
@@ -1519,28 +1518,21 @@
     cancelEmpBtn.addEventListener('click', () => employeeModal.style.display = 'none');
     saveEmpBtn.addEventListener('click', async function() {
         const rawText = employeeListInput.value;
-        // 切分並且過濾空白行
         let newList = rawText.split(/\r?\n/).map(n => n.trim()).filter(n => n !== '');
-        
         if (newList.length === 0) {
             empErrorMsg.textContent = "名單不可為空！至少需要一個人。";
             empErrorMsg.style.display = "block"; return;
         }
-
-        // (貼心設計) 確保管理員自己一定在名單中，如果手誤刪除會自動補上
         const manager = squadManagers[currentSquad];
         if (!newList.includes(manager)) {
-            newList.unshift(manager); // 把管理員放到第一順位
+            newList.unshift(manager);
         }
-
-        // 存成 JSON 字串到雲端
         if(!cloudData.settings) cloudData.settings = {};
         cloudData.settings[currentSquad + '_employees'] = JSON.stringify(newList);
         await postCloudData({ action: 'saveSetting', key: currentSquad + '_employees', value: JSON.stringify(newList) });
-        
         alert(`人員名單已更新！共 ${newList.length} 人。`);
         employeeModal.style.display = 'none';
-        renderTable(); // 立即重整頁面
+        renderTable();
     });
 
     logoutBtn.addEventListener('click', function() {
