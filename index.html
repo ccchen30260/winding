@@ -276,6 +276,7 @@
             padding: 4px 12px;
             border-radius: 20px;
             border: 1px solid var(--border-ios);
+            margin-right: 4px; /* 與修改密碼按鈕的間距 */
         }
 
         /* iOS 風格按鈕 */
@@ -295,8 +296,17 @@
             background: #e5e5ea;
         }
 
-        .logout-btn { color: var(--ios-red); background: #fff0f0; border-color: #ffcccc; }
-        .logout-btn:hover { background: #ffe5e5; }
+        .logout-btn {
+            color: var(--ios-red);
+            background: #fff0f0;
+            border-color: #ffcccc;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            padding: 8px 20px !important;
+        }
+        .logout-btn:hover {
+            background: #ffe5e5;
+        }
 
         .form-status-btn.open { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
         .form-status-btn.closed { background: #f5f5f5; color: #757575; border-color: #e0e0e0; }
@@ -604,12 +614,7 @@
         }
 
         .extra-controls {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 6px;
-            width: 100%;
+            display: none; /* 因為編輯跑馬燈與管理班表人員已移上來，此區塊隱藏 */
         }
 
         /* 響應式微調 */
@@ -618,6 +623,7 @@
             .header-controls { padding: 10px 12px; }
             .control-group { padding: 2px 6px 2px 10px; }
             .login-card { padding: 28px 20px; }
+            .logout-btn { font-size: 14px !important; padding: 6px 14px !important; }
         }
     </style>
 </head>
@@ -736,15 +742,34 @@
 <!-- 主應用 -->
 <div id="mainApp" class="main-app">
     <div class="header-controls">
+        <!-- 左側控制區：姓名、修改密碼、年份、月份、查看班表、加班限制、統計、十字高亮、填表開關、隱藏統計 -->
         <div class="left-controls">
+            <!-- 姓名（最左邊） -->
+            <div id="userInfoDisplay" class="user-info">👤 未登入</div>
+            <!-- 修改密碼（姓名右邊） -->
+            <button id="changePwdBtn" class="change-pwd-btn">修改密碼</button>
+            
+            <!-- 年份 -->
             <div class="control-group">
                 <span>年份</span>
                 <select id="yearSelect"></select>
             </div>
+            <!-- 月份 -->
             <div class="control-group">
                 <span>月份</span>
                 <select id="monthSelect"></select>
             </div>
+            <!-- 查看班表（月份右邊） -->
+            <div class="control-group">
+                <span>查看班表</span>
+                <select id="viewSquadSelect">
+                    <option value="S1">S1</option>
+                    <option value="S2">S2</option>
+                    <option value="S3">S3</option>
+                    <option value="S4">S4</option>
+                </select>
+            </div>
+            <!-- 加班限制 -->
             <div class="control-group" id="otLimitGroup">
                 <span>加班限制</span>
                 <select id="otLimitSelect">
@@ -758,35 +783,29 @@
                     <option value="7">7</option>
                 </select>
             </div>
+            <!-- 全班統計 -->
             <div class="total-stats-group">
                 <span id="totalOtDisplay" class="stat-badge stat-badge-ot">全班加班: 0天</span>
                 <span id="totalLvDisplay" class="stat-badge stat-badge-lv">全班請假: 0天</span>
                 <span id="totalUaDisplay" class="stat-badge stat-badge-ua">加班未到: 0天</span>
             </div>
-        </div>
-        <div class="right-controls">
-            <div class="control-group">
-                <span>查看班表</span>
-                <select id="viewSquadSelect">
-                    <option value="S1">S1</option>
-                    <option value="S2">S2</option>
-                    <option value="S3">S3</option>
-                    <option value="S4">S4</option>
-                </select>
-            </div>
+            <!-- 十字高亮（加班未到右邊） -->
             <button id="highlightBtn" class="highlight-btn" disabled>十字高亮：關</button>
+            <!-- 填表開關（十字高亮右邊） -->
             <button id="formStatusBtn" class="form-status-btn open">填表：開啟</button>
-            <div id="userInfoDisplay" class="user-info">👤 未登入</div>
-            <button id="changePwdBtn" class="change-pwd-btn">修改密碼</button>
-            <button id="logoutBtn" class="logout-btn">登出</button>
+            <!-- 隱藏統計（填表開關右邊） -->
             <button id="toggleStatsBtn" class="toggle-btn">隱藏統計</button>
+        </div>
+        
+        <!-- 右側控制區：編輯跑馬燈、管理班表人員、登出（最右邊、加大加粗） -->
+        <div class="right-controls">
+            <button id="editMarqueeBtn" class="edit-marquee-btn" style="display:none;">📝 編輯跑馬燈</button>
+            <button id="editEmployeeBtn" class="edit-employee-btn" style="display:none;">👥 管理班表人員</button>
+            <button id="logoutBtn" class="logout-btn">登出</button>
         </div>
     </div>
     
-    <div class="extra-controls">
-        <button id="editMarqueeBtn" class="edit-marquee-btn" style="display:none;">📝 編輯跑馬燈</button>
-        <button id="editEmployeeBtn" class="edit-employee-btn" style="display:none;">👥 管理班表人員</button>
-    </div>
+    <!-- extra-controls 已隱藏，因為按鈕已移上來 -->
 
     <div class="marquee-container">
         <div id="marqueeText" class="marquee-content">※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。</div>
