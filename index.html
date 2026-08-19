@@ -465,14 +465,15 @@
             background-color: #fff3cd !important;
         }
 
+        /* ===== 修改處：十字高亮改為很淡的藍色 ===== */
         body.crosshair-active td.crosshair-highlight,
         body.crosshair-active th.crosshair-highlight {
-            background-color: #ffffff !important;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.12);
+            background-color: #eaf3ff !important;
+            box-shadow: 0 0 8px rgba(0, 50, 150, 0.08);
             color: inherit !important;
         }
         body.crosshair-active td.crosshair-highlight select {
-            background-color: #ffffff !important;
+            background-color: #eaf3ff !important;
         }
 
         .marquee-container {
@@ -890,7 +891,7 @@
     });
 
     const tableContainer = document.querySelector('.table-container');
-    // ===== 修改處：只高亮「日」或「夜」的儲存格 =====
+    // 十字高亮事件：只高亮「日」或「夜」的儲存格
     tableContainer.addEventListener('mouseover', function(e) {
         if (!crosshairEnabled) return;
         const targetCell = e.target.closest('th, td');
@@ -901,7 +902,6 @@
         const targetRow = targetCell.parentElement;
         if (targetRow) {
             Array.from(targetRow.cells).forEach(c => {
-                // 只對「日 / 夜」儲存格加高亮
                 if (c.classList.contains('shift-day') || c.classList.contains('shift-night')) {
                     c.classList.add('crosshair-highlight');
                 }
@@ -926,7 +926,6 @@
                 }
             }
             if (closestCell) {
-                // 只對「日 / 夜」儲存格加高亮
                 if (closestCell.classList.contains('shift-day') || closestCell.classList.contains('shift-night')) {
                     closestCell.classList.add('crosshair-highlight');
                 }
