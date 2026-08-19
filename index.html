@@ -6,6 +6,7 @@
     <title>捲繞排班(S1~S4)</title>
     <style>
         :root {
+            /* 班別顏色保留原始設定（不可改變） */
             --bg-day: #c6e0b4;
             --bg-g: #ffff00;
             --bg-special: #ff00ff;
@@ -22,35 +23,71 @@
             --bg-mourning: #90a4ae;
             --bg-public: #ce93d8;
             --border-color: #a0a0a0;
+
+            /* iOS 風格主題色 */
+            --bg-ios: #f2f2f7;
+            --bg-card: #ffffff;
+            --text-primary: #1c1c1e;
+            --text-secondary: #3a3a3c;
+            --text-muted: #8e8e93;
+            --border-ios: #e5e5ea;
+            --ios-blue: #007aff;
+            --ios-green: #34c759;
+            --ios-red: #ff3b30;
+            --shadow-ios: 0 2px 12px rgba(0, 0, 0, 0.06);
+            --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.08);
         }
 
         body {
-            font-family: "Microsoft JhengHei", Arial, sans-serif;
-            margin: 10px;
-            background-color: #fcfcfc;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 16px;
+            background: var(--bg-ios);
+            color: var(--text-primary);
             touch-action: manipulation;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f2f2f7;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c7c7cc;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a6;
         }
 
         .sync-status {
             position: fixed;
-            bottom: 10px;
-            right: 110px;
-            background-color: rgba(0,0,0,0.75);
+            bottom: 20px;
+            right: 120px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
             color: #fff;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
             display: none;
             z-index: 10001;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
+        /* 登入視窗 - iOS 毛玻璃 */
         .login-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(245, 247, 250, 0.98);
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(12px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -58,295 +95,342 @@
         }
 
         .login-card {
-            background-color: #ffffff;
-            padding: 30px 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            background: var(--bg-card);
+            padding: 32px 24px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-card);
             width: 90%;
-            max-width: 450px;
+            max-width: 420px;
             text-align: center;
             box-sizing: border-box;
-            border: 1px solid #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .login-card h2 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            color: #333;
-            font-size: 20px;
+            margin: 0 0 24px 0;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: 0.5px;
         }
 
         .login-field {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             text-align: left;
         }
 
         .login-field label {
             display: block;
             margin-bottom: 6px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #555;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
         }
 
         .login-field input, .login-field select, .login-field textarea {
             width: 100%;
-            padding: 10px;
+            padding: 12px 14px;
             font-size: 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+            background: #f8f9fa;
+            border: 1px solid var(--border-ios);
+            border-radius: 8px;
             box-sizing: border-box;
-            background-color: #fff;
+            color: var(--text-primary);
             outline: none;
-            resize: vertical;
+            transition: all 0.2s ease;
             font-family: inherit;
+            resize: vertical;
+        }
+
+        .login-field input:focus, .login-field select:focus, .login-field textarea:focus {
+            border-color: var(--ios-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+            background: #ffffff;
+        }
+
+        .login-field select option {
+            background: #ffffff;
+            color: var(--text-primary);
         }
 
         .login-btn {
             width: 100%;
-            padding: 10px;
+            padding: 14px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 600;
             color: #fff;
-            background-color: #28a745;
+            background: var(--ios-blue);
             border: none;
-            border-radius: 6px;
+            border-radius: 10px;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.2s;
+            margin-top: 8px;
+            transition: all 0.2s ease;
+            letter-spacing: 0.5px;
         }
 
-        .login-btn:hover { background-color: #218838; }
+        .login-btn:hover {
+            background: #0066d9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+        }
 
         .login-error {
-            color: #dc3545;
+            color: var(--ios-red);
             font-size: 13px;
             margin-top: 12px;
             display: none;
-            font-weight: bold;
+            font-weight: 500;
         }
 
         .main-app { display: none; }
 
+        /* 頂部控制區 - iOS 風格卡片 */
         .header-controls {
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 10px;
+            margin-bottom: 14px;
             width: 100%;
             box-sizing: border-box;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            box-shadow: var(--shadow-ios);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .left-controls, .right-controls {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 8px;
             max-width: 100%;
         }
-
-        .left-controls { flex: 1 1 auto; }
 
         .control-group {
             display: flex;
             align-items: center;
-            background-color: #00ff00;
-            padding: 2px 4px;
-            border: 1px solid #000;
-            border-radius: 4px;
+            background: #f8f9fa;
+            padding: 4px 10px 4px 12px;
+            border: 1px solid var(--border-ios);
+            border-radius: 8px;
             box-sizing: border-box;
         }
 
         .control-group span {
-            font-weight: bold;
-            padding: 0 4px;
+            font-weight: 500;
+            padding-right: 6px;
             white-space: nowrap;
             font-size: 13px;
+            color: var(--text-secondary);
         }
 
         .total-stats-group {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
         .stat-badge {
-            font-size: 13px;
-            font-weight: bold;
-            padding: 4px 8px;
-            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 20px;
             white-space: nowrap;
-            border: 1px solid #bbb;
+            background: #f8f9fa;
+            color: var(--text-primary);
+            border: 1px solid var(--border-ios);
         }
-
-        .stat-badge-ot { background-color: #e6f7ff; color: #0073e6; border-color: #91d5ff; }
-        .stat-badge-lv { background-color: #ffe6e6; color: #d9363e; border-color: #ffa39e; }
-        .stat-badge-ua { background-color: #e2e2e2; color: #495057; border-color: #ced4da; }
+        .stat-badge-ot { background: #e5f1ff; color: var(--ios-blue); border-color: #cce0ff; }
+        .stat-badge-lv { background: #ffe5e5; color: var(--ios-red); border-color: #ffcccc; }
+        .stat-badge-ua { background: #f2f2f7; color: var(--text-muted); border-color: var(--border-ios); }
 
         select {
-            font-size: 14px;
-            padding: 4px;
-            border: 1px solid #ccc;
-            background-color: #ffe6e6;
-            border-radius: 4px;
+            font-size: 13px;
+            padding: 4px 6px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            color: var(--text-primary);
             outline: none;
+            font-weight: 500;
         }
-
         select:disabled {
-            background-color: #e0e0e0;
-            color: #666;
+            opacity: 0.6;
             cursor: not-allowed;
+        }
+        select option {
+            background: #ffffff;
+            color: var(--text-primary);
         }
 
         .user-info {
             font-size: 13px;
-            font-weight: bold;
-            color: #333;
-            background-color: #e9ecef;
-            padding: 5px 8px;
-            border-radius: 4px;
-            white-space: nowrap;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: #f8f9fa;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-ios);
+            margin-right: 4px; /* 與修改密碼按鈕的間距 */
         }
 
+        /* iOS 風格按鈕 */
         .change-pwd-btn, .logout-btn, .toggle-btn, .form-status-btn, .highlight-btn, .edit-marquee-btn, .edit-employee-btn {
-            padding: 6px 8px;
+            padding: 6px 14px;
             font-size: 12px;
-            font-weight: bold;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
+            font-weight: 500;
+            color: var(--ios-blue);
+            background: #f8f9fa;
+            border: 1px solid var(--border-ios);
+            border-radius: 8px;
             cursor: pointer;
             white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+        .change-pwd-btn:hover, .logout-btn:hover, .toggle-btn:hover, .form-status-btn:hover, .highlight-btn:hover, .edit-marquee-btn:hover, .edit-employee-btn:hover {
+            background: #e5e5ea;
         }
 
-        .change-pwd-btn { background-color: #17a2b8; }
-        .logout-btn { background-color: #dc3545; }
-        .toggle-btn { background-color: #007bff; }
-        .highlight-btn { background-color: #6f42c1; }
-        .highlight-btn.active { background-color: #28a745; }
-        .highlight-btn:disabled { cursor: not-allowed; opacity: 0.7; }
-        .edit-marquee-btn { background-color: #fd7e14; }
-        .edit-employee-btn { background-color: #e83e8c; }
+        .logout-btn {
+            color: var(--ios-red);
+            background: #fff0f0;
+            border-color: #ffcccc;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            padding: 8px 20px !important;
+        }
+        .logout-btn:hover {
+            background: #ffe5e5;
+        }
 
-        .form-status-btn.open { background-color: #28a745; }
-        .form-status-btn.closed { background-color: #6c757d; }
-        .form-status-btn:disabled { cursor: not-allowed; opacity: 0.85; }
+        .form-status-btn.open { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+        .form-status-btn.closed { background: #f5f5f5; color: #757575; border-color: #e0e0e0; }
 
+        .highlight-btn.active { background: var(--ios-blue); color: #fff; border-color: var(--ios-blue); }
+        .highlight-btn.active:hover { background: #0066d9; }
+        .highlight-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .edit-marquee-btn, .edit-employee-btn { color: #555; }
+
+        /* 確認按鈕 - iOS 風格綠色藥丸 */
         .btn-confirm {
             position: fixed;
-            bottom: 25px;
-            right: 25px;
+            bottom: 30px;
+            right: 30px;
             z-index: 9999;
             display: none;
-            padding: 15px 25px;
-            font-size: 20px;
-            font-weight: bold;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
             color: #fff;
-            background-color: #28a745;
+            background: var(--ios-green);
             border: none;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.5);
+            border-radius: 30px;
+            box-shadow: 0 4px 16px rgba(52, 199, 89, 0.3);
             cursor: pointer;
-            transition: all 0.3s ease;
-            user-select: none;
+            transition: all 0.2s ease;
+            letter-spacing: 0.5px;
         }
         .btn-confirm:hover:not(:disabled) {
-            background-color: #218838;
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.6);
+            background: #2db84d;
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(52, 199, 89, 0.4);
         }
         .btn-confirm:active:not(:disabled) {
-            transform: scale(0.95);
+            transform: scale(0.96);
         }
         .btn-confirm:disabled {
-            background-color: #a0a0a0 !important;
+            background: #a1a1a6 !important;
+            color: #f2f2f7 !important;
             box-shadow: none !important;
             cursor: default !important;
             transform: scale(1) !important;
             opacity: 1 !important;
         }
-        @media screen and (max-width: 600px) {
-            .btn-confirm {
-                bottom: 15px;
-                right: 15px;
-                padding: 12px 18px;
-                font-size: 17px;
-            }
-        }
 
+        /* iOS 風格模態框 */
         .custom-modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 10000;
         }
         .custom-modal-box {
-            background-color: #ffffff;
-            padding: 40px 30px;
-            border-radius: 16px;
-            max-width: 450px;
+            background: var(--bg-card);
+            padding: 32px 24px;
+            border-radius: 24px;
+            box-shadow: var(--shadow-card);
+            max-width: 420px;
             width: 90%;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             animation: fadeIn 0.3s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(-10px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         .custom-modal-box h3 {
-            margin-top: 0;
-            margin-bottom: 25px;
-            font-size: 22px;
-            line-height: 1.5;
+            margin: 0 0 16px 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.4;
         }
         .custom-modal-box p {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 25px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
             line-height: 1.6;
         }
         .modal-btn-group {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 12px;
         }
         .modal-btn-confirm, .modal-btn-cancel {
-            padding: 12px 30px;
-            font-size: 17px;
-            font-weight: bold;
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: 600;
             border: none;
-            border-radius: 30px;
+            border-radius: 12px;
             cursor: pointer;
             transition: 0.2s;
         }
         .modal-btn-confirm {
-            background-color: #28a745;
+            background: var(--ios-blue);
             color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
         }
         .modal-btn-confirm:hover {
-            background-color: #218838;
+            background: #0066d9;
         }
         .modal-btn-cancel {
-            background-color: #e9ecef;
-            color: #333;
-            border: 1px solid #ced4da;
+            background: #f2f2f7;
+            color: var(--ios-blue);
+            border: 1px solid var(--border-ios);
         }
         .modal-btn-cancel:hover {
-            background-color: #dde0e3;
+            background: #e5e5ea;
         }
 
+        /* 表格容器 - iOS 風格 */
         .table-container {
             overflow: auto;
             max-height: 75vh;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            background-color: white;
+            box-shadow: var(--shadow-ios);
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid var(--border-ios);
             -webkit-overflow-scrolling: touch;
         }
 
@@ -356,157 +440,190 @@
             width: 100%;
             text-align: center;
             font-size: 14px;
-            background-color: white;
+            background: #ffffff;
             white-space: nowrap;
+            color: var(--text-primary);
         }
 
         th, td {
-            border-right: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-ios);
+            border-bottom: 1px solid var(--border-ios);
             padding: 0;
             min-width: 32px;
-            height: 28px;
+            height: 32px;
             box-sizing: border-box;
             background-clip: padding-box;
         }
 
-        th:first-child, td:first-child { border-left: 1px solid var(--border-color); }
-        tr:first-child th { border-top: 1px solid var(--border-color); }
+        th:first-child, td:first-child { border-left: 1px solid var(--border-ios); }
+        tr:first-child th { border-top: 1px solid var(--border-ios); }
 
-        th { background-color: #f2f2f2; font-weight: bold; }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
 
         thead tr:nth-child(1) th { position: sticky; top: 0; z-index: 1; }
-        thead tr:nth-child(2) th { position: sticky; top: 28px; z-index: 1; }
-        thead tr:nth-child(3) th { position: sticky; top: 56px; z-index: 1; }
+        thead tr:nth-child(2) th { position: sticky; top: 32px; z-index: 1; }
+        thead tr:nth-child(3) th { position: sticky; top: 64px; z-index: 1; }
 
-        .stats-ot { position: sticky; left: 0; width: 40px; min-width: 40px; z-index: 2; color: #00b0f0; background-color: #e6f7ff; font-weight: bold; }
-        .stats-lv { position: sticky; left: 40px; width: 40px; min-width: 40px; z-index: 2; color: #ff0000; background-color: #ffe6e6; font-weight: bold; }
-        .col-name { position: sticky; left: 80px; width: 65px; min-width: 65px; z-index: 2; font-weight: bold; background-color: #fafafa; box-shadow: 2px 0 5px -2px rgba(0,0,0,0.3); }
+        /* 固定統計欄 */
+        .stats-ot {
+            position: sticky; left: 0; width: 40px; min-width: 40px; z-index: 2;
+            color: var(--ios-blue); background: #f8f9fa; font-weight: 600; border-right: 1px solid var(--border-ios);
+        }
+        .stats-lv {
+            position: sticky; left: 40px; width: 40px; min-width: 40px; z-index: 2;
+            color: var(--ios-red); background: #f8f9fa; font-weight: 600; border-right: 1px solid var(--border-ios);
+        }
+        .col-name {
+            position: sticky; left: 80px; width: 70px; min-width: 70px; z-index: 2;
+            font-weight: 600; background: #f8f9fa; box-shadow: 1px 0 6px rgba(0,0,0,0.02);
+            border-right: 1px solid var(--border-ios);
+            color: var(--text-primary);
+        }
 
-        thead th.stats-ot, thead th.stats-lv, thead th.col-name { z-index: 3 !important; background-color: #e0e0e0; color: black; }
+        thead th.stats-ot, thead th.stats-lv, thead th.col-name {
+            z-index: 3 !important;
+            background: #f2f2f7 !important;
+            color: var(--text-primary) !important;
+            text-shadow: none;
+        }
 
         body.hide-stats .stats-ot, body.hide-stats .stats-lv { display: none !important; }
         body.hide-stats .col-name { left: 0 !important; }
 
-        .weekend-header { color: red; }
-        .today-header { background-color: #00ffff !important; }
+        .weekend-header { color: var(--ios-red) !important; }
+        .today-header {
+            background: #e5f1ff !important;
+            color: var(--ios-blue) !important;
+            font-weight: 600 !important;
+        }
 
         tr.daily-ot-row {
-            background-color: #fffbe6;
-            font-weight: bold;
+            background: #fcf9e8;
+            font-weight: 600;
         }
         tr.daily-ot-row td {
-            background-color: #fffbe6;
+            background: #fcf9e8;
             color: #d48806;
             border-top: 2px solid #ffe58f;
         }
         tr.daily-ot-row td.col-name {
-            background-color: #fff1b8;
+            background: #fff1b8;
             color: #873800;
         }
         tr.daily-ot-row td.stats-ot, tr.daily-ot-row td.stats-lv {
-            background-color: #fff1b8;
+            background: #fff1b8;
         }
 
-        .cell-content { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; min-height: 28px; box-sizing: border-box; }
+        .cell-content {
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 100%; min-height: 32px;
+            box-sizing: border-box;
+        }
 
+        /* 下拉選單 */
         .shift-select {
-            width: 100%; height: 28px; border: none; background-color: transparent;
-            font-size: 15px; font-family: inherit; text-align: center; text-align-last: center;
+            width: 100%; height: 32px; border: none; background: transparent;
+            font-size: 14px; font-family: inherit; text-align: center; text-align-last: center;
             appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer; outline: none;
-            color: inherit; font-weight: inherit;
+            color: inherit; font-weight: 500;
         }
-
         .shift-select:disabled {
-            opacity: 1;
-            background-color: transparent;
-            cursor: default;
+            opacity: 1; background: transparent; cursor: default;
         }
+        .shift-select option { background: #ffffff; color: #1c1c1e; }
 
-        .shift-day { background-color: var(--bg-day); }
-        .shift-night { background-color: var(--bg-night); }
-        .shift-g { background-color: var(--bg-g); color: black; font-weight: bold; }
-        .shift-unattended { background-color: var(--bg-unattended); color: black; font-weight: bold; }
-        .shift-special { background-color: var(--bg-special); color: black; font-weight: bold; }
-        .shift-personal { background-color: var(--bg-personal); color: var(--text-personal); font-weight: bold; }
-        .shift-sick { background-color: var(--bg-sick); color: var(--text-sick); font-weight: bold; }
-        .shift-physio { background-color: var(--bg-physio); color: black; font-weight: bold; }
-        .shift-typhoon { background-color: var(--bg-typhoon); color: black; font-weight: bold; }
-        .shift-return { background-color: #b3e5fc; color: black; font-weight: bold; }
-        .shift-business { background-color: #fff9c4; color: black; font-weight: bold; }
-        .shift-absent { background-color: var(--bg-absent); color: black; font-weight: bold; }
-        .shift-marriage { background-color: var(--bg-marriage); color: black; font-weight: bold; }
-        .shift-mourning { background-color: var(--bg-mourning); color: white; font-weight: bold; }
-        .shift-public { background-color: var(--bg-public); color: black; font-weight: bold; }
+        /* 班別顏色（保留原始，僅微調文字對比） */
+        .shift-day { background-color: var(--bg-day); color: #000; }
+        .shift-night { background-color: var(--bg-night); color: #000; }
+        .shift-g { background-color: var(--bg-g); color: #000; font-weight: 600; }
+        .shift-unattended { background-color: var(--bg-unattended); color: #000; font-weight: 600; }
+        .shift-special { background-color: var(--bg-special); color: #000; font-weight: 600; }
+        .shift-personal { background-color: var(--bg-personal); color: var(--text-personal); font-weight: 600; }
+        .shift-sick { background-color: var(--bg-sick); color: var(--text-sick); font-weight: 600; }
+        .shift-physio { background-color: var(--bg-physio); color: #000; font-weight: 600; }
+        .shift-typhoon { background-color: var(--bg-typhoon); color: #000; font-weight: 600; }
+        .shift-return { background-color: #b3e5fc; color: #000; font-weight: 600; }
+        .shift-business { background-color: #fff9c4; color: #000; font-weight: 600; }
+        .shift-absent { background-color: var(--bg-absent); color: #000; font-weight: 600; }
+        .shift-marriage { background-color: var(--bg-marriage); color: #000; font-weight: 600; }
+        .shift-mourning { background-color: var(--bg-mourning); color: #fff; font-weight: 600; }
+        .shift-public { background-color: var(--bg-public); color: #000; font-weight: 600; }
 
         .daily-mark-select {
-            width: 100%;
-            height: 28px;
-            border: 1px solid #ccc;
-            background-color: #ffffff;
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            text-align-last: center;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            cursor: pointer;
-            outline: none;
+            width: 100%; height: 32px;
+            border: 1px solid var(--border-ios);
+            background: #ffffff;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center; text-align-last: center;
+            appearance: none; -webkit-appearance: none; -moz-appearance: none;
+            cursor: pointer; outline: none;
+            border-radius: 4px;
         }
         .daily-mark-select:disabled {
-            opacity: 1;
-            background-color: #ffffff;
-            cursor: default;
+            opacity: 1; background: #f8f9fa; cursor: default;
         }
+        .daily-mark-select option { background: #ffffff; color: #1c1c1e; }
 
         td.pending-edit select {
-            outline: 3px solid #ffc107;
-            background-color: #fff3cd !important;
+            outline: 2px solid #ffc107;
+            background: rgba(255, 193, 7, 0.1) !important;
+            box-shadow: 0 0 12px rgba(255, 193, 7, 0.05);
         }
 
-        /* ===== 修改處：十字高亮改為很淡的藍色 ===== */
+        /* 十字高亮 - iOS 淡藍 */
         body.crosshair-active td.crosshair-highlight,
         body.crosshair-active th.crosshair-highlight {
-            background-color: #eaf3ff !important;
-            box-shadow: 0 0 8px rgba(0, 50, 150, 0.08);
+            background-color: rgba(0, 122, 255, 0.08) !important;
+            box-shadow: none !important;
             color: inherit !important;
         }
         body.crosshair-active td.crosshair-highlight select {
-            background-color: #eaf3ff !important;
+            background-color: rgba(0, 122, 255, 0.08) !important;
         }
 
+        /* 跑馬燈 - iOS 風格 */
         .marquee-container {
-            margin-top: 0;
-            margin-bottom: 2px;
-            border: 1px solid #e2e2e2;
-            border-radius: 4px;
-            background: #fffdf7;
-            padding: 6px 0;
+            margin: 10px 0 8px 0;
+            border: 1px solid var(--border-ios);
+            border-radius: 12px;
+            background: #ffffff;
+            padding: 8px 0;
             overflow: hidden;
             position: relative;
             white-space: nowrap;
             box-sizing: border-box;
+            box-shadow: var(--shadow-ios);
         }
         .marquee-content {
             display: inline-block;
             padding-left: 100%;
             animation: scrollMarquee 30s linear infinite;
-            font-weight: bold;
-            color: #d9534f;
+            font-weight: 500;
+            color: var(--text-primary);
             font-size: 14px;
         }
         @keyframes scrollMarquee {
             0% { transform: translateX(0%); }
             100% { transform: translateX(-200%); }
         }
+
         .extra-controls {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 5px;
-            width: 100%;
+            display: none; /* 因為編輯跑馬燈與管理班表人員已移上來，此區塊隱藏 */
+        }
+
+        /* 響應式微調 */
+        @media screen and (max-width: 600px) {
+            .btn-confirm { bottom: 20px; right: 20px; padding: 12px 22px; font-size: 15px; }
+            .header-controls { padding: 10px 12px; }
+            .control-group { padding: 2px 6px 2px 10px; }
+            .login-card { padding: 28px 20px; }
+            .logout-btn { font-size: 14px !important; padding: 6px 14px !important; }
         }
     </style>
 </head>
@@ -625,15 +742,34 @@
 <!-- 主應用 -->
 <div id="mainApp" class="main-app">
     <div class="header-controls">
+        <!-- 左側控制區：姓名、修改密碼、年份、月份、查看班表、加班限制、統計、十字高亮、填表開關、隱藏統計 -->
         <div class="left-controls">
+            <!-- 姓名（最左邊） -->
+            <div id="userInfoDisplay" class="user-info">👤 未登入</div>
+            <!-- 修改密碼（姓名右邊） -->
+            <button id="changePwdBtn" class="change-pwd-btn">修改密碼</button>
+            
+            <!-- 年份 -->
             <div class="control-group">
                 <span>年份</span>
                 <select id="yearSelect"></select>
             </div>
+            <!-- 月份 -->
             <div class="control-group">
                 <span>月份</span>
                 <select id="monthSelect"></select>
             </div>
+            <!-- 查看班表（月份右邊） -->
+            <div class="control-group">
+                <span>查看班表</span>
+                <select id="viewSquadSelect">
+                    <option value="S1">S1</option>
+                    <option value="S2">S2</option>
+                    <option value="S3">S3</option>
+                    <option value="S4">S4</option>
+                </select>
+            </div>
+            <!-- 加班限制 -->
             <div class="control-group" id="otLimitGroup">
                 <span>加班限制</span>
                 <select id="otLimitSelect">
@@ -647,35 +783,29 @@
                     <option value="7">7</option>
                 </select>
             </div>
+            <!-- 全班統計 -->
             <div class="total-stats-group">
                 <span id="totalOtDisplay" class="stat-badge stat-badge-ot">全班加班: 0天</span>
                 <span id="totalLvDisplay" class="stat-badge stat-badge-lv">全班請假: 0天</span>
                 <span id="totalUaDisplay" class="stat-badge stat-badge-ua">加班未到: 0天</span>
             </div>
-        </div>
-        <div class="right-controls">
-            <div class="control-group">
-                <span>查看班表</span>
-                <select id="viewSquadSelect">
-                    <option value="S1">S1</option>
-                    <option value="S2">S2</option>
-                    <option value="S3">S3</option>
-                    <option value="S4">S4</option>
-                </select>
-            </div>
+            <!-- 十字高亮（加班未到右邊） -->
             <button id="highlightBtn" class="highlight-btn" disabled>十字高亮：關</button>
+            <!-- 填表開關（十字高亮右邊） -->
             <button id="formStatusBtn" class="form-status-btn open">填表：開啟</button>
-            <div id="userInfoDisplay" class="user-info">👤 未登入</div>
-            <button id="changePwdBtn" class="change-pwd-btn">修改密碼</button>
-            <button id="logoutBtn" class="logout-btn">登出</button>
+            <!-- 隱藏統計（填表開關右邊） -->
             <button id="toggleStatsBtn" class="toggle-btn">隱藏統計</button>
+        </div>
+        
+        <!-- 右側控制區：編輯跑馬燈、管理班表人員、登出（最右邊、加大加粗） -->
+        <div class="right-controls">
+            <button id="editMarqueeBtn" class="edit-marquee-btn" style="display:none;">📝 編輯跑馬燈</button>
+            <button id="editEmployeeBtn" class="edit-employee-btn" style="display:none;">👥 管理班表人員</button>
+            <button id="logoutBtn" class="logout-btn">登出</button>
         </div>
     </div>
     
-    <div class="extra-controls">
-        <button id="editMarqueeBtn" class="edit-marquee-btn" style="display:none;">📝 編輯跑馬燈</button>
-        <button id="editEmployeeBtn" class="edit-employee-btn" style="display:none;">👥 管理班表人員</button>
-    </div>
+    <!-- extra-controls 已隱藏，因為按鈕已移上來 -->
 
     <div class="marquee-container">
         <div id="marqueeText" class="marquee-content">※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。</div>
@@ -690,6 +820,7 @@
 </div>
 
 <script>
+    // ===== 以下 JavaScript 完全保留原始功能，未做任何更動 =====
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzLY435Gr3k6783bG__8TM0xs04CDLztMghV3Et4LX411iGTEt3so3zYSOVZlo27qPl/exec";
 
     const squadEmployeesDefault = {
@@ -891,7 +1022,6 @@
     });
 
     const tableContainer = document.querySelector('.table-container');
-    // 十字高亮事件：只高亮「日」或「夜」的儲存格
     tableContainer.addEventListener('mouseover', function(e) {
         if (!crosshairEnabled) return;
         const targetCell = e.target.closest('th, td');
