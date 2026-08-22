@@ -6,7 +6,6 @@
     <title>捲繞排班(S1~S4)</title>
     <style>
         :root {
-            /* 班別顏色保留原始設定（不可改變） */
             --bg-day: #c6e0b4;
             --bg-g: #ffff00;
             --bg-special: #ff00ff;
@@ -24,7 +23,6 @@
             --bg-public: #ce93d8;
             --border-color: #a0a0a0;
 
-            /* iOS 風格主題色 */
             --bg-ios: #f2f2f7;
             --bg-card: #ffffff;
             --text-primary: #1c1c1e;
@@ -41,7 +39,7 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
             margin: 0;
-            padding: 8px 12px; /* 縮減邊距，增加可視範圍 */
+            padding: 8px 12px;
             background: var(--bg-ios);
             color: var(--text-primary);
             touch-action: manipulation;
@@ -79,7 +77,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        /* 登入視窗 - iOS 毛玻璃 */
         .login-overlay {
             position: fixed;
             top: 0;
@@ -167,11 +164,18 @@
             transition: all 0.2s ease;
             letter-spacing: 0.5px;
         }
-
         .login-btn:hover {
             background: #0066d9;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+        }
+        .login-btn.super-btn {
+            background: #ff9500;
+            margin-top: 12px;
+        }
+        .login-btn.super-btn:hover {
+            background: #e08600;
+            box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
         }
 
         .login-error {
@@ -184,17 +188,16 @@
 
         .main-app { display: none; }
 
-        /* 頂部控制區 - iOS 風格卡片 */
         .header-controls {
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 8px; /* 減少間距 */
-            margin-bottom: 8px; /* 減少下方間距，讓表格更靠近 */
+            gap: 8px;
+            margin-bottom: 8px;
             width: 100%;
             box-sizing: border-box;
-            padding: 10px 14px; /* 縮減內邊距 */
+            padding: 10px 14px;
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             border-radius: 16px;
@@ -250,7 +253,7 @@
         .stat-badge-ua { background: #f2f2f7; color: var(--text-muted); border-color: var(--border-ios); }
 
         select {
-            font-size: 12px; /* 稍微縮小字體以節省空間 */
+            font-size: 12px;
             padding: 3px 4px;
             background: transparent;
             border: none;
@@ -279,7 +282,6 @@
             margin-right: 4px;
         }
 
-        /* iOS 風格按鈕 */
         .change-pwd-btn, .logout-btn, .toggle-btn, .form-status-btn, .highlight-btn, .edit-marquee-btn, .edit-employee-btn {
             padding: 5px 12px;
             font-size: 12px;
@@ -317,7 +319,6 @@
 
         .edit-marquee-btn, .edit-employee-btn { color: #555; }
 
-        /* 確認按鈕 - iOS 風格綠色藥丸 */
         .btn-confirm {
             position: fixed;
             bottom: 30px;
@@ -353,7 +354,6 @@
             opacity: 1 !important;
         }
 
-        /* iOS 風格模態框 */
         .custom-modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -423,10 +423,8 @@
             background: #e5e5ea;
         }
 
-        /* 表格容器 - iOS 風格 */
         .table-container {
             overflow: auto;
-            /* 動態計算高度：扣掉頂部控制區、跑馬燈與邊距，讓表格幾乎填滿螢幕 */
             height: calc(100vh - 155px);
             min-height: 300px;
             box-shadow: var(--shadow-ios);
@@ -452,7 +450,7 @@
             border-bottom: 1px solid var(--border-ios);
             padding: 0;
             min-width: 32px;
-            height: 30px; /* 稍微降低一點高度，多顯示幾行 */
+            height: 30px;
             box-sizing: border-box;
             background-clip: padding-box;
         }
@@ -470,7 +468,6 @@
         thead tr:nth-child(2) th { position: sticky; top: 30px; z-index: 1; }
         thead tr:nth-child(3) th { position: sticky; top: 60px; z-index: 1; }
 
-        /* 固定統計欄 */
         .stats-ot {
             position: sticky; left: 0; width: 40px; min-width: 40px; z-index: 2;
             color: var(--ios-blue); background: #f8f9fa; font-weight: 600; border-right: 1px solid var(--border-ios);
@@ -526,10 +523,9 @@
             box-sizing: border-box;
         }
 
-        /* 下拉選單 */
         .shift-select {
             width: 100%; height: 30px; border: none; background: transparent;
-            font-size: 13px; /* 稍微縮小字體 */
+            font-size: 13px;
             font-family: inherit; text-align: center; text-align-last: center;
             appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer; outline: none;
             color: inherit; font-weight: 500;
@@ -539,7 +535,6 @@
         }
         .shift-select option { background: #ffffff; color: #1c1c1e; }
 
-        /* 班別顏色（保留原始，僅微調文字對比） */
         .shift-day { background-color: var(--bg-day); color: #000; }
         .shift-night { background-color: var(--bg-night); color: #000; }
         .shift-g { background-color: var(--bg-g); color: #000; font-weight: 600; }
@@ -579,7 +574,6 @@
             box-shadow: 0 0 12px rgba(255, 193, 7, 0.05);
         }
 
-        /* 十字高亮 - iOS 淡藍 */
         body.crosshair-active td.crosshair-highlight,
         body.crosshair-active th.crosshair-highlight {
             background-color: rgba(0, 122, 255, 0.08) !important;
@@ -590,9 +584,8 @@
             background-color: rgba(0, 122, 255, 0.08) !important;
         }
 
-        /* 跑馬燈 - iOS 風格 */
         .marquee-container {
-            margin: 6px 0 6px 0; /* 減少間距，增加可視範圍 */
+            margin: 6px 0 6px 0;
             border: 1px solid var(--border-ios);
             border-radius: 12px;
             background: #ffffff;
@@ -620,14 +613,13 @@
             display: none;
         }
 
-        /* 響應式微調 */
         @media screen and (max-width: 600px) {
             .btn-confirm { bottom: 20px; right: 20px; padding: 12px 22px; font-size: 15px; }
             .header-controls { padding: 8px 10px; }
             .control-group { padding: 2px 4px 2px 8px; }
             .login-card { padding: 28px 20px; }
             .logout-btn { font-size: 14px !important; padding: 6px 14px !important; }
-            .table-container { height: calc(100vh - 200px); } /* 手機版稍微保留一點空間 */
+            .table-container { height: calc(100vh - 200px); }
         }
     </style>
 </head>
@@ -657,11 +649,43 @@
             </select>
         </div>
         <div class="login-field">
+            <label for="loginModeSelect">登入模式</label>
+            <select id="loginModeSelect">
+                <option value="view">檢視模式(View mode)</option>
+                <option value="edit" selected>編輯模式(Edit mode)</option>
+            </select>
+        </div>
+        <div class="login-field">
             <label for="loginPasswordInput">密碼</label>
             <input type="password" id="loginPasswordInput" placeholder="預設密碼：0000">
         </div>
         <button id="loginSubmitBtn" class="login-btn">登入</button>
+        <div style="margin: 12px 0; color: #8e8e93;">或</div>
+        <button id="superLoginBtn" class="login-btn super-btn">👑 總管理員登入</button>
         <div id="loginErrorMsg" class="login-error">請選擇班級、姓名或密碼錯誤！</div>
+    </div>
+</div>
+
+<!-- 總管理員登入視窗 -->
+<div id="superLoginModal" class="login-overlay" style="display: none; z-index: 10000;">
+    <div class="login-card">
+        <h2>總管理員登入</h2>
+        <div class="login-field">
+            <label for="superPasswordInput">密碼</label>
+            <input type="password" id="superPasswordInput" placeholder="請輸入總管理員密碼">
+        </div>
+        <div class="login-field">
+            <label for="superModeSelect">登入模式</label>
+            <select id="superModeSelect">
+                <option value="view">檢視模式(View mode)</option>
+                <option value="edit" selected>編輯模式(Edit mode)</option>
+            </select>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button id="cancelSuperLoginBtn" class="login-btn" style="background-color: #6c757d;">取消</button>
+            <button id="confirmSuperLoginBtn" class="login-btn">登入</button>
+        </div>
+        <div id="superLoginErrorMsg" class="login-error"></div>
     </div>
 </div>
 
@@ -689,13 +713,28 @@
     </div>
 </div>
 
-<!-- 編輯跑馬燈視窗 -->
+<!-- 編輯跑馬燈視窗（新增模式與速度） -->
 <div id="marqueeModal" class="login-overlay" style="display: none; z-index: 10000;">
     <div class="login-card">
         <h2>編輯跑馬燈文字</h2>
         <div class="login-field">
             <label for="marqueeInput">文字內容</label>
             <textarea id="marqueeInput" rows="3" style="width: 100%;"></textarea>
+        </div>
+        <div class="login-field">
+            <label for="marqueeModeSelect">跑馬燈模式</label>
+            <select id="marqueeModeSelect">
+                <option value="scroll">滾動(Scroll)</option>
+                <option value="static">靜止(Static)</option>
+            </select>
+        </div>
+        <div class="login-field">
+            <label for="marqueeSpeedSelect">速度</label>
+            <select id="marqueeSpeedSelect">
+                <option value="60">慢 (60秒)</option>
+                <option value="30" selected>正常 (30秒)</option>
+                <option value="15">快 (15秒)</option>
+            </select>
         </div>
         <div style="display: flex; gap: 10px; margin-top: 15px;">
             <button id="cancelMarqueeBtn" class="login-btn" style="background-color: #6c757d;">取消</button>
@@ -779,7 +818,7 @@
                     <option value="7">7</option>
                 </select>
             </div>
-            <div class="total-stats-group">
+            <div class="total-stats-group" id="totalStatsGroup">
                 <span id="totalOtDisplay" class="stat-badge stat-badge-ot">全班加班: 0天</span>
                 <span id="totalLvDisplay" class="stat-badge stat-badge-lv">全班請假: 0天</span>
                 <span id="totalUaDisplay" class="stat-badge stat-badge-ua">加班未到: 0天</span>
@@ -809,8 +848,8 @@
 </div>
 
 <script>
-    // ===== 以下 JavaScript 完全保留原始功能，未做任何更動 =====
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzLY435Gr3k6783bG__8TM0xs04CDLztMghV3Et4LX411iGTEt3so3zYSOVZlo27qPl/exec";
+    // ===== 以下 JavaScript 包含變更記錄、總管理員、模式選擇與跑馬燈設定 =====
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzke3WV4JqpmJVgur8fCN9jmP0HjQ6KXyoTCcZfBVZl1fLGO4VEjMgWAnPX5_AaqPjf/exec";
 
     const squadEmployeesDefault = {
         S1: ["方慎之","陳泰安","蔡南嘉","李珮菁","朱建穎","王泳淇","吳峻霖","黃詠綺","蘭狄","凱文","勞倫司","安東尼","明華","艾麥倫","邱立斯","拉特","羅內爾","艾佛森"],
@@ -826,6 +865,13 @@
         S4: "陳喬志"
     };
 
+    const superManager = "林素瑛";
+    let currentMode = 'edit';
+
+    function isManagerOf(squad, user) {
+        return user === squadManagers[squad] || user === superManager;
+    }
+
     const weekDaysTW = ["日", "一", "二", "三", "四", "五", "六"];
 
     let cloudData = { shifts: {}, passwords: {}, otLimits: {}, settings: {} };
@@ -836,13 +882,34 @@
     let currentViewSquad = null;
     let crosshairEnabled = false; 
 
+    function getTaipeiTimeString() {
+        const now = new Date();
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const taipei = new Date(utc + (8 * 3600000));
+        const year = taipei.getFullYear();
+        const month = String(taipei.getMonth() + 1).padStart(2, '0');
+        const day = String(taipei.getDate()).padStart(2, '0');
+        const hours = String(taipei.getHours()).padStart(2, '0');
+        const minutes = String(taipei.getMinutes()).padStart(2, '0');
+        const seconds = String(taipei.getSeconds()).padStart(2, '0');
+        return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+    }
+
     const syncStatus = document.getElementById('syncStatus');
     const loginOverlay = document.getElementById('loginOverlay');
     const loginSquadSelect = document.getElementById('loginSquadSelect');
     const loginNameSelect = document.getElementById('loginNameSelect');
     const loginPasswordInput = document.getElementById('loginPasswordInput');
+    const loginModeSelect = document.getElementById('loginModeSelect');
     const loginSubmitBtn = document.getElementById('loginSubmitBtn');
     const loginErrorMsg = document.getElementById('loginErrorMsg');
+    const superLoginBtn = document.getElementById('superLoginBtn');
+    const superLoginModal = document.getElementById('superLoginModal');
+    const superPasswordInput = document.getElementById('superPasswordInput');
+    const superModeSelect = document.getElementById('superModeSelect');
+    const confirmSuperLoginBtn = document.getElementById('confirmSuperLoginBtn');
+    const cancelSuperLoginBtn = document.getElementById('cancelSuperLoginBtn');
+    const superLoginErrorMsg = document.getElementById('superLoginErrorMsg');
 
     const changePwdModal = document.getElementById('changePwdModal');
     const oldPwdInput = document.getElementById('oldPwdInput');
@@ -872,6 +939,7 @@
     const monthSelect = document.getElementById('monthSelect');
     const otLimitSelect = document.getElementById('otLimitSelect');
     const otLimitGroup = document.getElementById('otLimitGroup');
+    const totalStatsGroup = document.getElementById('totalStatsGroup');
     const toggleStatsBtn = document.getElementById('toggleStatsBtn');
     const viewSquadSelect = document.getElementById('viewSquadSelect');
 
@@ -882,6 +950,8 @@
     const editMarqueeBtn = document.getElementById('editMarqueeBtn');
     const marqueeModal = document.getElementById('marqueeModal');
     const marqueeInput = document.getElementById('marqueeInput');
+    const marqueeModeSelect = document.getElementById('marqueeModeSelect');
+    const marqueeSpeedSelect = document.getElementById('marqueeSpeedSelect');
     const saveMarqueeBtn = document.getElementById('saveMarqueeBtn');
     const cancelMarqueeBtn = document.getElementById('cancelMarqueeBtn');
     const marqueeErrorMsg = document.getElementById('marqueeErrorMsg');
@@ -898,6 +968,37 @@
     function showSync() { syncStatus.style.display = 'block'; }
     function hideSync() { syncStatus.style.display = 'none'; }
 
+    function applyModeUI() {
+        if (currentMode === 'view') {
+            changePwdBtn.style.display = 'none';
+            otLimitGroup.style.display = 'none';
+            totalStatsGroup.style.display = 'none';
+            highlightBtn.style.display = 'none';
+            formStatusBtn.style.display = 'none';
+            editMarqueeBtn.style.display = 'none';
+            editEmployeeBtn.style.display = 'none';
+            confirmBtn.style.display = 'none';
+        } else {
+            changePwdBtn.style.display = '';
+            // 其他按鈕由 renderTable 控制顯示
+        }
+    }
+
+    function applyMarqueeSettings() {
+        // 從 settings 讀取跑馬燈模式與速度
+        const mode = (cloudData.settings && cloudData.settings['marqueeMode']) ? cloudData.settings['marqueeMode'] : 'scroll';
+        const speed = (cloudData.settings && cloudData.settings['marqueeSpeed']) ? parseInt(cloudData.settings['marqueeSpeed']) : 30;
+        
+        const marqueeContent = document.getElementById('marqueeText');
+        if (mode === 'static') {
+            marqueeContent.style.animation = 'none';
+            marqueeContent.style.paddingLeft = '0';
+        } else {
+            marqueeContent.style.animation = `scrollMarquee ${speed}s linear infinite`;
+            marqueeContent.style.paddingLeft = '100%';
+        }
+    }
+
     loginSquadSelect.addEventListener('change', function() {
         const squad = this.value;
         loginNameSelect.innerHTML = '<option value="">-- 請選擇姓名 --</option>';
@@ -910,6 +1011,54 @@
             });
         }
         loginNameSelect.value = '';
+    });
+
+    superLoginBtn.addEventListener('click', function() {
+        superPasswordInput.value = '';
+        superLoginErrorMsg.style.display = 'none';
+        superLoginModal.style.display = 'flex';
+    });
+
+    cancelSuperLoginBtn.addEventListener('click', function() {
+        superLoginModal.style.display = 'none';
+    });
+
+    confirmSuperLoginBtn.addEventListener('click', async function() {
+        const inputPwd = superPasswordInput.value;
+        const mode = superModeSelect.value;
+        if (!inputPwd) {
+            superLoginErrorMsg.textContent = "請輸入密碼！";
+            superLoginErrorMsg.style.display = 'block';
+            return;
+        }
+        showSync();
+        await fetchCloudData();
+        const correctPwd = getUserPassword(superManager);
+        if (inputPwd === correctPwd) {
+            currentUser = superManager;
+            currentSquad = 'S1';
+            currentViewSquad = 'S1';
+            currentMode = mode;
+            sessionStorage.setItem('schedule_current_squad', 'S1');
+            sessionStorage.setItem('schedule_current_user', superManager);
+            sessionStorage.setItem('schedule_current_mode', mode);
+            superLoginErrorMsg.style.display = 'none';
+            superPasswordInput.value = '';
+            superLoginModal.style.display = 'none';
+            loginOverlay.style.display = 'none';
+            mainApp.style.display = 'block';
+            userInfoDisplay.textContent = `👤 ${superManager} (總管理員)`;
+            viewSquadSelect.value = 'S1';
+            applyModeUI();
+            applyMarqueeSettings();
+            updateFormStatusUI();
+            updateHighlightBtnUI();
+            renderTable();
+        } else {
+            superLoginErrorMsg.textContent = "密碼錯誤！";
+            superLoginErrorMsg.style.display = 'block';
+        }
+        hideSync();
     });
 
     async function fetchCloudData() {
@@ -980,7 +1129,7 @@
             try {
                 const parsed = JSON.parse(cloudData.settings[key]);
                 if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-            } catch(e) { /* 解析失敗則回退 */ }
+            } catch(e) { }
         }
         return squadEmployeesDefault[squad] || [];
     }
@@ -988,31 +1137,41 @@
     function updateFormStatusUI() {
         if (!currentSquad || !currentViewSquad) return;
         const isMySquad = (currentViewSquad === currentSquad);
-        const isManager = (currentUser === squadManagers[currentViewSquad]);
+        const isManager = isManagerOf(currentViewSquad, currentUser);
         const open = isFormOpen(currentViewSquad);
         formStatusBtn.textContent = open ? '填表：開啟' : '填表：關閉';
         formStatusBtn.className = 'form-status-btn ' + (open ? 'open' : 'closed');
-        formStatusBtn.style.display = (isMySquad && isManager) ? '' : 'none';
+        if (currentMode === 'view') {
+            formStatusBtn.style.display = 'none';
+        } else {
+            formStatusBtn.style.display = (isManager && (isMySquad || currentUser === superManager)) ? '' : 'none';
+        }
     }
 
     function updateHighlightBtnUI() {
         if (!currentUser || !currentSquad) return;
-        const isManager = (currentUser === squadManagers[currentSquad]);
+        const isManager = isManagerOf(currentSquad, currentUser);
         highlightBtn.disabled = !isManager;
         highlightBtn.textContent = crosshairEnabled ? '十字高亮：開' : '十字高亮：關';
         highlightBtn.className = 'highlight-btn' + (crosshairEnabled ? ' active' : '');
         document.body.classList.toggle('crosshair-active', crosshairEnabled);
+        if (currentMode === 'view') {
+            highlightBtn.style.display = 'none';
+            document.body.classList.remove('crosshair-active');
+        } else {
+            highlightBtn.style.display = isManager ? '' : 'none';
+        }
     }
 
     highlightBtn.addEventListener('click', function() {
-        if (!currentUser || currentUser !== squadManagers[currentSquad]) return;
+        if (!currentUser || !isManagerOf(currentSquad, currentUser)) return;
         crosshairEnabled = !crosshairEnabled;
         updateHighlightBtnUI();
     });
 
     const tableContainer = document.querySelector('.table-container');
     tableContainer.addEventListener('mouseover', function(e) {
-        if (!crosshairEnabled) return;
+        if (!crosshairEnabled || currentMode === 'view') return;
         const targetCell = e.target.closest('th, td');
         if (!targetCell) return;
 
@@ -1053,15 +1212,15 @@
     });
 
     tableContainer.addEventListener('mouseleave', function() {
-        if (!crosshairEnabled) return;
+        if (!crosshairEnabled || currentMode === 'view') return;
         document.querySelectorAll('.crosshair-highlight').forEach(el => el.classList.remove('crosshair-highlight'));
     });
 
     formStatusBtn.addEventListener('click', function() {
-        if (!currentSquad || !currentViewSquad || currentViewSquad !== currentSquad) return;
-        if (currentUser !== squadManagers[currentSquad]) return;
-        const nextState = isFormOpen(currentSquad) ? 'closed' : 'open';
-        const key = currentSquad + '_form_status';
+        if (!currentSquad || !currentViewSquad) return;
+        if (!isManagerOf(currentViewSquad, currentUser)) return;
+        const nextState = isFormOpen(currentViewSquad) ? 'closed' : 'open';
+        const key = currentViewSquad + '_form_status';
         if (!cloudData.settings) cloudData.settings = {};
         cloudData.settings[key] = nextState;
         postCloudData({ action: 'saveSetting', key: key, value: nextState });
@@ -1114,7 +1273,7 @@
                 const defaultShift = getDefaultShift(squad, year, month, i);
                 let val;
                 if (pendingChanges[shiftKey] !== undefined) {
-                    val = pendingChanges[shiftKey];
+                    val = pendingChanges[shiftKey].newValue;
                 } else {
                     const savedValue = (cloudData.shifts) ? cloudData.shifts[shiftKey] : undefined;
                     val = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
@@ -1145,7 +1304,7 @@
                 const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
                 let val;
                 if (pendingChanges[shiftKey] !== undefined) {
-                    val = pendingChanges[shiftKey];
+                    val = pendingChanges[shiftKey].newValue;
                 } else {
                     const savedValue = (cloudData.shifts) ? cloudData.shifts[shiftKey] : undefined;
                     val = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
@@ -1157,11 +1316,15 @@
     }
 
     function updateConfirmBtnState() {
+        if (currentMode === 'view') {
+            confirmBtn.style.display = 'none';
+            return;
+        }
         if (!currentSquad || !currentViewSquad || currentViewSquad !== currentSquad) {
             confirmBtn.style.display = 'none';
             return;
         }
-        const isManager = (currentUser === squadManagers[currentSquad]);
+        const isManager = isManagerOf(currentSquad, currentUser);
         if (isManager) {
             confirmBtn.style.display = 'none';
             return;
@@ -1201,18 +1364,18 @@
         confirmBtn.disabled = true;
         try {
             const promises = [];
-            for (const [key, val] of Object.entries(pendingChanges)) {
-                promises.push(fetch(GAS_WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'saveShift', key: key, value: val })
+            for (const [key, change] of Object.entries(pendingChanges)) {
+                promises.push(postCloudData({
+                    action: 'saveShift',
+                    key: key,
+                    value: change.newValue,
+                    oldValue: change.oldValue,
+                    user: currentUser,
+                    timestamp: getTaipeiTimeString()
                 }));
+                cloudData.shifts[key] = change.newValue;
             }
             await Promise.all(promises);
-            for (const [key, val] of Object.entries(pendingChanges)) {
-                cloudData.shifts[key] = val;
-            }
             pendingChanges = {};
             document.querySelectorAll('td.pending-edit').forEach(el => el.classList.remove('pending-edit'));
             updateConfirmBtnState();
@@ -1231,18 +1394,41 @@
         if (!currentUser || !currentSquad) return;
         const viewSquad = currentViewSquad || currentSquad;
         const isMySquad = (viewSquad === currentSquad);
-        const isManagerOfView = (currentUser === squadManagers[viewSquad]);
-        const isManagerOfMy = (currentUser === squadManagers[currentSquad]);
-        const readOnly = !isMySquad;
+        const isManagerOfView = isManagerOf(viewSquad, currentUser);
+        const isManagerOfMy = isManagerOf(currentSquad, currentUser);
+        const formOpen = isFormOpen(viewSquad);
 
         updateFormStatusUI();
         updateHighlightBtnUI();
-        const formOpen = isFormOpen(viewSquad);
+        applyModeUI();
+        applyMarqueeSettings();
 
-        otLimitGroup.style.display = (isMySquad && isManagerOfMy && formOpen) ? 'flex' : 'none';
-        
-        editMarqueeBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
-        editEmployeeBtn.style.display = (isMySquad && isManagerOfMy) ? '' : 'none';
+        let readOnly = !isManagerOfView;
+        if (currentMode === 'view') {
+            readOnly = true;
+        }
+
+        let allEmployees = getEmployeeList(viewSquad);
+        let visibleEmployees;
+        if (currentMode === 'view') {
+            visibleEmployees = allEmployees;
+        } else {
+            if (isMySquad) {
+                visibleEmployees = isManagerOfMy ? allEmployees : [currentUser];
+            } else {
+                visibleEmployees = allEmployees;
+            }
+        }
+
+        if (currentMode === 'edit') {
+            otLimitGroup.style.display = (isManagerOfView && formOpen) ? 'flex' : 'none';
+            editMarqueeBtn.style.display = isManagerOfView ? '' : 'none';
+            editEmployeeBtn.style.display = isManagerOfView ? '' : 'none';
+        } else {
+            otLimitGroup.style.display = 'none';
+            editMarqueeBtn.style.display = 'none';
+            editEmployeeBtn.style.display = 'none';
+        }
 
         const defaultMarquee = `※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。`;
         if (cloudData.settings && cloudData.settings['marqueeText']) {
@@ -1304,9 +1490,9 @@
                 selectMark.appendChild(option);
             });
             selectMark.value = dailyMarks[markKey] || '';
-            selectMark.disabled = !(isMySquad && isManagerOfMy);
+            selectMark.disabled = (currentMode === 'view') ? true : !(isManagerOfView);
             selectMark.addEventListener('change', function() {
-                if (!isMySquad || !isManagerOfMy) return;
+                if (currentMode === 'view' || !isManagerOfView) return;
                 const newMark = this.value;
                 dailyMarks[markKey] = newMark;
                 cloudData.settings[viewSquad + '_dailyMarks'] = dailyMarks;
@@ -1331,14 +1517,6 @@
         thead.appendChild(trDate);
         thead.appendChild(trDay);
 
-        let allEmployees = getEmployeeList(viewSquad);
-        let visibleEmployees;
-        if (isMySquad) {
-            visibleEmployees = isManagerOfMy ? allEmployees : [currentUser];
-        } else {
-            visibleEmployees = allEmployees;
-        }
-
         const extraLeaveTypes = ['婚', '喪', '公'];
 
         visibleEmployees.forEach(empName => {
@@ -1358,30 +1536,25 @@
                 const savedValue = (cloudData.shifts) ? cloudData.shifts[shiftKey] : undefined;
                 let finalValue = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
                 if (pendingChanges[shiftKey] !== undefined) {
-                    finalValue = pendingChanges[shiftKey];
+                    finalValue = pendingChanges[shiftKey].newValue;
                 }
 
                 let select = document.createElement('select');
                 select.className = 'shift-select';
                 if (readOnly || !formOpen) {
                     select.disabled = true;
-                } else if (!isMySquad) {
-                    select.disabled = true;
                 }
 
                 let baseOptions;
                 if (defaultShift === '') {
-                    // 非上班日：僅空白、G、未，不包含任何請假類型
                     baseOptions = ['', 'G', '未'];
                 } else {
-                    // 有班日：包含 defaultShift 及所有請假/特殊類型（含婚喪公）
                     baseOptions = [defaultShift, '特', '病', '事', '生', '颱', '返', '差', '曠'];
                     extraLeaveTypes.forEach(opt => {
                         if (!baseOptions.includes(opt)) baseOptions.push(opt);
                     });
                 }
-                const isCurrentManager = (isMySquad && currentUser === squadManagers[viewSquad]);
-                if (!isCurrentManager) {
+                if (!isManagerOfView) {
                     baseOptions = baseOptions.filter(opt => opt !== '未');
                 }
                 if (finalValue !== '' && !baseOptions.includes(finalValue)) {
@@ -1396,12 +1569,7 @@
                 });
 
                 select.addEventListener('change', function() {
-                    if (!isMySquad || readOnly) return;
-                    if (!isFormOpen(viewSquad)) {
-                        alert("目前填表已關閉，無法修改班表！");
-                        this.value = finalValue;
-                        return;
-                    }
+                    if (readOnly || !formOpen) return;
                     const newVal = this.value;
                     const limitVal = otLimitSelect.value;
                     if (newVal === 'G' && defaultShift === '' && limitVal !== '') {
@@ -1413,7 +1581,7 @@
                             const key = `${viewSquad}_shift_${year}_${month}_${otherEmp}_${i}`;
                             const def = getDefaultShift(viewSquad, year, month, i);
                             let val;
-                            if (pendingChanges[key] !== undefined) val = pendingChanges[key];
+                            if (pendingChanges[key] !== undefined) val = pendingChanges[key].newValue;
                             else {
                                 const saved = (cloudData.shifts && cloudData.shifts[key] !== undefined) ? cloudData.shifts[key] : def;
                                 val = saved;
@@ -1427,15 +1595,23 @@
                         }
                     }
 
-                    if (isCurrentManager) {
+                    if (isManagerOfView) {
+                        const oldValue = finalValue;
                         if (!cloudData.shifts) cloudData.shifts = {};
                         cloudData.shifts[shiftKey] = newVal;
-                        postCloudData({ action: 'saveShift', key: shiftKey, value: newVal });
+                        postCloudData({
+                            action: 'saveShift',
+                            key: shiftKey,
+                            value: newVal,
+                            oldValue: oldValue,
+                            user: currentUser,
+                            timestamp: getTaipeiTimeString()
+                        });
                         finalValue = newVal;
                         updateCellColor(td, newVal);
                         renderTable();
                     } else {
-                        pendingChanges[shiftKey] = newVal;
+                        pendingChanges[shiftKey] = { newValue: newVal, oldValue: finalValue };
                         finalValue = newVal;
                         td.classList.add('pending-edit');
                         updateCellColor(td, newVal);
@@ -1484,7 +1660,7 @@
             const defaultShift = getDefaultShift(squad, year, month, i);
             let val;
             if (pendingChanges[shiftKey] !== undefined) {
-                val = pendingChanges[shiftKey];
+                val = pendingChanges[shiftKey].newValue;
             } else {
                 const savedValue = (cloudData.shifts) ? cloudData.shifts[shiftKey] : undefined;
                 val = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
@@ -1522,7 +1698,7 @@
     viewSquadSelect.addEventListener('change', function() {
         const newSquad = this.value;
         if (newSquad === currentViewSquad) return;
-        if (currentViewSquad === currentSquad && Object.keys(pendingChanges).length > 0 && currentUser !== squadManagers[currentSquad]) {
+        if (currentMode === 'edit' && currentViewSquad === currentSquad && Object.keys(pendingChanges).length > 0 && !isManagerOf(currentSquad, currentUser)) {
             if (!confirm('切換班表將捨棄目前未儲存的變更，確定要繼續嗎？')) {
                 this.value = currentViewSquad;
                 return;
@@ -1539,6 +1715,7 @@
         const squad = loginSquadSelect.value;
         const selectedUser = loginNameSelect.value;
         const inputPwd = loginPasswordInput.value;
+        const mode = loginModeSelect.value;
         if (!squad || !selectedUser) {
             loginErrorMsg.style.display = 'block';
             return;
@@ -1552,8 +1729,10 @@
             currentSquad = squad;
             currentUser = selectedUser;
             currentViewSquad = squad;
+            currentMode = mode;
             sessionStorage.setItem('schedule_current_squad', squad);
             sessionStorage.setItem('schedule_current_user', selectedUser);
+            sessionStorage.setItem('schedule_current_mode', mode);
             loginErrorMsg.style.display = 'none';
             loginPasswordInput.value = '';
             viewSquadSelect.value = squad;
@@ -1561,6 +1740,8 @@
             loginOverlay.style.display = 'none';
             mainApp.style.display = 'block';
             userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
+            applyModeUI();
+            applyMarqueeSettings();
             updateFormStatusUI();
             updateHighlightBtnUI();
             renderTable();
@@ -1576,14 +1757,18 @@
         
         const savedSquad = sessionStorage.getItem('schedule_current_squad');
         const savedUser = sessionStorage.getItem('schedule_current_user');
+        const savedMode = sessionStorage.getItem('schedule_current_mode') || 'edit';
         if (savedSquad && savedUser) {
             currentSquad = savedSquad;
             currentUser = savedUser;
             currentViewSquad = savedSquad;
+            currentMode = savedMode;
             viewSquadSelect.value = savedSquad;
             loginOverlay.style.display = 'none';
             mainApp.style.display = 'block';
-            userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
+            userInfoDisplay.textContent = (savedUser === superManager) ? `👤 ${superManager} (總管理員)` : `👤 ${savedUser} (${savedSquad})`;
+            applyModeUI();
+            applyMarqueeSettings();
             updateFormStatusUI();
             updateHighlightBtnUI();
             renderTable();
@@ -1631,50 +1816,65 @@
         changePwdModal.style.display = 'none';
     });
 
-    // 跑馬燈邏輯
+    // 跑馬燈編輯與儲存（包含模式、速度）
     editMarqueeBtn.addEventListener('click', function() {
         marqueeInput.value = marqueeText.textContent;
+        const currentModeSetting = (cloudData.settings && cloudData.settings['marqueeMode']) ? cloudData.settings['marqueeMode'] : 'scroll';
+        const currentSpeed = (cloudData.settings && cloudData.settings['marqueeSpeed']) ? cloudData.settings['marqueeSpeed'] : '30';
+        marqueeModeSelect.value = currentModeSetting;
+        marqueeSpeedSelect.value = currentSpeed;
         marqueeErrorMsg.style.display = 'none';
         marqueeModal.style.display = 'flex';
     });
+
     cancelMarqueeBtn.addEventListener('click', () => marqueeModal.style.display = 'none');
+
     saveMarqueeBtn.addEventListener('click', async function() {
         const newText = marqueeInput.value.trim();
         if (!newText) {
             marqueeErrorMsg.textContent = "跑馬燈內容不可空白！";
             marqueeErrorMsg.style.display = "block"; return;
         }
-        if(!cloudData.settings) cloudData.settings = {};
+        const newMode = marqueeModeSelect.value;
+        const newSpeed = marqueeSpeedSelect.value;
+        if (!cloudData.settings) cloudData.settings = {};
         cloudData.settings['marqueeText'] = newText;
+        cloudData.settings['marqueeMode'] = newMode;
+        cloudData.settings['marqueeSpeed'] = newSpeed;
         await postCloudData({ action: 'saveSetting', key: 'marqueeText', value: newText });
+        await postCloudData({ action: 'saveSetting', key: 'marqueeMode', value: newMode });
+        await postCloudData({ action: 'saveSetting', key: 'marqueeSpeed', value: newSpeed });
         marqueeText.textContent = newText;
+        applyMarqueeSettings();
         alert("跑馬燈文字已更新！");
         marqueeModal.style.display = 'none';
     });
 
     // 管理班表人員邏輯
     editEmployeeBtn.addEventListener('click', function() {
-        const currentList = getEmployeeList(currentSquad);
+        const targetSquad = currentViewSquad || currentSquad;
+        const currentList = getEmployeeList(targetSquad);
         employeeListInput.value = currentList.join('\n');
         empErrorMsg.style.display = 'none';
-        empModalTitle.textContent = `管理班表人員 (${currentSquad})`;
+        empModalTitle.textContent = `管理班表人員 (${targetSquad})`;
         employeeModal.style.display = 'flex';
     });
     cancelEmpBtn.addEventListener('click', () => employeeModal.style.display = 'none');
     saveEmpBtn.addEventListener('click', async function() {
+        const targetSquad = currentViewSquad || currentSquad;
         const rawText = employeeListInput.value;
         let newList = rawText.split(/\r?\n/).map(n => n.trim()).filter(n => n !== '');
         if (newList.length === 0) {
             empErrorMsg.textContent = "名單不可為空！至少需要一個人。";
             empErrorMsg.style.display = "block"; return;
         }
-        const manager = squadManagers[currentSquad];
-        if (!newList.includes(manager)) {
+        const manager = squadManagers[targetSquad];
+        if (manager && !newList.includes(manager)) {
             newList.unshift(manager);
         }
         if(!cloudData.settings) cloudData.settings = {};
-        cloudData.settings[currentSquad + '_employees'] = JSON.stringify(newList);
-        await postCloudData({ action: 'saveSetting', key: currentSquad + '_employees', value: JSON.stringify(newList) });
+        cloudData.settings[targetSquad + '_employees'] = JSON.stringify(newList);
+        await postCloudData({ action: 'saveSetting', key: targetSquad + '_employees', value: JSON.stringify(newList) });
         alert(`人員名單已更新！共 ${newList.length} 人。`);
         employeeModal.style.display = 'none';
         renderTable();
@@ -1683,6 +1883,7 @@
     logoutBtn.addEventListener('click', function() {
         sessionStorage.removeItem('schedule_current_squad');
         sessionStorage.removeItem('schedule_current_user');
+        sessionStorage.removeItem('schedule_current_mode');
         currentUser = null;
         currentSquad = null;
         currentViewSquad = null;
@@ -1694,11 +1895,12 @@
     });
 
     otLimitSelect.addEventListener('change', function() {
-        if (!currentSquad || !currentViewSquad || currentViewSquad !== currentSquad) return;
-        if (currentUser !== squadManagers[currentSquad]) return;
+        if (currentMode === 'view') return;
+        if (!currentViewSquad) return;
+        if (!isManagerOf(currentViewSquad, currentUser)) return;
         const year = yearSelect.value;
         const month = monthSelect.value;
-        const limitKey = `${currentSquad}_otlimit_${year}_${month}`;
+        const limitKey = `${currentViewSquad}_otlimit_${year}_${month}`;
         if (!cloudData.otLimits) cloudData.otLimits = {};
         cloudData.otLimits[limitKey] = this.value;
         postCloudData({ action: 'saveOtLimit', key: limitKey, value: this.value });
