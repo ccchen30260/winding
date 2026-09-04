@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>捲繞排班(S1~S4)</title>
+    <!-- 引入 Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-day: #c6e0b4;
@@ -713,7 +715,7 @@
     </div>
 </div>
 
-<!-- 編輯跑馬燈視窗（新增模式與速度） -->
+<!-- 編輯跑馬燈視窗 -->
 <div id="marqueeModal" class="login-overlay" style="display: none; z-index: 10000;">
     <div class="login-card">
         <h2>編輯跑馬燈文字</h2>
@@ -848,8 +850,12 @@
 </div>
 
 <script>
-    // ===== 以下 JavaScript 包含變更記錄、總管理員、模式選擇與跑馬燈設定 =====
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzke3WV4JqpmJVgur8fCN9jmP0HjQ6KXyoTCcZfBVZl1fLGO4VEjMgWAnPX5_AaqPjf/exec";
+    // ==========================================
+    // 💡 請在此處填入你的 Supabase URL 與 ANON KEY
+    // ==========================================
+    const SUPABASE_URL = "https://kevpgpsrkldyyokpffvv.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_uQpGQe9oack6Xhry24jgkA_B87KHS7z";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const squadEmployeesDefault = {
         S1: ["方慎之","陳泰安","蔡南嘉","李珮菁","朱建穎","王泳淇","吳峻霖","黃詠綺","蘭狄","凱文","勞倫司","安東尼","明華","艾麥倫","邱立斯","拉特","羅內爾","艾佛森"],
@@ -980,12 +986,10 @@
             confirmBtn.style.display = 'none';
         } else {
             changePwdBtn.style.display = '';
-            // 其他按鈕由 renderTable 控制顯示
         }
     }
 
     function applyMarqueeSettings() {
-        // 從 settings 讀取跑馬燈模式與速度
         const mode = (cloudData.settings && cloudData.settings['marqueeMode']) ? cloudData.settings['marqueeMode'] : 'scroll';
         const speed = (cloudData.settings && cloudData.settings['marqueeSpeed']) ? parseInt(cloudData.settings['marqueeSpeed']) : 30;
         
@@ -1061,13 +1065,29 @@
         hideSync();
     });
 
+    // 改用 Supabase 抓取資料
     async function fetchCloudData() {
         showSync();
         try {
-            const timestamp = new Date().getTime();
-            const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData&t=${timestamp}`);
-            const data = await resp.json();
-            if (data) cloudData = data;
+            const [shRes, pwRes, otRes, stRes] = await Promise.all([
+                supabase.from('shifts').select('*'),
+                supabase.from('passwords').select('*'),
+                supabase.from('ot_limits').select('*'),
+                supabase.from('settings').select('*')
+            ]);
+
+            cloudData.shifts = {};
+            if (shRes.data) shRes.data.forEach(row => cloudData.shifts[row.key] = row.value);
+
+            cloudData.passwords = {};
+            if (pwRes.data) pwRes.data.forEach(row => cloudData.passwords[row.key] = row.value);
+
+            cloudData.otLimits = {};
+            if (otRes.data) otRes.data.forEach(row => cloudData.otLimits[row.key] = row.value);
+
+            cloudData.settings = {};
+            if (stRes.data) stRes.data.forEach(row => cloudData.settings[row.key] = row.value);
+
             if (cloudData.settings) {
                 if (cloudData.settings['form_status'] && !cloudData.settings['S4_form_status']) {
                     cloudData.settings['S4_form_status'] = cloudData.settings['form_status'];
@@ -1086,24 +1106,54 @@
                     }
                 });
             }
-            if (!cloudData.otLimits) cloudData.otLimits = {};
         } catch (err) {
-            console.error("雲端讀取失敗", err);
+            console.error("Supabase 讀取失敗", err);
         } finally {
             hideSync();
         }
     }
 
+    // 改用 Supabase 儲存資料
     async function postCloudData(payload) {
         showSync();
         try {
-            await fetch(GAS_WEB_APP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
-            });
+            const { action, key, value, oldValue, user, timestamp } = payload;
+            let table = '';
+            
+            if (action === 'saveShift') table = 'shifts';
+            else if (action === 'savePassword') table = 'passwords';
+            else if (action === 'saveOtLimit') table = 'ot_limits';
+            else if (action === 'saveSetting') table = 'settings';
+
+            if (table) {
+                const { error } = await supabase.from(table).upsert({ key: key, value: String(value) });
+                if (error) throw error;
+            }
+
+            // 寫入變更紀錄
+            if (action === 'saveShift' && oldValue !== undefined) {
+                const parts = key.split('_');
+                const squad = parts[0] || '';
+                const year = parts[2] || '';
+                const month = parts[3] || '';
+                const empName = parts[4] || '';
+                const day = parts[5] || '';
+
+                await supabase.from('change_logs').insert({
+                    changed_at: new Date().toISOString(),
+                    user_name: user,
+                    squad: squad,
+                    shift_year: year,
+                    shift_month: month,
+                    emp_name: empName,
+                    shift_day: day,
+                    old_value: String(oldValue),
+                    new_value: String(value),
+                    shift_key: key
+                });
+            }
         } catch (err) {
-            console.error("雲端寫入失敗", err);
+            console.error("Supabase 寫入失敗", err);
         } finally {
             hideSync();
         }
@@ -1495,7 +1545,7 @@
                 if (currentMode === 'view' || !isManagerOfView) return;
                 const newMark = this.value;
                 dailyMarks[markKey] = newMark;
-                cloudData.settings[viewSquad + '_dailyMarks'] = dailyMarks;
+                cloudData.settings[viewSquad + '_dailyMarks'] = JSON.stringify(dailyMarks);
                 postCloudData({ action: 'saveSetting', key: viewSquad + '_dailyMarks', value: JSON.stringify(dailyMarks) });
             });
             thMark.appendChild(selectMark);
@@ -1816,7 +1866,6 @@
         changePwdModal.style.display = 'none';
     });
 
-    // 跑馬燈編輯與儲存（包含模式、速度）
     editMarqueeBtn.addEventListener('click', function() {
         marqueeInput.value = marqueeText.textContent;
         const currentModeSetting = (cloudData.settings && cloudData.settings['marqueeMode']) ? cloudData.settings['marqueeMode'] : 'scroll';
@@ -1850,7 +1899,6 @@
         marqueeModal.style.display = 'none';
     });
 
-    // 管理班表人員邏輯
     editEmployeeBtn.addEventListener('click', function() {
         const targetSquad = currentViewSquad || currentSquad;
         const currentList = getEmployeeList(targetSquad);
@@ -1859,7 +1907,9 @@
         empModalTitle.textContent = `管理班表人員 (${targetSquad})`;
         employeeModal.style.display = 'flex';
     });
+    
     cancelEmpBtn.addEventListener('click', () => employeeModal.style.display = 'none');
+    
     saveEmpBtn.addEventListener('click', async function() {
         const targetSquad = currentViewSquad || currentSquad;
         const rawText = employeeListInput.value;
