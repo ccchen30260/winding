@@ -850,9 +850,6 @@
 </div>
 
 <script>
-    // ==========================================
-    // 💡 請在此處填入你的 Supabase URL 與 ANON KEY
-    // ==========================================
     const SUPABASE_URL = "https://kevpgpsrkldyyokpffvv.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_uQpGQe9oack6Xhry24jgkA_B87KHS7z";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1065,7 +1062,6 @@
         hideSync();
     });
 
-    // 改用 Supabase 抓取資料
     async function fetchCloudData() {
         showSync();
         try {
@@ -1113,7 +1109,6 @@
         }
     }
 
-    // 改用 Supabase 儲存資料
     async function postCloudData(payload) {
         showSync();
         try {
@@ -1130,7 +1125,6 @@
                 if (error) throw error;
             }
 
-            // 寫入變更紀錄
             if (action === 'saveShift' && oldValue !== undefined) {
                 const parts = key.split('_');
                 const squad = parts[0] || '';
