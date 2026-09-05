@@ -282,7 +282,7 @@
             margin-right: 4px;
         }
 
-        .change-pwd-btn, .logout-btn, .toggle-btn, .form-status-btn, .highlight-btn, .edit-marquee-btn, .edit-employee-btn, .query-attendance-btn {
+        .change-pwd-btn, .logout-btn, .toggle-btn, .form-status-btn, .highlight-btn, .edit-marquee-btn, .edit-employee-btn {
             padding: 5px 12px;
             font-size: 12px;
             font-weight: 500;
@@ -294,7 +294,7 @@
             white-space: nowrap;
             transition: all 0.2s ease;
         }
-        .change-pwd-btn:hover, .logout-btn:hover, .toggle-btn:hover, .form-status-btn:hover, .highlight-btn:hover, .edit-marquee-btn:hover, .edit-employee-btn:hover, .query-attendance-btn:hover {
+        .change-pwd-btn:hover, .logout-btn:hover, .toggle-btn:hover, .form-status-btn:hover, .highlight-btn:hover, .edit-marquee-btn:hover, .edit-employee-btn:hover {
             background: #e5e5ea;
         }
 
@@ -317,7 +317,7 @@
         .highlight-btn.active:hover { background: #0066d9; }
         .highlight-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .edit-marquee-btn, .edit-employee-btn, .query-attendance-btn { color: #555; }
+        .edit-marquee-btn, .edit-employee-btn { color: #555; }
 
         .btn-confirm {
             position: fixed;
@@ -760,37 +760,6 @@
     </div>
 </div>
 
-<!-- 查詢出缺勤視窗 -->
-<div id="attendanceModal" class="login-overlay" style="display: none; z-index: 10000;">
-    <div class="login-card" style="text-align: left;">
-        <h2>查詢出缺勤狀況</h2>
-        <div class="login-field">
-            <label for="attEmpSelect">員工姓名</label>
-            <select id="attEmpSelect"></select>
-        </div>
-        <div class="login-field">
-            <label for="attTypeSelect">查詢範圍</label>
-            <select id="attTypeSelect">
-                <option value="month">當月</option>
-                <option value="year">當年</option>
-            </select>
-        </div>
-        <div class="login-field" id="attYearGroup">
-            <label for="attYearSelect">年份</label>
-            <select id="attYearSelect"></select>
-        </div>
-        <div class="login-field" id="attMonthGroup">
-            <label for="attMonthSelect">月份</label>
-            <select id="attMonthSelect"></select>
-        </div>
-        <div style="display: flex; gap: 10px; margin-top: 15px; justify-content: flex-end;">
-            <button id="cancelAttendanceBtn" class="login-btn" style="background-color: #6c757d; width: auto; padding: 8px 20px;">取消</button>
-            <button id="queryAttendanceSubmitBtn" class="login-btn" style="width: auto; padding: 8px 20px;">查詢</button>
-        </div>
-        <div id="attendanceResultArea" style="margin-top: 20px; overflow-x: auto;"></div>
-    </div>
-</div>
-
 <!-- 自定義雙語確認視窗 -->
 <div id="confirmModal" class="custom-modal-overlay">
     <div class="custom-modal-box">
@@ -858,11 +827,10 @@
             <button id="formStatusBtn" class="form-status-btn open">填表：開啟</button>
             <button id="toggleStatsBtn" class="toggle-btn">隱藏統計</button>
         </div>
-        
+
         <div class="right-controls">
             <button id="editMarqueeBtn" class="edit-marquee-btn" style="display:none;">📝 編輯跑馬燈</button>
             <button id="editEmployeeBtn" class="edit-employee-btn" style="display:none;">👥 管理班表人員</button>
-            <button id="queryAttendanceBtn" class="query-attendance-btn" style="display:none;">📊 查詢出缺勤</button>
             <button id="logoutBtn" class="logout-btn">登出</button>
         </div>
     </div>
@@ -879,9 +847,17 @@
     </div>
 </div>
 
+<!-- ===== Supabase JS SDK ===== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-    // ===== 以下 JavaScript 包含變更記錄、總管理員、模式選擇與跑馬燈設定 =====
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzke3WV4JqpmJVgur8fCN9jmP0HjQ6KXyoTCcZfBVZl1fLGO4VEjMgWAnPX5_AaqPjf/exec";
+    // ===== 以下 JavaScript 已改為使用 Supabase（取代原本的 Google Apps Script） =====
+
+    // 請將以下兩行換成你自己 Supabase 專案的值
+    // (Project Settings -> API -> Project URL / anon public key)
+    const SUPABASE_URL = "https://uczyrbaqojhcetqaqzcw.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_rj4tdbDeW0i95WiDEqlcOQ_5ysQR8If";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const squadEmployeesDefault = {
         S1: ["方慎之","陳泰安","蔡南嘉","李珮菁","朱建穎","王泳淇","吳峻霖","黃詠綺","蘭狄","凱文","勞倫司","安東尼","明華","艾麥倫","邱立斯","拉特","羅內爾","艾佛森"],
@@ -957,7 +933,7 @@
     const logoutBtn = document.getElementById('logoutBtn');
     const formStatusBtn = document.getElementById('formStatusBtn');
     const highlightBtn = document.getElementById('highlightBtn');
-    
+
     const confirmBtn = document.getElementById('confirmBtn');
     const confirmModal = document.getElementById('confirmModal');
     const confirmModalText = document.getElementById('confirmModalText');
@@ -997,19 +973,6 @@
     const cancelEmpBtn = document.getElementById('cancelEmpBtn');
     const empErrorMsg = document.getElementById('empErrorMsg');
 
-    // 查詢出缺勤相關元素
-    const queryAttendanceBtn = document.getElementById('queryAttendanceBtn');
-    const attendanceModal = document.getElementById('attendanceModal');
-    const attEmpSelect = document.getElementById('attEmpSelect');
-    const attTypeSelect = document.getElementById('attTypeSelect');
-    const attYearSelect = document.getElementById('attYearSelect');
-    const attMonthSelect = document.getElementById('attMonthSelect');
-    const attYearGroup = document.getElementById('attYearGroup');
-    const attMonthGroup = document.getElementById('attMonthGroup');
-    const queryAttendanceSubmitBtn = document.getElementById('queryAttendanceSubmitBtn');
-    const cancelAttendanceBtn = document.getElementById('cancelAttendanceBtn');
-    const attendanceResultArea = document.getElementById('attendanceResultArea');
-
     function showSync() { syncStatus.style.display = 'block'; }
     function hideSync() { syncStatus.style.display = 'none'; }
 
@@ -1022,7 +985,6 @@
             formStatusBtn.style.display = 'none';
             editMarqueeBtn.style.display = 'none';
             editEmployeeBtn.style.display = 'none';
-            queryAttendanceBtn.style.display = 'none';
             confirmBtn.style.display = 'none';
         } else {
             changePwdBtn.style.display = '';
@@ -1031,9 +993,10 @@
     }
 
     function applyMarqueeSettings() {
+        // 從 settings 讀取跑馬燈模式與速度
         const mode = (cloudData.settings && cloudData.settings['marqueeMode']) ? cloudData.settings['marqueeMode'] : 'scroll';
         const speed = (cloudData.settings && cloudData.settings['marqueeSpeed']) ? parseInt(cloudData.settings['marqueeSpeed']) : 30;
-        
+
         const marqueeContent = document.getElementById('marqueeText');
         if (mode === 'static') {
             marqueeContent.style.animation = 'none';
@@ -1106,13 +1069,35 @@
         hideSync();
     });
 
+    // ===== Supabase 資料讀取（取代 fetchCloudData 的 GAS fetch） =====
     async function fetchCloudData() {
         showSync();
         try {
-            const timestamp = new Date().getTime();
-            const resp = await fetch(`${GAS_WEB_APP_URL}?action=getAllData&t=${timestamp}`);
-            const data = await resp.json();
-            if (data) cloudData = data;
+            const [shiftsRes, passwordsRes, otLimitsRes, settingsRes] = await Promise.all([
+                supabaseClient.from('shifts').select('key,value'),
+                supabaseClient.from('passwords').select('key,value'),
+                supabaseClient.from('ot_limits').select('key,value'),
+                supabaseClient.from('settings').select('key,value')
+            ]);
+
+            const toMap = (res) => {
+                const map = {};
+                if (res && res.error) {
+                    console.error('讀取失敗:', res.error);
+                }
+                if (res && res.data) {
+                    res.data.forEach(row => { map[row.key] = row.value; });
+                }
+                return map;
+            };
+
+            cloudData = {
+                shifts: toMap(shiftsRes),
+                passwords: toMap(passwordsRes),
+                otLimits: toMap(otLimitsRes),
+                settings: toMap(settingsRes)
+            };
+
             if (cloudData.settings) {
                 if (cloudData.settings['form_status'] && !cloudData.settings['S4_form_status']) {
                     cloudData.settings['S4_form_status'] = cloudData.settings['form_status'];
@@ -1139,19 +1124,70 @@
         }
     }
 
+    // ===== Supabase 資料寫入（取代 postCloudData 的 GAS fetch） =====
     async function postCloudData(payload) {
         showSync();
         try {
-            await fetch(GAS_WEB_APP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
-            });
+            const action = payload.action;
+            let error = null;
+
+            if (action === 'saveShift') {
+                const { error: err1 } = await supabaseClient
+                    .from('shifts')
+                    .upsert({ key: payload.key, value: payload.value }, { onConflict: 'key' });
+                error = err1;
+                // 若有提供 oldValue，表示需要記錄變更
+                if (payload.oldValue !== undefined) {
+                    await logShiftChange(payload.key, payload.oldValue, payload.value, payload.user, payload.timestamp);
+                }
+            } else if (action === 'savePassword') {
+                const { error: err2 } = await supabaseClient
+                    .from('passwords')
+                    .upsert({ key: payload.key, value: payload.value }, { onConflict: 'key' });
+                error = err2;
+            } else if (action === 'saveOtLimit') {
+                const { error: err3 } = await supabaseClient
+                    .from('ot_limits')
+                    .upsert({ key: payload.key, value: payload.value }, { onConflict: 'key' });
+                error = err3;
+            } else if (action === 'saveSetting') {
+                const { error: err4 } = await supabaseClient
+                    .from('settings')
+                    .upsert({ key: payload.key, value: payload.value }, { onConflict: 'key' });
+                error = err4;
+            }
+
+            if (error) console.error('雲端寫入失敗', error);
         } catch (err) {
             console.error("雲端寫入失敗", err);
         } finally {
             hideSync();
         }
+    }
+
+    // 記錄班表變更（取代 GAS 的 logShiftChange）
+    async function logShiftChange(key, oldValue, newValue, user, timestamp) {
+        // key 格式為 `${squad}_shift_${year}_${month}_${empName}_${day}`
+        const parts = key.split('_');
+        const squad = parts[0] || '';
+        const year = parts[2] || '';
+        const month = parts[3] || '';
+        const empName = parts[4] || '';
+        const day = parts[5] || '';
+
+        const { error } = await supabaseClient.from('change_logs').insert({
+            ts: timestamp,
+            user_name: user,
+            squad: squad,
+            year: year,
+            month: month,
+            employee: empName,
+            day: day,
+            old_value: oldValue,
+            new_value: newValue,
+            key: key
+        });
+        if (error) console.error('寫入變更紀錄失敗', error);
     }
 
     function getUserPassword(empName) {
@@ -1469,12 +1505,10 @@
             otLimitGroup.style.display = (isManagerOfView && formOpen) ? 'flex' : 'none';
             editMarqueeBtn.style.display = isManagerOfView ? '' : 'none';
             editEmployeeBtn.style.display = isManagerOfView ? '' : 'none';
-            queryAttendanceBtn.style.display = isManagerOfView ? '' : 'none';
         } else {
             otLimitGroup.style.display = 'none';
             editMarqueeBtn.style.display = 'none';
             editEmployeeBtn.style.display = 'none';
-            queryAttendanceBtn.style.display = 'none';
         }
 
         const defaultMarquee = `※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。`;
@@ -1742,136 +1776,6 @@
         }
     }
 
-    // ===== 查詢出缺勤功能 =====
-    function calculateAttendance(squad, empName, year, month) {
-        const stats = {
-            totalDays: 0,
-            workDays: 0,
-            overtimeDays: 0,
-            leaveDays: 0,
-            leaveDetails: {},
-            absenceDays: 0,
-            otherDays: 0,
-            details: [] // 保留但不再使用
-        };
-        const lvTypes = ['特', '病', '事', '生', '婚', '喪', '公'];
-        const absenceTypes = ['曠', '未'];
-        const startMonth = month || 1;
-        const endMonth = month || 12;
-        for (let m = startMonth; m <= endMonth; m++) {
-            const daysInMonth = new Date(year, m, 0).getDate();
-            for (let d = 1; d <= daysInMonth; d++) {
-                const shiftKey = `${squad}_shift_${year}_${m}_${empName}_${d}`;
-                const defaultShift = getDefaultShift(squad, year, m, d);
-                let val;
-                if (pendingChanges[shiftKey] !== undefined) {
-                    val = pendingChanges[shiftKey].newValue;
-                } else {
-                    const savedValue = (cloudData.shifts && cloudData.shifts[shiftKey] !== undefined) ? cloudData.shifts[shiftKey] : defaultShift;
-                    val = savedValue;
-                }
-                if (val === '日' || val === '夜') {
-                    stats.workDays++;
-                } else if (val === 'G') {
-                    stats.overtimeDays++;
-                    stats.workDays++;
-                } else if (lvTypes.includes(val)) {
-                    stats.leaveDays++;
-                    stats.leaveDetails[val] = (stats.leaveDetails[val] || 0) + 1;
-                } else if (absenceTypes.includes(val)) {
-                    stats.absenceDays++;
-                } else if (val !== '') {
-                    stats.otherDays++;
-                }
-                stats.totalDays++;
-                // 我們不再需要每日明細，所以不填充 details
-            }
-        }
-        return stats;
-    }
-
-    function displayAttendanceResult(result, empName, year, month) {
-        let html = '';
-        html += `<h3>${empName} ${year}年${month ? month + '月' : '全年'}出缺勤統計</h3>`;
-        html += `<div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px;">`;
-        html += `<span class="stat-badge">總天數: ${result.totalDays}</span>`;
-        html += `<span class="stat-badge stat-badge-ot">上班: ${result.workDays} (含加班${result.overtimeDays})</span>`;
-        html += `<span class="stat-badge stat-badge-lv">請假: ${result.leaveDays}</span>`;
-        html += `<span class="stat-badge stat-badge-ua">缺勤: ${result.absenceDays}</span>`;
-        html += `<span class="stat-badge">其他: ${result.otherDays}</span>`;
-        html += `</div>`;
-        if (result.leaveDays > 0) {
-            html += `<div style="margin-bottom:15px;"><strong>請假明細：</strong> `;
-            const details = [];
-            for (const [type, count] of Object.entries(result.leaveDetails)) {
-                details.push(`${type}: ${count}天`);
-            }
-            html += details.join(', ');
-            html += `</div>`;
-        }
-        attendanceResultArea.innerHTML = html;
-    }
-
-    queryAttendanceBtn.addEventListener('click', function() {
-        if (!currentViewSquad || !isManagerOf(currentViewSquad, currentUser)) return;
-        const empList = getEmployeeList(currentViewSquad);
-        attEmpSelect.innerHTML = '';
-        empList.forEach(emp => {
-            let opt = document.createElement('option');
-            opt.value = emp;
-            opt.textContent = emp;
-            attEmpSelect.appendChild(opt);
-        });
-        attendanceResultArea.innerHTML = '';
-        attendanceModal.style.display = 'flex';
-    });
-
-    cancelAttendanceBtn.addEventListener('click', () => {
-        attendanceModal.style.display = 'none';
-    });
-
-    attTypeSelect.addEventListener('change', function() {
-        if (this.value === 'month') {
-            attMonthGroup.style.display = 'block';
-        } else {
-            attMonthGroup.style.display = 'none';
-        }
-    });
-    // 初始觸發一次
-    attTypeSelect.dispatchEvent(new Event('change'));
-
-    queryAttendanceSubmitBtn.addEventListener('click', function() {
-        const empName = attEmpSelect.value;
-        const type = attTypeSelect.value;
-        const year = parseInt(attYearSelect.value);
-        if (!empName) {
-            alert('請選擇員工！');
-            return;
-        }
-        let month = null;
-        if (type === 'month') {
-            month = parseInt(attMonthSelect.value);
-        }
-        const result = calculateAttendance(currentViewSquad, empName, year, month);
-        displayAttendanceResult(result, empName, year, month);
-    });
-
-    // 初始化查詢模態框的年份與月份
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    for (let y = currentYear - 5; y <= currentYear + 5; y++) {
-        let opt = document.createElement('option');
-        opt.value = y; opt.text = y;
-        if (y === currentYear) opt.selected = true;
-        attYearSelect.appendChild(opt);
-    }
-    for (let m = 1; m <= 12; m++) {
-        let opt = document.createElement('option');
-        opt.value = m; opt.text = m;
-        if (m === (now.getMonth() + 1)) opt.selected = true;
-        attMonthSelect.appendChild(opt);
-    }
-
     viewSquadSelect.addEventListener('change', function() {
         const newSquad = this.value;
         if (newSquad === currentViewSquad) return;
@@ -1913,7 +1817,7 @@
             loginErrorMsg.style.display = 'none';
             loginPasswordInput.value = '';
             viewSquadSelect.value = squad;
-            
+
             loginOverlay.style.display = 'none';
             mainApp.style.display = 'block';
             userInfoDisplay.textContent = `👤 ${currentUser} (${currentSquad})`;
@@ -1931,7 +1835,7 @@
 
     async function checkLoginStatus() {
         await fetchCloudData();
-        
+
         const savedSquad = sessionStorage.getItem('schedule_current_squad');
         const savedUser = sessionStorage.getItem('schedule_current_user');
         const savedMode = sessionStorage.getItem('schedule_current_mode') || 'edit';
@@ -2083,7 +1987,8 @@
         postCloudData({ action: 'saveOtLimit', key: limitKey, value: this.value });
     });
 
-    // 初始化主畫面的年份與月份
+    const now = new Date();
+    const currentYear = now.getFullYear();
     for (let y = currentYear - 5; y <= currentYear + 5; y++) {
         let opt = document.createElement('option');
         opt.value = y; opt.text = y;
