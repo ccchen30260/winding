@@ -760,6 +760,24 @@
     </div>
 </div>
 
+<!-- 重置人員密碼視窗 -->
+<div id="resetPwdModal" class="login-overlay" style="display: none; z-index: 10000;">
+    <div class="login-card">
+        <h2 id="resetPwdModalTitle">重置人員密碼</h2>
+        <div class="login-field">
+            <label for="resetEmpSelect">選擇員工姓名</label>
+            <select id="resetEmpSelect">
+                <option value="">-- 請選擇員工 --</option>
+            </select>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button id="cancelResetPwdBtn" class="login-btn" style="background-color: #6c757d;">取消</button>
+            <button id="confirmResetPwdBtn" class="login-btn" style="background-color: var(--ios-red);">重置為 0000</button>
+        </div>
+        <div id="resetPwdErrorMsg" class="login-error"></div>
+    </div>
+</div>
+
 <!-- 自定義雙語確認視窗 -->
 <div id="confirmModal" class="custom-modal-overlay">
     <div class="custom-modal-box">
@@ -831,6 +849,7 @@
         <div class="right-controls">
             <button id="editMarqueeBtn" class="edit-marquee-btn" style="display:none;">📝 編輯跑馬燈</button>
             <button id="editEmployeeBtn" class="edit-employee-btn" style="display:none;">👥 管理班表人員</button>
+            <button id="resetPwdBtn" class="edit-employee-btn" style="display:none; color: var(--ios-red);">🔑 重置人員密碼</button>
             <button id="logoutBtn" class="logout-btn">登出</button>
         </div>
     </div>
@@ -973,6 +992,14 @@
     const cancelEmpBtn = document.getElementById('cancelEmpBtn');
     const empErrorMsg = document.getElementById('empErrorMsg');
 
+    const resetPwdBtn = document.getElementById('resetPwdBtn');
+    const resetPwdModal = document.getElementById('resetPwdModal');
+    const resetPwdModalTitle = document.getElementById('resetPwdModalTitle');
+    const resetEmpSelect = document.getElementById('resetEmpSelect');
+    const cancelResetPwdBtn = document.getElementById('cancelResetPwdBtn');
+    const confirmResetPwdBtn = document.getElementById('confirmResetPwdBtn');
+    const resetPwdErrorMsg = document.getElementById('resetPwdErrorMsg');
+
     function showSync() { syncStatus.style.display = 'block'; }
     function hideSync() { syncStatus.style.display = 'none'; }
 
@@ -985,6 +1012,7 @@
             formStatusBtn.style.display = 'none';
             editMarqueeBtn.style.display = 'none';
             editEmployeeBtn.style.display = 'none';
+            resetPwdBtn.style.display = 'none';
             confirmBtn.style.display = 'none';
         } else {
             changePwdBtn.style.display = '';
@@ -1505,10 +1533,12 @@
             otLimitGroup.style.display = (isManagerOfView && formOpen) ? 'flex' : 'none';
             editMarqueeBtn.style.display = isManagerOfView ? '' : 'none';
             editEmployeeBtn.style.display = isManagerOfView ? '' : 'none';
+            resetPwdBtn.style.display = isManagerOfView ? '' : 'none';
         } else {
             otLimitGroup.style.display = 'none';
             editMarqueeBtn.style.display = 'none';
             editEmployeeBtn.style.display = 'none';
+            resetPwdBtn.style.display = 'none';
         }
 
         const defaultMarquee = `※"G"→加班；"C"→加班費1倍；"換"→換班日(不加班)；"歲"→歲修(不上班)；"旺"→尾牙(不上班)。`;
@@ -1959,6 +1989,63 @@
         alert(`人員名單已更新！共 ${newList.length} 人。`);
         employeeModal.style.display = 'none';
         renderTable();
+    });
+
+    // ===== 重置人員密碼邏輯 =====
+    resetPwdBtn.addEventListener('click', function() {
+        const targetSquad = currentViewSquad || currentSquad;
+        const empList = getEmployeeList(targetSquad);
+        
+        resetPwdModalTitle.textContent = `重置人員密碼 (${targetSquad})`;
+        resetEmpSelect.innerHTML = '<option value="">-- 請選擇員工 --</option>';
+        
+        empList.forEach(emp => {
+            let opt = document.createElement('option');
+            opt.value = emp;
+            opt.textContent = emp;
+            resetEmpSelect.appendChild(opt);
+        });
+        
+        resetPwdErrorMsg.style.display = 'none';
+        resetPwdModal.style.display = 'flex';
+    });
+
+    cancelResetPwdBtn.addEventListener('click', function() {
+        resetPwdModal.style.display = 'none';
+    });
+
+    confirmResetPwdBtn.addEventListener('click', async function() {
+        const selectedEmp = resetEmpSelect.value;
+        if (!selectedEmp) {
+            resetPwdErrorMsg.textContent = "請先選擇要重置密碼的員工！";
+            resetPwdErrorMsg.style.display = "block";
+            return;
+        }
+
+        const confirmReset = await showConfirmModal(
+            `Are you sure you want to reset password for ${selectedEmp} to "0000"? / 確定要將【${selectedEmp}】的密碼重置為 "0000" 嗎？`
+        );
+        if (!confirmReset) return;
+
+        showSync();
+        try {
+            if (!cloudData.passwords) cloudData.passwords = {};
+            cloudData.passwords[selectedEmp] = "0000";
+            
+            await postCloudData({ 
+                action: 'savePassword', 
+                key: selectedEmp, 
+                value: '0000' 
+            });
+
+            alert(`✅ 已成功將【${selectedEmp}】的密碼重置為 0000！`);
+            resetPwdModal.style.display = 'none';
+        } catch (err) {
+            console.error("重置密碼失敗", err);
+            alert("❌ 重置密碼失敗，請稍後再試。");
+        } finally {
+            hideSync();
+        }
     });
 
     logoutBtn.addEventListener('click', function() {
