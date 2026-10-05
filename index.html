@@ -21,6 +21,9 @@
             --bg-marriage: #f48fb1;
             --bg-mourning: #90a4ae;
             --bg-public: #ce93d8;
+            --bg-maternity: #f8bbd0; /* 新增假別樣式：產假 */
+            --bg-paternity: #e1bee7; /* 新增假別樣式：陪產假 */
+            --bg-compensatory: #b2dfdb; /* 新增假別樣式：補休 */
             --border-color: #a0a0a0;
 
             --bg-ios: #f2f2f7;
@@ -535,6 +538,7 @@
         }
         .shift-select option { background: #ffffff; color: #1c1c1e; }
 
+        /* 假別背景顏色定義 */
         .shift-day { background-color: var(--bg-day); color: #000; }
         .shift-night { background-color: var(--bg-night); color: #000; }
         .shift-g { background-color: var(--bg-g); color: #000; font-weight: 600; }
@@ -550,6 +554,9 @@
         .shift-marriage { background-color: var(--bg-marriage); color: #000; font-weight: 600; }
         .shift-mourning { background-color: var(--bg-mourning); color: #fff; font-weight: 600; }
         .shift-public { background-color: var(--bg-public); color: #000; font-weight: 600; }
+        .shift-maternity { background-color: var(--bg-maternity); color: #000; font-weight: 600; }
+        .shift-paternity { background-color: var(--bg-paternity); color: #000; font-weight: 600; }
+        .shift-compensatory { background-color: var(--bg-compensatory); color: #000; font-weight: 600; }
 
         .daily-mark-select {
             width: 100%; height: 30px;
@@ -890,6 +897,9 @@
 
     const superManager = "林素瑛";
     let currentMode = 'edit';
+
+    // 定義所有計入「請假統計」的假別
+    const lvTypes = ['特', '病', '事', '生', '婚', '喪', '公', '產', '陪', '補'];
 
     function isManagerOf(squad, user) {
         return user === squadManagers[squad] || user === superManager;
@@ -1377,7 +1387,6 @@
         const empList = getEmployeeList(squad);
         if (!empList) return;
         let grandTotalOt = 0, grandTotalLv = 0, grandTotalUa = 0;
-        const lvTypes = ['特', '病', '事', '生', '婚', '喪', '公'];
         empList.forEach(empName => {
             for (let i = 1; i <= daysInMonth; i++) {
                 const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
@@ -1514,7 +1523,6 @@
         applyModeUI();
         applyMarqueeSettings();
 
-        // 💡 修改處：只有當前模式為 'view' 時才設為唯讀
         let readOnly = (currentMode === 'view');
 
         let allEmployees = getEmployeeList(viewSquad);
@@ -1628,8 +1636,6 @@
         thead.appendChild(trDate);
         thead.appendChild(trDay);
 
-        const extraLeaveTypes = ['婚', '喪', '公'];
-
         visibleEmployees.forEach(empName => {
             let tr = document.createElement('tr');
             const otCellId = `ot_${viewSquad}_${year}_${month}_${empName}`;
@@ -1653,11 +1659,9 @@
                 let select = document.createElement('select');
                 select.className = 'shift-select';
 
-                // 💡 修改處：判斷當前這格是否為「該登入員工本人」的格子
                 const isSelf = (empName === currentUser);
                 const canEditThisRow = isManagerOfView || (isMySquad && isSelf);
 
-                // 如果是唯讀模式、填表已關閉、或者不具備該列編輯權限，則停用選單
                 if (readOnly || !formOpen || !canEditThisRow) {
                     select.disabled = true;
                 }
@@ -1666,11 +1670,10 @@
                 if (defaultShift === '') {
                     baseOptions = ['', 'G', '未'];
                 } else {
-                    baseOptions = [defaultShift, '特', '病', '事', '生', '颱', '返', '差', '曠'];
-                    extraLeaveTypes.forEach(opt => {
-                        if (!baseOptions.includes(opt)) baseOptions.push(opt);
-                    });
+                    // 下拉選單中支援的預設與擴充假別清單
+                    baseOptions = [defaultShift, '特', '病', '事', '生', '颱', '返', '差', '曠', '婚', '喪', '公', '產', '陪', '補'];
                 }
+
                 if (!isManagerOfView) {
                     baseOptions = baseOptions.filter(opt => opt !== '未');
                 }
@@ -1771,7 +1774,6 @@
 
     function calculateStats(empName, squad, year, month, daysInMonth, otCellId, lvCellId) {
         let otCount = 0, lvCount = 0;
-        const lvTypes = ['特', '病', '事', '生', '婚', '喪', '公'];
         for (let i = 1; i <= daysInMonth; i++) {
             const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
             const defaultShift = getDefaultShift(squad, year, month, i);
@@ -1792,7 +1794,7 @@
     }
 
     function updateCellColor(td, value) {
-        td.classList.remove('shift-day', 'shift-night', 'shift-g', 'shift-unattended', 'shift-special', 'shift-personal', 'shift-sick', 'shift-physio', 'shift-typhoon', 'shift-return', 'shift-business', 'shift-absent', 'shift-marriage', 'shift-mourning', 'shift-public');
+        td.classList.remove('shift-day', 'shift-night', 'shift-g', 'shift-unattended', 'shift-special', 'shift-personal', 'shift-sick', 'shift-physio', 'shift-typhoon', 'shift-return', 'shift-business', 'shift-absent', 'shift-marriage', 'shift-mourning', 'shift-public', 'shift-maternity', 'shift-paternity', 'shift-compensatory');
         switch (value) {
             case '日': td.classList.add('shift-day'); break;
             case '夜': td.classList.add('shift-night'); break;
@@ -1809,6 +1811,9 @@
             case '婚': td.classList.add('shift-marriage'); break;
             case '喪': td.classList.add('shift-mourning'); break;
             case '公': td.classList.add('shift-public'); break;
+            case '產': td.classList.add('shift-maternity'); break;
+            case '陪': td.classList.add('shift-paternity'); break;
+            case '補': td.classList.add('shift-compensatory'); break;
         }
     }
 
