@@ -870,10 +870,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-    // ===== 以下 JavaScript 已改為使用 Supabase（取代原本的 Google Apps Script） =====
-
-    // 請將以下兩行換成你自己 Supabase 專案的值
-    // (Project Settings -> API -> Project URL / anon public key)
     const SUPABASE_URL = "https://uczyrbaqojhcetqaqzcw.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_rj4tdbDeW0i95WiDEqlcOQ_5ysQR8If";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1016,12 +1012,10 @@
             confirmBtn.style.display = 'none';
         } else {
             changePwdBtn.style.display = '';
-            // 其他按鈕由 renderTable 控制顯示
         }
     }
 
     function applyMarqueeSettings() {
-        // 從 settings 讀取跑馬燈模式與速度
         const mode = (cloudData.settings && cloudData.settings['marqueeMode']) ? cloudData.settings['marqueeMode'] : 'scroll';
         const speed = (cloudData.settings && cloudData.settings['marqueeSpeed']) ? parseInt(cloudData.settings['marqueeSpeed']) : 30;
 
@@ -1097,7 +1091,7 @@
         hideSync();
     });
 
-    // ===== Supabase 資料讀取（取代 fetchCloudData 的 GAS fetch） =====
+    // ===== Supabase 資料讀取（修復 Key 對應問題） =====
     async function fetchCloudData() {
         showSync();
         try {
@@ -1114,7 +1108,9 @@
                     console.error('讀取失敗:', res.error);
                 }
                 if (res && res.data) {
-                    res.data.forEach(row => { map[row.key] = row.value; });
+                    res.data.forEach(row => { 
+                        map[String(row.key).trim()] = row.value; 
+                    });
                 }
                 return map;
             };
@@ -1137,7 +1133,9 @@
                     const key = sq + '_dailyMarks';
                     if (cloudData.settings[key]) {
                         try {
-                            cloudData.settings[key] = JSON.parse(cloudData.settings[key]);
+                            cloudData.settings[key] = typeof cloudData.settings[key] === 'string' 
+                                ? JSON.parse(cloudData.settings[key]) 
+                                : cloudData.settings[key];
                         } catch(e) { cloudData.settings[key] = {}; }
                     } else {
                         cloudData.settings[key] = {};
@@ -1152,7 +1150,7 @@
         }
     }
 
-    // ===== Supabase 資料寫入（取代 postCloudData 的 GAS fetch） =====
+    // ===== Supabase 資料寫入 =====
     async function postCloudData(payload) {
         showSync();
         try {
@@ -1164,7 +1162,6 @@
                     .from('shifts')
                     .upsert({ key: payload.key, value: payload.value }, { onConflict: 'key' });
                 error = err1;
-                // 若有提供 oldValue，表示需要記錄變更
                 if (payload.oldValue !== undefined) {
                     await logShiftChange(payload.key, payload.oldValue, payload.value, payload.user, payload.timestamp);
                 }
@@ -1193,9 +1190,7 @@
         }
     }
 
-    // 記錄班表變更（取代 GAS 的 logShiftChange）
     async function logShiftChange(key, oldValue, newValue, user, timestamp) {
-        // key 格式為 `${squad}_shift_${year}_${month}_${empName}_${day}`
         const parts = key.split('_');
         const squad = parts[0] || '';
         const year = parts[2] || '';
@@ -1236,7 +1231,9 @@
         const key = squad + '_employees';
         if (cloudData.settings && cloudData.settings[key]) {
             try {
-                const parsed = JSON.parse(cloudData.settings[key]);
+                const parsed = typeof cloudData.settings[key] === 'string' 
+                    ? JSON.parse(cloudData.settings[key]) 
+                    : cloudData.settings[key];
                 if (Array.isArray(parsed) && parsed.length > 0) return parsed;
             } catch(e) { }
         }
@@ -1927,7 +1924,6 @@
         changePwdModal.style.display = 'none';
     });
 
-    // 跑馬燈編輯與儲存（包含模式、速度）
     editMarqueeBtn.addEventListener('click', function() {
         marqueeInput.value = marqueeText.textContent;
         const currentModeSetting = (cloudData.settings && cloudData.settings['marqueeMode']) ? cloudData.settings['marqueeMode'] : 'scroll';
@@ -1961,7 +1957,6 @@
         marqueeModal.style.display = 'none';
     });
 
-    // 管理班表人員邏輯
     editEmployeeBtn.addEventListener('click', function() {
         const targetSquad = currentViewSquad || currentSquad;
         const currentList = getEmployeeList(targetSquad);
@@ -1991,7 +1986,6 @@
         renderTable();
     });
 
-    // ===== 重置人員密碼邏輯 =====
     resetPwdBtn.addEventListener('click', function() {
         const targetSquad = currentViewSquad || currentSquad;
         const empList = getEmployeeList(targetSquad);
