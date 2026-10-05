@@ -21,9 +21,7 @@
             --bg-marriage: #f48fb1;
             --bg-mourning: #90a4ae;
             --bg-public: #ce93d8;
-            --bg-maternity: #f8bbd0; /* 新增假別樣式：產假 */
-            --bg-paternity: #e1bee7; /* 新增假別樣式：陪產假 */
-            --bg-compensatory: #b2dfdb; /* 新增假別樣式：補休 */
+            --bg-custom-leave: #e1bee7; /* 自訂動態假別預設背景色 */
             --border-color: #a0a0a0;
 
             --bg-ios: #f2f2f7;
@@ -285,7 +283,7 @@
             margin-right: 4px;
         }
 
-        .change-pwd-btn, .logout-btn, .toggle-btn, .form-status-btn, .highlight-btn, .edit-marquee-btn, .edit-employee-btn {
+        .change-pwd-btn, .logout-btn, .toggle-btn, .form-status-btn, .highlight-btn, .edit-marquee-btn, .edit-employee-btn, .edit-leave-btn {
             padding: 5px 12px;
             font-size: 12px;
             font-weight: 500;
@@ -297,7 +295,7 @@
             white-space: nowrap;
             transition: all 0.2s ease;
         }
-        .change-pwd-btn:hover, .logout-btn:hover, .toggle-btn:hover, .form-status-btn:hover, .highlight-btn:hover, .edit-marquee-btn:hover, .edit-employee-btn:hover {
+        .change-pwd-btn:hover, .logout-btn:hover, .toggle-btn:hover, .form-status-btn:hover, .highlight-btn:hover, .edit-marquee-btn:hover, .edit-employee-btn:hover, .edit-leave-btn:hover {
             background: #e5e5ea;
         }
 
@@ -320,7 +318,7 @@
         .highlight-btn.active:hover { background: #0066d9; }
         .highlight-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .edit-marquee-btn, .edit-employee-btn { color: #555; }
+        .edit-marquee-btn, .edit-employee-btn, .edit-leave-btn { color: #555; }
 
         .btn-confirm {
             position: fixed;
@@ -538,7 +536,7 @@
         }
         .shift-select option { background: #ffffff; color: #1c1c1e; }
 
-        /* 假別背景顏色定義 */
+        /* 預設假別顏色 */
         .shift-day { background-color: var(--bg-day); color: #000; }
         .shift-night { background-color: var(--bg-night); color: #000; }
         .shift-g { background-color: var(--bg-g); color: #000; font-weight: 600; }
@@ -554,9 +552,7 @@
         .shift-marriage { background-color: var(--bg-marriage); color: #000; font-weight: 600; }
         .shift-mourning { background-color: var(--bg-mourning); color: #fff; font-weight: 600; }
         .shift-public { background-color: var(--bg-public); color: #000; font-weight: 600; }
-        .shift-maternity { background-color: var(--bg-maternity); color: #000; font-weight: 600; }
-        .shift-paternity { background-color: var(--bg-paternity); color: #000; font-weight: 600; }
-        .shift-compensatory { background-color: var(--bg-compensatory); color: #000; font-weight: 600; }
+        .shift-custom { background-color: var(--bg-custom-leave); color: #000; font-weight: 600; }
 
         .daily-mark-select {
             width: 100%; height: 30px;
@@ -767,6 +763,22 @@
     </div>
 </div>
 
+<!-- 動態管理假別視窗 (新增) -->
+<div id="leaveModal" class="login-overlay" style="display: none; z-index: 10000;">
+    <div class="login-card" style="text-align: left;">
+        <h2>🏷️ 管理系統假別</h2>
+        <div class="login-field">
+            <label>可供選擇的假別代碼 (一行一個假別，如：特、病、事、公、產...)</label>
+            <textarea id="leaveListInput" rows="10" style="width: 100%;"></textarea>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 15px; justify-content: flex-end;">
+            <button id="cancelLeaveBtn" class="login-btn" style="background-color: #6c757d; width: auto; padding: 8px 20px;">取消</button>
+            <button id="saveLeaveBtn" class="login-btn" style="width: auto; padding: 8px 20px;">儲存假別設定</button>
+        </div>
+        <div id="leaveErrorMsg" class="login-error"></div>
+    </div>
+</div>
+
 <!-- 重置人員密碼視窗 -->
 <div id="resetPwdModal" class="login-overlay" style="display: none; z-index: 10000;">
     <div class="login-card">
@@ -855,6 +867,7 @@
 
         <div class="right-controls">
             <button id="editMarqueeBtn" class="edit-marquee-btn" style="display:none;">📝 編輯跑馬燈</button>
+            <button id="editLeaveBtn" class="edit-leave-btn" style="display:none;">🏷️ 管理假別</button>
             <button id="editEmployeeBtn" class="edit-employee-btn" style="display:none;">👥 管理班表人員</button>
             <button id="resetPwdBtn" class="edit-employee-btn" style="display:none; color: var(--ios-red);">🔑 重置人員密碼</button>
             <button id="logoutBtn" class="logout-btn">登出</button>
@@ -888,6 +901,9 @@
         S4: ["陳喬志","楊代億","廖曉彤","蔡靜儀","賴建亦","施榮傑","陰其德","黃譯鋒","楊雅婷","羅啟倫","埃爾默","拉斯特","雷伊","漢斯","達利斯","甘達","特拉多","達爾文"]
     };
 
+    // 系統預設假別代碼清單
+    const defaultLeaveOptions = ['特', '病', '事', '生', '颱', '返', '差', '曠', '婚', '喪', '公', '產', '陪', '補'];
+
     const squadManagers = {
         S1: "方慎之",
         S2: "黃正忠",
@@ -897,9 +913,6 @@
 
     const superManager = "林素瑛";
     let currentMode = 'edit';
-
-    // 定義所有計入「請假統計」的假別
-    const lvTypes = ['特', '病', '事', '生', '婚', '喪', '公', '產', '陪', '補'];
 
     function isManagerOf(squad, user) {
         return user === squadManagers[squad] || user === superManager;
@@ -998,6 +1011,14 @@
     const cancelEmpBtn = document.getElementById('cancelEmpBtn');
     const empErrorMsg = document.getElementById('empErrorMsg');
 
+    // 動態假別 UI 元素
+    const editLeaveBtn = document.getElementById('editLeaveBtn');
+    const leaveModal = document.getElementById('leaveModal');
+    const leaveListInput = document.getElementById('leaveListInput');
+    const saveLeaveBtn = document.getElementById('saveLeaveBtn');
+    const cancelLeaveBtn = document.getElementById('cancelLeaveBtn');
+    const leaveErrorMsg = document.getElementById('leaveErrorMsg');
+
     const resetPwdBtn = document.getElementById('resetPwdBtn');
     const resetPwdModal = document.getElementById('resetPwdModal');
     const resetPwdModalTitle = document.getElementById('resetPwdModalTitle');
@@ -1017,6 +1038,7 @@
             highlightBtn.style.display = 'none';
             formStatusBtn.style.display = 'none';
             editMarqueeBtn.style.display = 'none';
+            editLeaveBtn.style.display = 'none';
             editEmployeeBtn.style.display = 'none';
             resetPwdBtn.style.display = 'none';
             confirmBtn.style.display = 'none';
@@ -1255,6 +1277,19 @@
         return squadEmployeesDefault[squad] || [];
     }
 
+    // 取得動態自訂假別清單
+    function getLeaveOptions() {
+        if (cloudData.settings && cloudData.settings['custom_leave_options']) {
+            try {
+                const parsed = typeof cloudData.settings['custom_leave_options'] === 'string' 
+                    ? JSON.parse(cloudData.settings['custom_leave_options']) 
+                    : cloudData.settings['custom_leave_options'];
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            } catch(e) { }
+        }
+        return defaultLeaveOptions;
+    }
+
     function updateFormStatusUI() {
         if (!currentSquad || !currentViewSquad) return;
         const isMySquad = (currentViewSquad === currentSquad);
@@ -1387,6 +1422,8 @@
         const empList = getEmployeeList(squad);
         if (!empList) return;
         let grandTotalOt = 0, grandTotalLv = 0, grandTotalUa = 0;
+        const currentLeaveOpts = getLeaveOptions();
+
         empList.forEach(empName => {
             for (let i = 1; i <= daysInMonth; i++) {
                 const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
@@ -1399,7 +1436,7 @@
                     val = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
                 }
                 if (val === 'G') grandTotalOt++;
-                if (lvTypes.includes(val)) grandTotalLv++;
+                if (currentLeaveOpts.includes(val)) grandTotalLv++;
                 if (val === '未') grandTotalUa++;
             }
         });
@@ -1540,11 +1577,13 @@
         if (currentMode === 'edit') {
             otLimitGroup.style.display = (isManagerOfView && formOpen) ? 'flex' : 'none';
             editMarqueeBtn.style.display = isManagerOfView ? '' : 'none';
+            editLeaveBtn.style.display = isManagerOfView ? '' : 'none';
             editEmployeeBtn.style.display = isManagerOfView ? '' : 'none';
             resetPwdBtn.style.display = isManagerOfView ? '' : 'none';
         } else {
             otLimitGroup.style.display = 'none';
             editMarqueeBtn.style.display = 'none';
+            editLeaveBtn.style.display = 'none';
             editEmployeeBtn.style.display = 'none';
             resetPwdBtn.style.display = 'none';
         }
@@ -1636,6 +1675,8 @@
         thead.appendChild(trDate);
         thead.appendChild(trDay);
 
+        const currentLeaveOpts = getLeaveOptions();
+
         visibleEmployees.forEach(empName => {
             let tr = document.createElement('tr');
             const otCellId = `ot_${viewSquad}_${year}_${month}_${empName}`;
@@ -1670,8 +1711,8 @@
                 if (defaultShift === '') {
                     baseOptions = ['', 'G', '未'];
                 } else {
-                    // 下拉選單中支援的預設與擴充假別清單
-                    baseOptions = [defaultShift, '特', '病', '事', '生', '颱', '返', '差', '曠', '婚', '喪', '公', '產', '陪', '補'];
+                    // 動態載入使用者自訂的假別
+                    baseOptions = [defaultShift, ...currentLeaveOpts];
                 }
 
                 if (!isManagerOfView) {
@@ -1774,6 +1815,7 @@
 
     function calculateStats(empName, squad, year, month, daysInMonth, otCellId, lvCellId) {
         let otCount = 0, lvCount = 0;
+        const currentLeaveOpts = getLeaveOptions();
         for (let i = 1; i <= daysInMonth; i++) {
             const shiftKey = `${squad}_shift_${year}_${month}_${empName}_${i}`;
             const defaultShift = getDefaultShift(squad, year, month, i);
@@ -1785,7 +1827,7 @@
                 val = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
             }
             if (val === 'G') otCount++;
-            if (lvTypes.includes(val)) lvCount++;
+            if (currentLeaveOpts.includes(val)) lvCount++;
         }
         const otElem = document.getElementById(otCellId);
         const lvElem = document.getElementById(lvCellId);
@@ -1794,7 +1836,7 @@
     }
 
     function updateCellColor(td, value) {
-        td.classList.remove('shift-day', 'shift-night', 'shift-g', 'shift-unattended', 'shift-special', 'shift-personal', 'shift-sick', 'shift-physio', 'shift-typhoon', 'shift-return', 'shift-business', 'shift-absent', 'shift-marriage', 'shift-mourning', 'shift-public', 'shift-maternity', 'shift-paternity', 'shift-compensatory');
+        td.classList.remove('shift-day', 'shift-night', 'shift-g', 'shift-unattended', 'shift-special', 'shift-personal', 'shift-sick', 'shift-physio', 'shift-typhoon', 'shift-return', 'shift-business', 'shift-absent', 'shift-marriage', 'shift-mourning', 'shift-public', 'shift-custom');
         switch (value) {
             case '日': td.classList.add('shift-day'); break;
             case '夜': td.classList.add('shift-night'); break;
@@ -1811,9 +1853,11 @@
             case '婚': td.classList.add('shift-marriage'); break;
             case '喪': td.classList.add('shift-mourning'); break;
             case '公': td.classList.add('shift-public'); break;
-            case '產': td.classList.add('shift-maternity'); break;
-            case '陪': td.classList.add('shift-paternity'); break;
-            case '補': td.classList.add('shift-compensatory'); break;
+            default:
+                if (getLeaveOptions().includes(value)) {
+                    td.classList.add('shift-custom');
+                }
+                break;
         }
     }
 
@@ -1969,6 +2013,31 @@
         applyMarqueeSettings();
         alert("跑馬燈文字已更新！");
         marqueeModal.style.display = 'none';
+    });
+
+    // 觸發管理假別彈窗
+    editLeaveBtn.addEventListener('click', function() {
+        const currentOpts = getLeaveOptions();
+        leaveListInput.value = currentOpts.join('\n');
+        leaveErrorMsg.style.display = 'none';
+        leaveModal.style.display = 'flex';
+    });
+
+    cancelLeaveBtn.addEventListener('click', () => leaveModal.style.display = 'none');
+
+    saveLeaveBtn.addEventListener('click', async function() {
+        const rawText = leaveListInput.value;
+        let newList = rawText.split(/\r?\n/).map(n => n.trim()).filter(n => n !== '');
+        if (newList.length === 0) {
+            leaveErrorMsg.textContent = "假別清單不可為空！至少需要保留一種假別。";
+            leaveErrorMsg.style.display = "block"; return;
+        }
+        if (!cloudData.settings) cloudData.settings = {};
+        cloudData.settings['custom_leave_options'] = JSON.stringify(newList);
+        await postCloudData({ action: 'saveSetting', key: 'custom_leave_options', value: JSON.stringify(newList) });
+        alert(`假別設定已儲存！共 ${newList.length} 種假別。`);
+        leaveModal.style.display = 'none';
+        renderTable();
     });
 
     editEmployeeBtn.addEventListener('click', function() {
