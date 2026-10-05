@@ -1091,14 +1091,13 @@
         hideSync();
     });
 
-    // ===== Supabase 資料讀取（依當前選擇年份與月份精準過濾，徹底解決 1000 筆上限問題） =====
+    // ===== Supabase 資料讀取（依當前選擇年份與月份精準過濾） =====
     async function fetchCloudData() {
         showSync();
         try {
             const selectedYear = yearSelect && yearSelect.value ? yearSelect.value : new Date().getFullYear();
             const selectedMonth = monthSelect && monthSelect.value ? monthSelect.value : (new Date().getMonth() + 1);
 
-            // 組合出精準查詢 pattern（例如：%_2026_10_%）
             const shiftPattern = `%_${selectedYear}_${selectedMonth}_%`;
 
             const [shiftsRes, passwordsRes, otLimitsRes, settingsRes] = await Promise.all([
@@ -1515,10 +1514,8 @@
         applyModeUI();
         applyMarqueeSettings();
 
-        let readOnly = !isManagerOfView;
-        if (currentMode === 'view') {
-            readOnly = true;
-        }
+        // 💡 修改處：只有當前模式為 'view' 時才設為唯讀
+        let readOnly = (currentMode === 'view');
 
         let allEmployees = getEmployeeList(viewSquad);
         let visibleEmployees;
@@ -1655,7 +1652,13 @@
 
                 let select = document.createElement('select');
                 select.className = 'shift-select';
-                if (readOnly || !formOpen) {
+
+                // 💡 修改處：判斷當前這格是否為「該登入員工本人」的格子
+                const isSelf = (empName === currentUser);
+                const canEditThisRow = isManagerOfView || (isMySquad && isSelf);
+
+                // 如果是唯讀模式、填表已關閉、或者不具備該列編輯權限，則停用選單
+                if (readOnly || !formOpen || !canEditThisRow) {
                     select.disabled = true;
                 }
 
@@ -1683,7 +1686,7 @@
                 });
 
                 select.addEventListener('change', function() {
-                    if (readOnly || !formOpen) return;
+                    if (readOnly || !formOpen || !canEditThisRow) return;
                     const newVal = this.value;
                     const limitVal = otLimitSelect.value;
                     if (newVal === 'G' && defaultShift === '' && limitVal !== '') {
@@ -2089,7 +2092,6 @@
         monthSelect.appendChild(opt);
     }
 
-    // 切換年份與月份時，重新從雲端載入當月資料
     yearSelect.addEventListener('change', async function() {
         await fetchCloudData();
         renderTable();
