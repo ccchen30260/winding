@@ -1091,15 +1091,15 @@
         hideSync();
     });
 
-    // ===== Supabase 資料讀取（修復 Key 對應問題） =====
+    // ===== Supabase 資料讀取（加入 .limit(10000) 突破預設 1000 筆限制） =====
     async function fetchCloudData() {
         showSync();
         try {
             const [shiftsRes, passwordsRes, otLimitsRes, settingsRes] = await Promise.all([
-                supabaseClient.from('shifts').select('key,value'),
-                supabaseClient.from('passwords').select('key,value'),
-                supabaseClient.from('ot_limits').select('key,value'),
-                supabaseClient.from('settings').select('key,value')
+                supabaseClient.from('shifts').select('key,value').limit(10000),
+                supabaseClient.from('passwords').select('key,value').limit(2000),
+                supabaseClient.from('ot_limits').select('key,value').limit(2000),
+                supabaseClient.from('settings').select('key,value').limit(2000)
             ]);
 
             const toMap = (res) => {
@@ -1109,7 +1109,9 @@
                 }
                 if (res && res.data) {
                     res.data.forEach(row => { 
-                        map[String(row.key).trim()] = row.value; 
+                        if (row.key !== null && row.key !== undefined) {
+                            map[String(row.key).trim()] = row.value; 
+                        }
                     });
                 }
                 return map;
