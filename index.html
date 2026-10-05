@@ -713,7 +713,7 @@
     </div>
 </div>
 
-<!-- 編輯跑馬燈視窗（新增模式與速度） -->
+<!-- 編輯跑馬燈視窗 -->
 <div id="marqueeModal" class="login-overlay" style="display: none; z-index: 10000;">
     <div class="login-card">
         <h2>編輯跑馬燈文字</h2>
@@ -1091,10 +1091,11 @@
         hideSync();
     });
 
-    // ===== Supabase 資料讀取（加入 .limit(10000) 突破預設 1000 筆限制） =====
+    // ===== Supabase 資料讀取 + 詳細除錯 Log =====
     async function fetchCloudData() {
         showSync();
         try {
+            console.log("🔍 開始向 Supabase 撈取資料...");
             const [shiftsRes, passwordsRes, otLimitsRes, settingsRes] = await Promise.all([
                 supabaseClient.from('shifts').select('key,value').limit(10000),
                 supabaseClient.from('passwords').select('key,value').limit(2000),
@@ -1102,10 +1103,12 @@
                 supabaseClient.from('settings').select('key,value').limit(2000)
             ]);
 
+            console.log("📊 shifts 表原始回應:", shiftsRes);
+
             const toMap = (res) => {
                 const map = {};
                 if (res && res.error) {
-                    console.error('讀取失敗:', res.error);
+                    console.error('❌ Supabase 讀取錯誤:', res.error);
                 }
                 if (res && res.data) {
                     res.data.forEach(row => { 
@@ -1123,6 +1126,9 @@
                 otLimits: toMap(otLimitsRes),
                 settings: toMap(settingsRes)
             };
+
+            console.log("✅ 成功解析 shifts 筆數:", Object.keys(cloudData.shifts).length);
+            console.log("📌 shifts key 範例 5 筆:", Object.keys(cloudData.shifts).slice(0, 5));
 
             if (cloudData.settings) {
                 if (cloudData.settings['form_status'] && !cloudData.settings['S4_form_status']) {
@@ -1146,7 +1152,7 @@
             }
             if (!cloudData.otLimits) cloudData.otLimits = {};
         } catch (err) {
-            console.error("雲端讀取失敗", err);
+            console.error("❌ 雲端讀取例外失敗", err);
         } finally {
             hideSync();
         }
@@ -1160,6 +1166,7 @@
             let error = null;
 
             if (action === 'saveShift') {
+                console.log(`💾 正在寫入 shift: Key = "${payload.key}", Value = "${payload.value}"`);
                 const { error: err1 } = await supabaseClient
                     .from('shifts')
                     .upsert({ key: payload.key, value: payload.value }, { onConflict: 'key' });
@@ -1184,9 +1191,10 @@
                 error = err4;
             }
 
-            if (error) console.error('雲端寫入失敗', error);
+            if (error) console.error('❌ 雲端寫入失敗:', error);
+            else console.log('✅ 雲端寫入成功！');
         } catch (err) {
-            console.error("雲端寫入失敗", err);
+            console.error("❌ 雲端寫入例外失敗", err);
         } finally {
             hideSync();
         }
@@ -1629,6 +1637,8 @@
 
         const extraLeaveTypes = ['婚', '喪', '公'];
 
+        console.log(`🖼️ 開始繪製表格: 年=${year}, 月=${month}, 班別=${viewSquad}`);
+
         visibleEmployees.forEach(empName => {
             let tr = document.createElement('tr');
             const otCellId = `ot_${viewSquad}_${year}_${month}_${empName}`;
@@ -1642,8 +1652,17 @@
             for (let i = 1; i <= daysInMonth; i++) {
                 let td = document.createElement('td');
                 const defaultShift = getDefaultShift(viewSquad, year, month, i);
+                
+                // 產生網頁查詢所使用的 Key
                 const shiftKey = `${viewSquad}_shift_${year}_${month}_${empName}_${i}`;
+                
                 const savedValue = (cloudData.shifts) ? cloudData.shifts[shiftKey] : undefined;
+                
+                // 印出前幾天比對細節供分析
+                if (i <= 3) {
+                    console.log(`比對 Key: "${shiftKey}" -> 找到的儲存值: "${savedValue}", 預設值: "${defaultShift}"`);
+                }
+
                 let finalValue = (savedValue !== undefined && savedValue !== null) ? savedValue : defaultShift;
                 if (pendingChanges[shiftKey] !== undefined) {
                     finalValue = pendingChanges[shiftKey].newValue;
